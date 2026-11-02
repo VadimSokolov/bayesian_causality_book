@@ -1,0 +1,502 @@
+\chapter{Theory}\label{app:theory}
+
+
+
+\section{Noncollapsibility of the odds ratio}
+
+\begin{proposition}
+Let $Q$ be a law on a covariate $X$, let $p_0(x) \in (0,1)$ be a baseline risk that is not $Q$ almost surely constant, and let treatment multiply the conditional odds by $c \neq 1$ for every $x$. Under randomization the marginal odds ratio lies strictly between 1 and $c$\index{noncollapsibility!of the odds ratio|textbf}.
+\end{proposition}
+
+\begin{proof}
+Write $g(p)=cp/\{1+(c-1)p\}$, $p_1(x)=g(p_0(x))$ and $m_t=\int p_t(x)\,Q(dx)$, $t\in\{0,1\}$. For $c>1$,
+\[
+g''(p)=-\frac{2c(c-1)}{\{1+(c-1)p\}^3}<0.
+\]
+Jensen's inequality is strict because $p_0(X)$ is nonconstant. Together with $g(p)>p$, this gives $m_0<m_1<g(m_0)$. Since odds increase with risk and $g$ multiplies odds by $c$,
+\[
+1<\frac{m_1/(1-m_1)}{m_0/(1-m_0)}<c.
+\]
+For $c<1$, exchange treatment and control and apply this to $1/c$.
+\end{proof}
+
+
+
+\section{Exchangeability, finite and infinite}
+
+De Finetti's theorem requires an infinite exchangeable sequence\index{exchangeability!finite versus infinite|textbf}. For the finite populations of causal inference, a bound of Diaconis and Freedman\index{de Finetti theorem@de Finetti's theorem!finite version|textbf} justifies treating a large population as a mixture of independent draws.
+
+\begin{theorem}[Diaconis and Freedman]
+Let $(Z_1, \ldots, Z_N)$ be exchangeable on a finite set of size $c$. Then the law of $(Z_1, \ldots, Z_k)$ is within distance $2ck/N$ of a mixture of laws of independent and identically distributed sequences, in the norm $\|P - Q\| = 2\sup_A|P(A) - Q(A)|$ of Diaconis and Freedman (1980), that is, within $ck/N$ in total variation taken as the supremum over events.
+\end{theorem}
+
+
+
+\section{Ignorability and the Bayesian posterior}
+
+\begin{proposition}
+Suppose the joint density of $(X, T, Y(0), Y(1))$ factorizes as $p(x \mid \eta)\,p(t \mid x, \phi)\,p(y(0), y(1) \mid x, \theta)$, so that assignment is ignorable\index{ignorability!and the Bayesian posterior|textbf}, $T \indep (Y(0), Y(1)) \mid X$, and the prior as $\pi(\eta)\pi(\phi)\pi(\theta)$. Then the posterior of $\theta$ given the observed data $(X_i, T_i, Y_i)_{i=1}^n$ is proportional to $\pi(\theta)\prod_i f_{T_i}(Y_i \mid X_i, \theta)$, where $f_t$ is the marginal density of $Y(t)$ given $X$.
+\end{proposition}
+
+\begin{proof}
+Integrating out $y(1-T_i)$ gives the observed data density $\prod_i p(X_i \mid \eta)\,p(T_i \mid X_i,\phi)\,f_{T_i}(Y_i \mid X_i,\theta)$. The independent prior blocks let us integrate out $\eta$ and $\phi$, leaving the stated posterior of $\theta$.
+\end{proof}
+
+The propensity score\index{propensity score} drops out of the posterior only when $\phi$ and $\theta$ are a priori independent. The Robins and Ritov\index{Robins and Ritov example}, coupled horseshoe\index{horseshoe prior} and Bayesian causal forest\index{Bayesian causal forest} priors deliberately link them.
+
+\section{Bernstein von Mises for causal functionals}
+
+\begin{theorem}[Parametric case]
+Let $\theta \in \Theta \subset \R^d$ index a regular parametric model with nonsingular Fisher information\index{Fisher information} $I(\theta_0)$ at an interior truth $\theta_0$, with uniformly consistent tests of $\theta_0$ against $\{\lVert\theta - \theta_0\rVert \ge \epsilon\}$ for every $\epsilon > 0$, let the prior have a continuous positive density at $\theta_0$, and let $\psi: \Theta \to \R$ be continuously differentiable with $\nabla\psi(\theta_0) \neq 0$. Then
+\begin{multline*}
+\sup_B \Bigl|\Pi\bigl(\sqrt{n}\{\psi(\theta) - \psi(\hat\theta_n)\} \in B \bigm| \text{data}\bigr) \\
+- N\bigl(0, \nabla\psi^\top I(\theta_0)^{-1}\nabla\psi\bigr)(B)\Bigr| \to 0
+\end{multline*}
+in probability, where $\hat\theta_n$ is an efficient estimator.
+\end{theorem}
+
+The classical Bernstein von Mises\index{Bernstein von Mises theorem} theorem\index{Bernstein von Mises theorem!for causal functionals|textbf} (van der Vaart 1998, Theorem 10.1), with the delta method, gives this result for smooth accounting functionals, including the average treatment effect over fixed $Q$. Credible intervals are asymptotically confidence intervals.
+
+Semiparametric models are subtler. Castillo and Rousseau (2015) give general conditions for semiparametric Bernstein von Mises theorems. Ray and van der Vaart (2020) study a binary outcome missing at random.
+
+\begin{theorem}[Ray and van der Vaart, informal]
+Consider the mean of a binary outcome that is missing at random given covariates, equivalently one arm of a treatment effect, with a nonparametrically modelled propensity score, a Gaussian process prior on the outcome regression and a Dirichlet process prior on the covariate distribution. Under smoothness conditions the posterior of the mean satisfies a semiparametric Bernstein von Mises theorem at the efficient variance. If the Gaussian process prior is augmented by a term $\lambda/\hat e(x)$, with $\lambda$ given its own normal prior and $\hat e$ an estimate of the probability of observing the outcome, the same conclusion holds under strictly weaker smoothness conditions. In their theory $\hat e$ is computed from an independent auxiliary sample.
+\end{theorem}
+
+This is the theoretical counterpart of our coupled prior. A prior that ignores the propensity can fail to give efficient, well calibrated inference for the average effect when the regression function is rough; adding a propensity dependent direction repairs it.
+
+\section{Tail robustness of the horseshoe}
+
+\begin{lemma}
+Let $\pi$ be a density on $\R$ that is regularly varying at infinity with index $-\alpha$, $\alpha > 1$, and eventually differentiable with $\pi'(y)/\pi(y) \sim -\alpha/y$. Let $\phi$ be the standard normal density and $m(y) = \int\phi(y - \beta)\pi(\beta)\,d\beta$ the marginal density of $y$ when $y \mid \beta \sim N(\beta, 1)$ and $\beta \sim \pi$. Then $m(y) \sim \pi(y)$ and $m'(y)/m(y) \sim -\alpha/y$ as $y \to \infty$.
+\end{lemma}
+
+\begin{proof}
+On $|\beta-y|\le\sqrt y$, uniform convergence for regularly varying functions gives $\pi(\beta)/\pi(y)\to1$ uniformly, and the Gaussian mass tends to one. Outside this interval, $\phi(y-\beta)\le(2\pi)^{-1/2}e^{-y/2}$, so the contribution is $O(e^{-y/2})=o(\pi(y))$. Thus $m(y)\sim\pi(y)$. This uses only that $\pi$ integrates to one and decays polynomially, allowing the horseshoe's unbounded density at the origin.
+
+For the derivative, $m'(y)=\int\phi'(y-\beta)\pi(\beta)\,d\beta$. Outside the interval the same bound, with an extra factor of order $y$, gives $O(ye^{-y/2})$. On it, integrating by parts, with boundary terms $O(e^{-y/2})$, gives
+\[
+m'(y)=\int_{y-\sqrt y}^{y+\sqrt y}\phi(y-\beta)\pi'(\beta)\,d\beta+O(ye^{-y/2}).
+\]
+The derivative hypothesis makes $-\pi'$ regularly varying with index $-\alpha-1$. Uniform convergence gives the integral as $\pi'(y)\{1+o(1)\}$, while the remainder is $o(\pi(y)/y)$. Hence $m'(y)\sim\pi'(y)\sim-\alpha\pi(y)/y$.
+\end{proof}
+
+\begin{theorem}[Tail robustness]
+Under the conditions of the lemma\index{tail robustness}, $\E(\beta \mid y) = y - \alpha/y + o(1/y)$ as $y \to \infty$.
+\end{theorem}
+
+\begin{proof}
+By Tweedie's formula\index{Tweedie formula@Tweedie's formula}, $\E(\beta \mid y) = y + m'(y)/m(y)$, and the lemma gives $m'(y)/m(y) = -\alpha/y + o(1/y)$.
+\end{proof}
+
+The horseshoe satisfies the lemma with $\alpha = 2$. With unit global scale (a different scale only rescales $\beta$), substituting $\lambda = \beta/s$ in the half Cauchy scale mixture gives, for $\beta > 0$,
+\[
+\pi(\beta) = 2K\int_0^\infty \frac{s\,e^{-s^2/2}}{s^2 + \beta^2}\,ds, \qquad K = (2\pi^3)^{-1/2}.
+\]
+By monotone convergence $\beta^2\pi(\beta) \to 2K$, and differentiating under the integral, $\beta^3\pi'(\beta) = -4K\int_0^\infty s\,e^{-s^2/2}\beta^4(s^2 + \beta^2)^{-2}\,ds \to -4K$. So $\pi$ is regularly varying with index $-2$ and $\beta\pi'(\beta)/\pi(\beta) \to -2$. 
+
+\section{Regularization induced confounding}
+
+\begin{proposition}
+Consider $Y = \tau T + X\beta + \varepsilon$ and $T = X\gamma + \nu$, with $X$ an $n \times p$ design, $\varepsilon \sim N(0, \sigma^2 I)$, a flat prior on $\tau$ and $\beta \sim N(0, v I_p)$ independent of $\tau$. Write $M = I - T(T^\top T)^{-1}T^\top$, $A=X^\top MX$ and $a=\sigma^2/v$. The posterior mean of $\tau$ is
+\[
+\hat\tau = (T^\top T)^{-1}T^\top(Y - X\hat\beta), \qquad \hat\beta = (A+aI)^{-1}X^\top MY,
+\]
+and its conditional bias given $X$ and $T$\index{regularization induced confounding!proposition|textbf} is
+\[
+\E(\hat\tau\mid X,T)-\tau=(T^\top T)^{-1}T^\top X\,a(A+aI)^{-1}\beta.
+\]
+\end{proposition}
+
+\begin{proof}
+The posterior mean solves the penalized normal equations. Profiling out $\tau$ gives $\hat\beta$; substituting back gives $\hat\tau$. Since $\E(MY\mid X,T)=MX\beta$, $\E(\hat\beta\mid X,T)=(A+aI)^{-1}A\beta$, and $\E(\hat\tau\mid X,T)-\tau=(T^\top T)^{-1}T^\top X\{\beta-\E(\hat\beta\mid X,T)\}$. The identity $I-(A+aI)^{-1}A=a(A+aI)^{-1}$ gives the bias.
+\end{proof}
+
+The bias projects the shrinkage error of $\beta$ through $T^\top X$, a factor of order $n\gamma^\top\Sigma_X$ with $\Sigma_X$ the covariance of a row of $X$. It vanishes when $X^\top T=0$ (no confounding). As $v\to\infty$ (no shrinkage), $a(A+aI)^{-1}$ tends to the orthogonal projector $P_0$ onto the null space of $A$, so the bias tends to $(T^\top T)^{-1}T^\top XP_0\beta$. This is zero when $(T,X)$ has full column rank, since then $A$ is nonsingular and $P_0=0$, but need not be zero otherwise, for instance when $p\ge n$. Neither escape is available in high dimensions, hence the need for a prior that knows about $\gamma$.
+
+\begin{proposition}[Coupling through the propensity direction, informal]
+Add the column $\hat m = X\gamma$ to the outcome regression with a flat prior on its coefficient. Then, for any normal prior on $\beta$, the first order bias of the posterior mean of $\tau$ vanishes when averaged over the treatment noise $\nu$ given $X$.
+\end{proposition}
+
+\begin{proof}
+Write $\beta=\beta_\parallel+\beta_\perp$ with $X\beta_\parallel=c\hat m$ and $\hat m^\top X\beta_\perp=0$. The flat prior on the coefficient $\delta$ of $\hat m$ absorbs $c$, leaving shrinkage on $\beta_\perp$. If $M_{\hat m}$ projects off $\hat m$, then $M_{\hat m}T=M_{\hat m}\nu$ and $M_{\hat m}X\beta_\perp=X\beta_\perp$. Thus $(M_{\hat m}T)^\top X\beta_\perp=\nu^\top X\beta_\perp$ has mean zero given $X$, so the projection of the shrinkage error vanishes in expectation.
+\end{proof}
+
+This first order argument treats $\gamma$ as known and ignores the dependence of $\hat\beta_\perp$ on $\nu$ through $Y$, a further term the sketch does not bound. It is a heuristic for the coupled prior, not a theorem for the high dimensional case; Problem 1 of Chapter~\ref{ch:open} asks for that theorem.
+
+
+
+\begin{proposition}[Product bias]\label{ss:prop:product}
+Let $Y = \tau T + X\beta + \varepsilon$ and $T = X\gamma + \nu$, where $X$ has rows $X_i^\top$ and $p$ is fixed. Suppose the triples $(X_i,\nu_i,\varepsilon_i)$ are independent and identically distributed across observations, with $X_i$, $\nu_i$ and $\varepsilon_i$ mutually independent, $\E X_i = 0$, finite covariance $\Sigma = \mathrm{Cov}(X_i)$, $\E\nu_i = \E\varepsilon_i = 0$, $0 < \mathrm{Var}(\nu_i) = \sigma_\nu^2 < \infty$ and $\E\varepsilon_i^2 < \infty$. Use the Gaussian outcome likelihood of Section~\ref{sec:hsregression}, with flat priors on $\tau$ and on the coefficient of $\hat m = X\hat\gamma$ and any prior, independent of these, on the coefficient vector of $X$ and the error variance, where $\hat\gamma$ is fixed and $\hat\gamma^\top\Sigma\hat\gamma > 0$. Let $\hat\tau$ and $\hat\beta_n$ be the posterior means of the coefficients of $T$ and $X$, assumed to exist, and suppose $\hat\beta_n \to \beta_\star$ in probability for a deterministic vector $\beta_\star$. Put $\Delta = \gamma - \hat\gamma$, $c = \beta - \beta_\star$ and, for a vector $u$, $u_\perp = u - \hat\gamma\,(\hat\gamma^\top\Sigma u)/(\hat\gamma^\top\Sigma\hat\gamma)$. Then, as $n\to\infty$,
+\[
+\hat\tau - \tau \;\longrightarrow\; \frac{\Delta^\top\Sigma\, c_\perp}{\sigma_\nu^2 + \Delta_\perp^\top\Sigma\,\Delta_\perp}
+\]
+in probability. In particular the limit is zero when $\Delta = 0$, and its absolute value is bounded by $\|\Sigma^{1/2}\Delta\|\,\|\Sigma^{1/2}c\|/\sigma_\nu^2$.
+\end{proposition}
+
+\begin{proof}
+Put $c_n = \beta - \hat\beta_n$. The conditional Gaussian calculation leading to \eqref{eq:pcbias} in Chapter~\ref{ch:horseshoe} applies to any fixed $\hat\gamma$, giving
+\[
+\hat\tau - \tau = \frac{\tilde T^\top(Xc_n+\varepsilon)}{\tilde T^\top\tilde T},
+\qquad
+\tilde T = T-\hat m\,\frac{\hat m^\top T}{\hat m^\top\hat m}.
+\]
+The sample projection coefficient converges in probability to $a=(\hat\gamma^\top\Sigma\gamma)/(\hat\gamma^\top\Sigma\hat\gamma)$, with $\gamma-a\hat\gamma=\Delta_\perp$. The law of large numbers and $c_n\to c$ give
+\[
+\begin{aligned}
+n^{-1}\tilde T^\top(Xc_n+\varepsilon)&\longrightarrow\Delta_\perp^\top\Sigma c=\Delta^\top\Sigma c_\perp,\\
+n^{-1}\tilde T^\top\tilde T&\longrightarrow\sigma_\nu^2+\Delta_\perp^\top\Sigma\Delta_\perp.
+\end{aligned}
+\]
+The denominator limit is positive, so taking the ratio proves the limit. Applying $\Sigma^{1/2}$ turns $u\mapsto u_\perp$ into an ordinary orthogonal projection, so Cauchy and Schwarz gives $|\Delta^\top\Sigma c_\perp|\le\|\Sigma^{1/2}\Delta\|\,\|\Sigma^{1/2}c\|$. Dividing by a denominator at least $\sigma_\nu^2$ proves the bound.
+\end{proof}
+
+The numerator is the covariance of $X\Delta$ and $Xc$ after removing $\hat m$; the denominator is the treatment residual variance. The bias is small when either error is small, the product structure behind Chapter~\ref{ch:dml}'s rate condition. A reparameterization with the coefficient of $T-X\hat\gamma$ in place of a free coefficient on $\hat m$ (the reduced form coordinates of Hahn, Carvalho, Puelz and He 2018 and of DiTraglia and Liu 2025) adds a term quadratic in $\Delta$, which the free coefficient absorbs here. For fixed $p$ and nonsingular $\Sigma$, consistency for the identified coefficient of $X$, $b+\delta\hat\gamma$ ($b$ the free coefficient of $X$, $\delta$ that of $\hat m$), makes $c_\perp\to0$ and the limit zero. A nonzero limit requires persistent shrinkage error, as when prior support excludes the true coefficients or $p$ grows with $n$. The proposition gives neither horseshoe bounds for $\Delta$ and $c$ nor a product rate. Section~\ref{sec:baipw} takes up the rates; we cannot supply them for the horseshoe logistic propensity model.
+
+\section{The limit of Li's estimator}
+
+\begin{theorem}
+In the Robins, Ritov and Wasserman model with $X \sim \mathrm{Uniform}\{1, \ldots, B\}$, $R \mid X \sim \mathrm{Bernoulli}(p_X)$ and $Y \mid X \sim \mathrm{Bernoulli}(\theta_X)$, with $R$ and $Y$ independent given $X$, the estimator $\hat\psi_{\mathrm{Li}} = (\sum R_iY_i + 1)/(\sum R_i + 2)$\index{Li estimator@Li's estimator!limit of|textbf} satisfies
+\[
+\hat\psi_{\mathrm{Li}} \to \frac{\overline{\theta p}}{\bar p} = \psi + \frac{\sigma_{\theta,p}}{\bar p}
+\quad\text{almost surely,}
+\]
+and
+\[
+\sqrt{n}\Bigl(\hat\psi_{\mathrm{Li}} - \frac{\overline{\theta p}}{\bar p}\Bigr) \to N(0, V_{\mathrm{Li}}), \qquad V_{\mathrm{Li}} = \frac{\overline{\theta p}(\bar p - \overline{\theta p})}{\bar p^3},
+\]
+in distribution, where $\overline{\theta p} = B^{-1}\sum_b\theta_bp_b$, $\bar p = B^{-1}\sum_b p_b$, $\psi = B^{-1}\sum_b\theta_b$ and $\sigma_{\theta,p} = \overline{\theta p} - \bar p\psi$.
+\end{theorem}
+
+\begin{proof}
+Put $\mu=\overline{\theta p}/\bar p$. The strong law gives $\hat\psi_{\mathrm{Li}}\to\mu$ almost surely. The additive constants are negligible at the root $n$ scale, and
+\[
+\sqrt n(\hat\psi_{\mathrm{Li}}-\mu)=\frac1{\bar p\sqrt n}\sum_iR_i(Y_i-\mu)+o_p(1).
+\]
+The summands are independent and identically distributed, with mean zero and variance $\overline{\theta p}(1-\mu)$. The central limit theorem gives variance $\overline{\theta p}(1-\mu)/\bar p^2=\overline{\theta p}(\bar p-\overline{\theta p})/\bar p^3$.
+\end{proof}
+
+The variance contains no term $1/p_b$; that of Horvitz and Thompson\index{Horvitz Thompson estimator} is $n^{-1}(B^{-1}\sum_b\theta_b/p_b - \psi^2)$.
+
+\section{Partially identified posteriors}
+
+\begin{theorem}
+Let the parameter be $(\phi, \xi)$, where the likelihood depends on $\phi$ only\index{partial identification!posteriors under|textbf}, and let the prior be $\pi(\phi)\pi(\xi \mid \phi)$. If the posterior of $\phi$ concentrates at $\phi_0$ and $\pi(\xi \mid \phi)$ is continuous in $\phi$ in total variation, then for any functional $h(\phi, \xi)$ continuous in $\phi$, the posterior law of $h$ converges weakly to the law of $h(\phi_0, \xi)$ with $\xi \sim \pi(\cdot \mid \phi_0)$.
+\end{theorem}
+
+\begin{proof}
+The posterior factorizes as $\pi(\phi \mid \text{data})\pi(\xi \mid \phi)$, since the likelihood does not involve $\xi$. For bounded continuous $g$, $\E\{g(h(\phi, \xi)) \mid \text{data}\} = \int\!\!\int g(h(\phi, \xi))\pi(d\xi \mid \phi)\,\pi(d\phi \mid \text{data})$. The inner integral is continuous in $\phi$ under the stated conditions, so the outer integral converges to its value at $\phi_0$.
+\end{proof}
+
+The Fr\'echet segment of Proposition~\ref{gr:prop:frechet} illustrates the limit: the fraction helped retains its prior conditional on the margins, uniform on the segment under the uniform Dirichlet prior, generally nonuniform under other Dirichlet priors. Moon and Schorfheide (2012) and Gustafson (2015) give fuller treatments, including the relation to the frequentist identified set\index{identified set|textbf}.
+
+\section{The Makarov bounds}
+
+\begin{theorem}
+For any coupling\index{coupling!of potential outcomes} of $Y(0) \sim F_0$ and $Y(1) \sim F_1$ and any $\delta$, with $\Delta = Y(1) - Y(0)$,
+\begin{align*}
+F_\Delta(\delta) &\geq \sup_y\max\{F_1(y) - F_0(y - \delta), 0\},\\
+F_\Delta(\delta) &\leq 1 + \inf_y\min\{F_1(y) - F_0(y - \delta), 0\}.
+\end{align*}
+\end{theorem}
+
+\begin{proof}
+For each $y$,
+\[
+\begin{aligned}
+\{Y(1)\le y\}&\subset\{Y(0)\le y-\delta\}\cup\{\Delta\le\delta\},\\
+\{\Delta\le\delta\}&\subset\{Y(1)\le y\}\cup\{Y(0)>y-\delta\}.
+\end{aligned}
+\]
+Thus $F_1(y)-F_0(y-\delta)\le F_\Delta(\delta)\le F_1(y)+1-F_0(y-\delta)$. Taking the supremum and infimum over $y$, with $0\le F_\Delta\le1$, gives the bounds. For continuous $F_0$ and $F_1$ each is the infimum or supremum over couplings, as Makarov\index{Makarov bounds} (1981) showed; the lower bound need not be attained.
+\end{proof}
+
+\paragraph{Pointwise sharpness.} For uniform margins on $(0,1)$ and $\delta=0$, the lower bound is zero but unattainable: $\Delta>0$ almost surely contradicts $\E\Delta=0$. With $U$ uniform, $Y(0)=U$ and $Y(1)=U+a-\mathbf1\{U>1-a\}$, $0<a<1$, have uniform margins and $\Prob(\Delta\le0)=a$, approaching zero. No single coupling attains the lower bound at every $\delta$: on $[0,1]$ it equals $\delta$, the distribution function of a uniform law with mean $1/2$, whereas every coupling has $\E\Delta=0$.
+
+\section{The Tian and Pearl bounds as linear programs}
+
+\begin{proposition}
+Let $q \in \R^8$ be the joint law of $(X, Y(1), Y(0))$ for binary variables, and let $Aq = b$ collect the constraints implied by the experimental and observational margins, which are taken to describe one population. The sharp bounds\index{Tian and Pearl bounds} on $\PNS = \sum_x q_{x,1,0}$ are the optimal values of the linear programs $\min$ and $\max$ of $c^\top q$ subject to $Aq = b$, $q \geq 0$, with $c$ the indicator of the cells $(x, 1, 0)$. By linear programming duality, each optimal value equals $\max\{b^\top w : A^\top w \leq c\}$ or its counterpart. Once redundant equations are removed, so that $A$ has full row rank, the dual feasible region contains no line and the optimum is attained at a vertex, and enumerating the vertices gives the closed forms of Chapter~\ref{ch:tianpearl}.
+\end{proposition}
+
+\begin{proof}
+Sharpness holds because every $q$ in the feasible polytope is a valid joint law consistent with the data, and the extremes of a linear function over a polytope are attained at vertices. Strong duality holds because the primal is feasible and bounded.
+\end{proof}
+
+\section{Noise outsourcing}
+
+For real $Y$, the conditional quantile function proves Theorem~\ref{comp:thm:outsourcing} (Kallenberg)\index{noise outsourcing!proof|textbf}.
+
+\begin{proof}[Proof for real $Y$]
+Let $F(\cdot \mid x)$ be a regular conditional distribution function and $G(u,x) = \inf\{y : F(y \mid x) \geq u\}$. For $U$ uniform and independent of $X$, $\Prob(G(U,X) \leq y \mid X = x) = \Prob(U \leq F(y \mid x)) = F(y \mid x)$, so $(X, G(U,X)) \overset{d}{=} (X, Y)$. For the almost sure statement, set $U = F(Y^- \mid X) + V\{F(Y \mid X) - F(Y^- \mid X)\}$ with $V$ uniform and independent of $(X, Y)$, enlarging the space if necessary; then $U$ is uniform, independent of $X$, and $G(U,X) = Y$ almost surely. The general case reduces to the real case through a Borel isomorphism.
+\end{proof}
+
+\section{Two way fixed effects weights}
+
+In a balanced panel with $N$ units and periods $1,\ldots,T$, with or without never treated units,
+\[
+\tilde D_{it}=D_{it}-\bar D_{i\cdot}-\bar D_{\cdot t}+\bar D_{\cdot\cdot}.
+\]
+For a unit adopting at $g$, $\bar D_{i\cdot}=(T-g+1)/T$. Early adopters therefore have large unit means; in late post periods, a large $\bar D_{\cdot t}$ can make $\tilde D_{it}<0$. By Proposition~\ref{prop:twfe}, those cells receive negative weight\index{two way fixed effects}\index{two way fixed effects!negative weights}.
+
+\section{Proofs for Chapter~\ref{ch:groups}}\label{app:groupsproofs}
+
+The Bayesian guarantees are proved in Appendix~\ref{pg:sec:groups}\index{proofs for the groups chapter|textbf}; the remaining proofs follow the order of Chapter~\ref{ch:groups}.
+
+\begin{proof}[Proof of Lemma~\ref{gr:lem:chart}]
+Fix $y_0\in I$. Freeness and transitivity make $o:g\mapsto gy_0$ a continuous bijection $G\to I$. A connected one dimensional Lie group is $\R$ or the circle; compactness excludes the circle. Choose an isomorphism $\psi:G\to\R$. The continuous bijection $o\circ\psi^{-1}:\R\to I$ is strictly monotone and hence a homeomorphism. Change the sign of $\psi$ if needed so that $h=\psi\circ o^{-1}$ is increasing. For $y=ky_0$, $h(gy)=\psi(gk)=\psi(g)+h(y)$.
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{gr:prop:range}]
+For $d(\gamma)=\expit(\gamma+\psi)-\expit(\gamma)$, $\psi>0$ gives $d>0$ and $d(\gamma)\to0$ as $\gamma\to\pm\infty$. Since $\expit'$ is even and strictly decreasing in $|v|$, $d'(\gamma)=\expit'(\gamma+\psi)-\expit'(\gamma)$ is positive below $-\psi/2$ and negative above it. The unique maximum is $M=d(-\psi/2)=\tanh(\psi/4)$. Thus $0<\tau_Q(\psi)\le M$, with equality only for the point mass at $-\psi/2$. Continuity and the limits at infinity give every $c\in(0,M]$ as $d(\gamma_c)$, attained by the point mass at $\gamma_c$. Finally, $\tanh(\psi/4)\ge\tau$ if and only if $\psi\ge4\operatorname{artanh}(\tau)$.
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{gr:prop:fpc}]
+The hypergeometric variance is $\mathrm{Var}(\bar Y_1)=S_1^2(1-n_1/n)/n_1$, with $S_1^2=np_1(1-p_1)/(n-1)$, proving the first display. Let $S_{10}$ be the finite population covariance of $Y(1)$ and $Y(0)$, with divisor $n-1$, so $S_\tau^2=S_1^2+S_0^2-2S_{10}$. Sampling without replacement gives $\mathrm{Var}(\bar Y_0)=S_0^2(1-n_0/n)/n_0$ and, from $\mathrm{Cov}(T_i,T_j)=-n_1n_0/\{n^2(n-1)\}$ for $i\ne j$, $\mathrm{Cov}(\bar Y_1,\bar Y_0)=-S_{10}/n$. Hence
+\[
+\mathrm{Var}(\hat\tau)=\mathrm{Var}(\bar Y_1)+\mathrm{Var}(\bar Y_0)-2\,\mathrm{Cov}(\bar Y_1,\bar Y_0)=\frac{S_1^2}{n_1}+\frac{S_0^2}{n_0}-\frac{S_1^2+S_0^2-2S_{10}}{n},
+\]
+Neyman's (1923) formula. The last term combines both finite population corrections\index{finite population correction} and minus twice the covariance. If $Y_i(1)=Y_i(0)+\psi$, then $S_\tau^2=0$ and Neyman's conservative estimator $s_1^2/n_1+s_0^2/n_0$ is unbiased for $\mathrm{Var}(\hat\tau)$, since $\E s_t^2=S_t^2$ for the sample variance $s_t^2$ in arm $t$. Stability of the laws alone does not suffice: for control values symmetric about 0 and $Y_i(1)=\psi-Y_i(0)$, the treated values are the control values shifted by $\psi$, yet $S_\tau^2=4S_0^2$.
+\end{proof}
+
+\begin{proof}[Proof of the statement on independent priors in Section~\ref{gr:sec:urn}]
+Write the unobserved coordinates as $\tilde Y_i(1)$ for the units with $T_i=0$ and $\tilde Y_i(0)$ for those with $T_i=1$, so that
+\[
+\tau_{\mathrm{fp}}=\frac1n\Bigl\{\sum_{T_i=1}Y_i+\sum_{T_i=0}\tilde Y_i(1)\Bigr\}-\frac1n\Bigl\{\sum_{T_i=0}Y_i+\sum_{T_i=1}\tilde Y_i(0)\Bigr\}.
+\]
+Independent priors and independent imputation make the two braces independent given the data, so their variances add, divided by $n^2$. Give the treated success probability $\mu_1$ a Beta$(a,b)$ prior, and put $N'=a+b+n_1$ and $\bar p=\E(\mu_1\mid\text{data})$, so that $\mathrm{Var}(\mu_1\mid\text{data})=\bar p(1-\bar p)/(N'+1)$. Conditional on $\mu_1$, the $n_0$ missing coordinates are independent Bernoulli($\mu_1$) draws. With all moments conditional on the data, the first brace divided by $n$ has variance
+\begin{align*}
+\frac{n_0\,\E\{\mu_1(1-\mu_1)\}+n_0^2\,\mathrm{Var}(\mu_1)}{n^2}&=\frac{\bar p(1-\bar p)}{n^2(N'+1)}\,n_0(N'+n_0)\\
+&=\mathrm{Var}(\mu_1)\,\frac{n_0(n+a+b)}{n^2}.
+\end{align*}
+Under the same Beta prior, the control factor is $n_1(n+a+b)/n^2$. As $a,b\to0$ the factors are $n_0/n$ and $n_1/n$, and approximately so when $a+b$ is small against $n$.
+
+For a margin $F_1$ of any kind, with mean $\mu_1$ and variance $\sigma_1^2(F_1)$, the missing draws are independent given $F_1$, so
+\[
+\mathrm{Var}\Bigl(\frac1n\sum_{T_i=0}\tilde Y_i(1)\Bigm|\text{data}\Bigr)=\frac{n_0\E\,\sigma_1^2(F_1)+n_0^2\,\mathrm{Var}(\mu_1)}{n^2}.
+\]
+This is also the variance of the first brace after division by $n$, since the observed responses are fixed. It equals $(n_0/n)\,\mathrm{Var}(\mu_1)$ exactly when $\E\,\sigma_1^2(F_1)=n_1\mathrm{Var}(\mu_1)$.
+
+Under a Dirichlet process prior with total mass $\alpha$, whose posterior has total mass $\alpha+n_1$, $\E\,\sigma_1^2(F_1)=(\alpha+n_1)\mathrm{Var}(\mu_1)$, so the treated factor is $n_0(n+\alpha)/n^2$ and the control factor $n_1(n+\alpha)/n^2$, about $n_0/n$ and $n_1/n$ when $\alpha$ is small against $n$. A Dirichlet process prior on a binary margin has the same Beta posterior as above.
+
+A normal margin with a flat prior on its mean meets the condition exactly whatever the prior on its variance, since then $\mathrm{Var}(\mu_1\mid\text{data})=\E(\sigma_1^2\mid\text{data})/n_1$, so the factors are exactly $n_0/n$ and $n_1/n$. For the bivariate normal model of Section~\ref{sec:imputation} with $\rho=0$, known variances $\sigma_1^2$ and $\sigma_0^2$ and flat priors on the two means,
+\[
+\mathrm{Var}(\tau_{\mathrm{fp}}\mid\text{data})=\frac{n_0}{n}\,\frac{\sigma_1^2}{n_1}+\frac{n_1}{n}\,\frac{\sigma_0^2}{n_0},
+\]
+against $\mathrm{Var}(\tau\mid\text{data})=\sigma_1^2/n_1+\sigma_0^2/n_0$.
+
+For all these priors, then, the posterior variance of $\tau_{\mathrm{fp}}$ is that of the superpopulation effect $\tau=\mu_1-\mu_0$, $\mathrm{Var}(\mu_1\mid\text{data})+\mathrm{Var}(\mu_0\mid\text{data})$, with the margins scaled by about $n_0/n$ and $n_1/n$, which is the statement. Other independent priors scale the margins differently. A Laplace margin with known scale $s$ has variance $2s^2$, while a flat prior on its location gives a posterior variance of the location asymptotic to $s^2/n_1$, so $\E\,\sigma_1^2(F_1)$ is near $2n_1\mathrm{Var}(\mu_1)$, and with $n_0=n_1$ and large arms the factor tends to $3/4$, not $1/2$.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{gr:thm:sep}]
+(i) implies (ii) by integrating $f(a,b)=\alpha(a)+\beta(b)$; (ii) implies (iii) immediately. For (iii) to (i), take full support margins for which $\int f\,dF$ is constant on $\mathcal F(F_1,F_0)$. Their product $F=F_1\otimes F_0$ gives every cell positive probability. For $a\ne a'$, $b\ne b'$ and $0<\epsilon<\min_{a,b}F(a,b)$, the law $F_\epsilon=F+\epsilon(\delta_{(a,b)}+\delta_{(a',b')}-\delta_{(a,b')}-\delta_{(a',b)})$ has the same margins. Constancy gives
+\[
+f(a,b)+f(a',b')-f(a,b')-f(a',b)=0,
+\]
+also trivially when either pair coincides. Fix $(a_0,b_0)$ and put $\alpha(a)=f(a,b_0)-f(a_0,b_0)$, $\beta(b)=f(a_0,b)$. The identity gives $f(a,b)=\alpha(a)+\beta(b)$.
+\end{proof}
+
+\begin{proof}[Proof of the statement on means of a function of the unit effect (Section~\ref{gr:sec:margins})]
+Let $\mathcal Y=\{y_0+j\delta:j=0,\dots,m-1\}$, $m\ge2$, $\delta>0$, and let $f(a,b)=\kappa(a-b)$, where $\kappa$ is defined on $D=\{j\delta:|j|\le m-1\}$. By Theorem~\ref{gr:thm:sep} and its proof, the mean $\int\kappa(a-b)\,dF$ is identified in the sense of (ii) exactly when all mixed second differences of $f$ vanish. Taking $a'=a+\delta$, $b'=b+\delta$ gives $2\kappa(d)=\kappa(d-\delta)+\kappa(d+\delta)$ for every $d=j\delta$ with $|j|\le m-2$. Thus $\kappa(d)=\kappa_0+cd$ on $D$. Conversely this affine form makes $f$ separable, with mean $\kappa_0+c\,\tau_{\mathrm{fp}}$. For binary outcomes $m=2$, $D=\{-1,0,1\}$, and the condition is $\kappa(1)+\kappa(-1)=2\kappa(0)$. The treated mean $f(a,b)=a$ is separable but is not a mean of a function of the unit effect.
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{gr:prop:sharpvar}]
+Unit effects lie in $\{-1,0,1\}$, so $V_\tau=p_{10}+p_{01}-\tau_{\mathrm{fp}}^2$, and $\tau_{\mathrm{fp}}=p_{10}-p_{01}$ gives $p_{01}=p_{10}-\tau_{\mathrm{fp}}$. Hence $V_\tau=2p_{10}-\tau_{\mathrm{fp}}-\tau_{\mathrm{fp}}^2$, which is increasing in $p_{10}$. By Proposition~\ref{gr:prop:frechet}, $p_{10}$ ranges over $[\max(0,\tau_{\mathrm{fp}}),\min(p_1,1-p_0)]$ and both ends are attained, so substituting the endpoints gives the bounds. The lower bound, $|\tau_{\mathrm{fp}}|(1-|\tau_{\mathrm{fp}}|)$, is positive exactly when $0<|\tau_{\mathrm{fp}}|<1$. The comonotone coupling attains it, in agreement with Aronow, Green and Lee (2014). Since $S_\tau^2=nV_\tau/(n-1)$, a positive lower bound makes the last term of Proposition~\ref{gr:prop:fpc} nonzero, so $\mathrm{Var}(\hat\tau)$ is strictly smaller than $S_1^2/n_1+S_0^2/n_0$, the expectation of Neyman's conservative estimator.
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{gr:prop:strat}]
+The first statement is the decomposition of the average of the unit effects over strata. Within stratum $x$ the arm means are unbiased for the stratum margins, $\E\,\bar Y_{x,t}=\mu_{x,t}$, the mean of the $n_x$ values $Y_i(t)$ in the stratum. The collapsed contrast therefore has expectation $\sum_xa_x\mu_{x,1}-\sum_xb_x\mu_{x,0}$ with $a_x=n_{x,1}/n_1$ and $b_x=n_{x,0}/n_0$. This equals $\tau_{\mathrm{fp}}=\sum_x(n_x/n)(\mu_{x,1}-\mu_{x,0})$ for every choice of the $\mu_{x,t}$, which vary freely, if and only if $a_x=b_x=n_x/n$ for all $x$.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{gr:thm:recon}, parts (a) and (c)]
+(a) By Lemma~\ref{gr:lem:chart}, on the chart scale the control and treated laws are $h(\gamma_i)+\varepsilon$ and $h(\gamma_i)+\psi(g)+\varepsilon$. Their comonotone coupling has $h(Y_i(1))-h(Y_i(0))=\psi(g)$ pointwise. Since $h$ is increasing it preserves this coupling, and averaging gives the second claim, independently of the baselines. This coupling is also optimal for every convex cost of the difference. Under any other coupling, $\E\,h(Y_i(1))-\E\,h(Y_i(0))=\psi(g)$ whenever $\E|\varepsilon|<\infty$, so the superpopulation mean is still $\psi(g)$, though a unit's effect may differ.
+
+(c) In the location model of part (b), write $z_i=h(Y_i)-h(\gamma_i)=\theta+\varepsilon_i$, $\theta=\psi(g)$ and $\hat\theta=\psi(\hat g)$ for the unique maximum likelihood estimate, which is equivariant. The proof of (b) (Appendix~\ref{pg:sec:groups}) gives its conditional density given $a$ as $c_1(a)L(\theta)$, where $L(\theta)=\prod_i f(\hat\theta+a_i-\theta)$. Both $j(\hat\theta)=-\sum_i(\log f)''(a_i)$ and $L(\hat\theta)=\prod_i f(a_i)$ depend only on $a$. So $c(a)|j(\hat\theta)|^{1/2}L(\theta)/L(\hat\theta)=c_1(a)L(\theta)$ for the $c(a)$ that normalizes the formula, which is exactly the conditional density. For a general transformation model exactness is the theorem of Barndorff Nielsen (1983).
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{gr:prop:transport}]
+(i) implies (ii): $F_{x,1}^{-1}=g\circ F_{x,0}^{-1}$ gives $M_x=g$ on $\R$, using full support. Conversely, continuity and strict increase make $M=F_{x,1}^{-1}\circ F_{x,0}$ an increasing homeomorphism, and $F_{x,0}=F_{x,1}\circ M$ gives (i) with $g=M$. Every such group contains $M$, so the smallest is its cyclic group. If $M(y)>y$, monotonicity gives $M^k(y)>y$ for every $k\ge1$; use $M^{-1}$ when $M(y)<y$. Thus a nonidentity $M$ has infinite order.
+
+For the flow, let $\mathcal F=\{y:M(y)=y\}$ be the set of fixed points, which is closed. On each component $(\alpha,\beta)$ of its complement $M$ is an increasing bijection of $(\alpha,\beta)$ onto itself, with either $M(y)>y$ throughout or $M(y)<y$ throughout, by continuity.
+
+Suppose first that $M(y)>y$ on $(\alpha,\beta)$ and fix $y_*\in(\alpha,\beta)$. The orbit $M^k(y_*)$ increases with $k$ and has no fixed point to converge to inside $(\alpha,\beta)$, so it tends to $\beta$ as $k\to\infty$ and to $\alpha$ as $k\to-\infty$, and the intervals $[M^k(y_*),M^{k+1}(y_*))$ tile $(\alpha,\beta)$. Choose any increasing continuous bijection $\eta$ from $[y_*,M(y_*))$ onto $[0,1)$ and extend it by $\eta(M^k(y))=\eta(y)+k$. Then $\eta$ is an increasing homeomorphism of $(\alpha,\beta)$ onto $\R$ with $\eta\circ M=\eta+1$, and translation in this coordinate,
+\[
+g^{s}(y)=\eta^{-1}(\eta(y)+s),
+\]
+is a flow on $(\alpha,\beta)$ with $g^{1}=M$. On a component where $M(y)<y$, apply this to $M^{-1}$ to get a flow $\varphi^{s}$ with $\varphi^{1}=M^{-1}$, and put $g^{s}=\varphi^{-s}$. Set $g^{s}=\mathrm{id}$ on $\mathcal F$. Each $g^{s}$ is an increasing bijection of $\R$ and $g^{s+r}=g^{s}g^{r}$.
+
+Within a component, $(s,y)\mapsto g^{s}(y)$ is jointly continuous because $\eta$ is a homeomorphism. For continuity at the fixed points, take $y$ in a component with $M(y)>y$ and $k\le s\le k+1$. Then $g^{s}(y)=g^{s-k}(M^k(y))$, so
+\[
+M^k(y)\le g^{s}(y)\le M^{k+1}(y),
+\]
+with the inequalities reversed on a component with $M(y)<y$ and equality on $\mathcal F$. At a fixed point both bounds are continuous in $y$ and equal the point itself, and only finitely many $k$ occur for $s$ in a compact interval, so $(s,y)\mapsto g^{s}(y)$ is jointly continuous.
+
+The flow is not unique when $M$ is not the identity. Suppose $M>\mathrm{id}$ on a component. Replace $\eta$ on the fundamental domain by $\phi\circ\eta$, where $\phi$ is an increasing homeomorphism of $[0,1]$ fixing its endpoints with $\phi(1/2)\ne1/2$, and extend as before. The time one map remains $M$, but the time one half image of $y_*=\eta^{-1}(0)$ becomes $\eta^{-1}(\phi^{-1}(1/2))$ instead of $\eta^{-1}(1/2)$. For a component with $M<\mathrm{id}$, apply this construction to $M^{-1}$ and reverse time; distinct time one half maps have distinct inverses.
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{gr:prop:affine}]
+Write $g(y)=\sigma y+\mu$ as $(\sigma,\mu)$. Composition gives
+\[
+(\sigma_2,\mu_2)(\sigma_1,\mu_1)=(\sigma_2\sigma_1,\sigma_2\mu_1+\mu_2).
+\]
+Left translation by $(\sigma',\mu')$ sends $(\sigma,\mu)$ to $(\sigma'\sigma,\sigma'\mu+\mu')$, with Jacobian $\sigma'^2$; right translation sends it to $(\sigma\sigma',\sigma\mu'+\mu)$, with Jacobian $\sigma'$. Substitution gives invariant densities $\sigma^{-2}$ on the left and $\sigma^{-1}$ on the right, so $G$ is not unimodular. The factors commute exactly when $(\sigma_2-1)\mu_1=(\sigma_1-1)\mu_2$, which fails, for example, when $\sigma_1=1$, $\sigma_2\ne1$ and $\mu_1\ne0$.
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{gr:prop:limit}]
+Interior cell probabilities make $\KL(F^\circ_{x,t}\,\|\,\cdot)$ diverge at the boundary. Normalize the chart by
+\[
+H_\lambda(p)=\lambda^{-1}h_\lambda(1-p)=-\log p+\frac{\log(1-p^\lambda)-\log\lambda}{\lambda}.
+\]
+The remainder tends to zero uniformly on compact subsets of $(0,1)$. Positive scaling and shifts leave a stability class unchanged, since only chart differences enter. The chart $H_\lambda$ therefore defines the same $\mathcal S_\lambda$ and converges to the risk ratio chart $-\log p$.
+
+For the upper bound on the gaps, take a member of $\mathcal S_{\mathrm{RR}}$ with interior probabilities and effect $\psi$. Each $h_\lambda$ is an increasing bijection onto $\R$ for $\lambda\ge0$, so keeping its baselines and solving for $F_{x,1}$ with effect $\psi_\lambda=-\lambda\psi$ gives a member of $\mathcal S_\lambda$. Since $H_\lambda\to-\log p$ uniformly on compacts, these members converge to the given one, and so do their divergences from $F^{\circ}$. Members with a boundary probability have infinite divergence from $F^{\circ}$, so the infimum defining $D_{\mathrm{RR}}$ is taken over members with interior probabilities, and hence $\limsup D_\lambda\le D_{\mathrm{RR}}$.
+
+For the lower bound, take $F^\lambda\in\mathcal S_\lambda$ with $\KL_w(F^{\circ}\,\|\,F^\lambda)\le D_\lambda+1/\lambda$, a minimizer when there is one. By the upper bound this divergence is at most $D_{\mathrm{RR}}+2$ for large $\lambda$, and by the behaviour at the boundary the $F^\lambda$ stay in a compact subset of the open simplex. Every limit point lies in $\mathcal S_{\mathrm{RR}}$ by the uniform convergence of $H_\lambda$, and the divergence is continuous there, so $D_{\mathrm{RR}}\le\liminf D_\lambda$.
+
+When the risk ratio projection is unique the $F^\lambda$ converge to it, since every limit point lies in $\mathcal S_{\mathrm{RR}}$ with divergence at most $\limsup D_\lambda\le D_{\mathrm{RR}}$ and is therefore a projection. Taking treated minus control differences of $H_\lambda$ then gives $-\psi_\lambda/\lambda\to\psi_{\mathrm{RR}}$.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{gr:thm:hoeffding}]
+(i) With $nw_{x,t}$ draws per cell, the method of types bounds each empirical table's probability under $P\in\mathcal S_G$ by $e^{-n\KL_w(F\,\|\,P)}$. There are at most $(n+1)^{Cm}$ tables, and on $\{W_n\ge\zeta\}$, $\KL_w(F\,\|\,P)\ge\KL_w(F\,\|\,\mathcal S_G)\ge\zeta$. Summing gives the bound.
+
+(ii) Compactness of $\mathcal S_G$ and joint lower semicontinuity of $\KL_w$ make $F\mapsto\KL_w(F\,\|\,\mathcal S_G)$ lower semicontinuous. For upper semicontinuity at $F^\circ$, fix a near minimizer $P$ with full support and use $\KL_w(F\,\|\,P)\to\KL_w(F^\circ\,\|\,P)$. Continuity and $L_n\to F^\circ$ almost surely prove (ii).
+
+(iii) Parts (i) and (ii) give $\liminf-n^{-1}\log p_n\ge D_G$. Let $P^*$ be a projection of $F^\circ$ on $\mathcal S_G$. For $\delta>0$, continuity and the hypothesis give a table $F_\delta$ with $\KL_w(F_\delta\,\|\,P^*)<D_G+\delta$ and $\KL_w(F_\delta\,\|\,\mathcal S_G)>D_G+2\zeta$ for some $\zeta>0$. Lower semicontinuity gives an open ball $U$ around $F_\delta$ on which the gap exceeds $D_G+\zeta$. Almost surely $W_n^{\mathrm{obs}}<D_G+\zeta$ eventually, so $\{L_n\in U\}\subset\{W_n\ge W_n^{\mathrm{obs}}\}$. Sanov's lower bound, applied cell by cell, gives $p_n\ge\Prob_{P^*}(L_n\in U)\ge e^{-n(D_G+2\delta)}$ eventually. Hence $\limsup-n^{-1}\log p_n\le D_G+2\delta$ for every $\delta>0$. The Bahadur exact slope\index{Bahadur exact slope} is twice the exponent, $2D_G$.
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{gr:prop:ancillary}]
+Closed convex $A$ and full support $P$ on a finite set give a unique I projection $F^\dagger$. By the chain rule,
+\[
+\KL(F\,\|\,P)=\KL(F_{XT}\,\|\,P_{XT})+\E_{F_{XT}}\KL(F_{Y\mid XT}\,\|\,P_{Y\mid XT}).
+\]
+Replacing $F_{Y\mid XT}$ by $P_{Y\mid XT}$ preserves the constraint and makes the second term zero, so the minimizer does too. It charges every cell: at a law missing a cell, the slope toward an interior point $E\in A$ is $-\infty$. Thus $F^\dagger_{Y\mid X,T}=P_{Y\mid X,T}$ everywhere, preserving every functional of the cell laws alone. When $D_G=0$ this includes the stable effect, the group element taking each control cell law to its treated law. The collapsed contrast
+\[
+\sum_xF(x\mid T=1)\,\E_P(Y\mid x,1)-\sum_xF(x\mid T=0)\,\E_P(Y\mid x,0)
+\]
+also depends on the weights $F(x\mid T=t)$, which change when the constraint binds. It therefore changes in general, except in special cases such as stratum means independent of $x$.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{gr:thm:pyth}]
+Put $\eta_{x,t}=\gamma_x+\psi t$ and $a(\eta)=\log(1+e^\eta)$. The log likelihood is $\sum_x\gamma_xs_x+\psi s_T-\sum_{x,t}n_{x,t}a(\eta_{x,t})$, with $s_x$ the stratum success counts and $s_T$ the treated success total. This is the stated exponential family, so the maximum likelihood point $F^*$ matches the expected sufficient statistics to their values under $\hat F$. Writing $\eta^*_{x,t}$ for its canonical parameters,
+\begin{align*}
+\KL_w(\hat F\,\|\,F)-\KL_w(\hat F\,\|\,F^*)&=\sum_{x,t}w_{x,t}\bigl[\hat F_{x,t}(1)(\eta^*_{x,t}-\eta_{x,t})\\
+&\qquad-a(\eta^*_{x,t})+a(\eta_{x,t})\bigr].
+\end{align*}
+The linear term is $n^{-1}\{\sum_x(\gamma_x^*-\gamma_x)s_x+(\psi^*-\psi)s_T\}$, unchanged by replacing $\hat F$ with $F^*$ under the moment equations. The right side is therefore $\KL_w(F^*\,\|\,F)$, proving the identity\index{Pythagorean identity}. For the log risk ratio chart, $\log F(Y=1)=\gamma_x+\psi t$ is linear but $\log F(Y=0)=\log(1-e^{\gamma_x+\psi t})$ is not, so the family is curved, the argument fails and the residual is not zero in general. Figure~\ref{gr:fig:pyth} shows largest absolute residuals $7.7\times10^{-10}$ for the logit family (numerical error) and $3.1\times10^{-4}$ for the log risk ratio family.
+
+Assume every empirical cell law $\hat F_{x,t}$ gives both outcomes positive probability. The risk difference class is convex, with linear constraints $F_{x,1}(1)-F_{x,0}(1)=F_{x',1}(1)-F_{x',0}(1)$ for all $x,x'$, and contains the table with all risks $1/2$. Its I projection\index{I projection} $F^\dagger$ has positive probabilities: at a boundary table, the slope toward that interior table is $-\infty$. For any $F$ in this class, $F^\dagger+\epsilon(F-F^\dagger)$ is feasible for small $\epsilon$ of either sign. Differentiating $\KL_w(\cdot\,\|\,\hat F)$ at $\epsilon=0$ gives
+\[
+0=\sum_{x,t}w_{x,t}\sum_y\{F_{x,t}(y)-F^\dagger_{x,t}(y)\}\log\frac{F^\dagger_{x,t}(y)}{\hat F_{x,t}(y)},
+\]
+with the constant term cancelling by cell normalization. Expanding the right side gives $\KL_w(F\,\|\,\hat F)-\KL_w(F\,\|\,F^\dagger)-\KL_w(F^\dagger\,\|\,\hat F)$, proving the dual identity (Csisz\'ar 1975).
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{gr:prop:dv}]
+For any $f$, $|\E_{Q'}f-\E_Qf|\le(\max f-\min f)\|Q-Q'\|_{\mathrm{TV}}$, with total variation the supremum over events. Pinsker's inequality gives the second bound. For the outer bound, apply the Donsker and Varadhan formula\index{Donsker Varadhan formula}, $\log\E_Qe^f=\sup_{Q'}\{\E_{Q'}f-\KL(Q'\,\|\,Q)\}$, to $f=\lambda(\psi_G-\bar\psi_G(Q))$, $\lambda>0$. Hoeffding's lemma gives
+\[
+\bar\psi_G(Q')-\bar\psi_G(Q)\le\frac{\KL(Q'\,\|\,Q)}{\lambda}+\frac{\lambda R_G^2}{8}.
+\]
+Optimizing over $\lambda>0$ gives $R_G\sqrt{\KL(Q'\,\|\,Q)/2}$; repeat with $-f$ for the absolute value. Exact stability gives $R_G=0$. With different baselines and a nonzero effect, another scale generally has $R_{G'}>0$, with exceptions: risks $(0.1,0.2)$ and $(0.8,0.9)$ share both a risk difference and an odds ratio.
+\end{proof}
+
+\section{Proofs for Chapters~\ref{ch:dml} and~\ref{ch:critique}}\label{app:dmlproofs}
+
+Write $T=m(X)+\nu$, $Y=\tau T+g(X)+\varepsilon$ and $\ell=\tau m+g$. Put $\delta_m=\hat m-m$, $\delta_\ell=\hat\ell-\ell$, $J=\E\,\mathrm{Var}(T\mid X)$ and $b=\langle\delta_m,\delta_\ell\rangle-\tau\|\delta_m\|^2$, with norm and inner product in $L_2$ of the covariate law, holding the fits fixed. For cross fitted residuals $\hat\nu_i=\nu_i-\delta_m(X_i)$, each fit omits the fold containing observation $i$. Lemma~\ref{dml:lem:exact} gives\index{proofs for the double machine learning chapters|textbf}
+\[
+\hat\tau-\tau=\frac{S_n+C_n+B_n}{\hat J_n},
+\]
+where
+\[
+\begin{gathered}
+S_n=\frac1n\sum_i\nu_i\varepsilon_i,\qquad \hat J_n=\frac1n\sum_i\hat\nu_i^2,\\
+C_n=-\frac1n\sum_i\bigl[\nu_i(\delta_\ell-\tau\delta_m)(X_i)+\delta_m(X_i)\varepsilon_i\bigr],\\
+B_n=\frac1n\sum_i\delta_m(X_i)(\delta_\ell-\tau\delta_m)(X_i).
+\end{gathered}
+\]
+Condition on each fold's training data and combine the $K$ folds at the end. Within a fold the fits are fixed and the summands independent; conditional Chebyshev bounds apply.
+
+\begin{proof}[Proof of Theorem~\ref{crit:thm:sharp}]
+Here $b$ averages the fold conditional means. The central limit theorem gives $\sqrt n\,S_n\Rightarrow N(0,\sigma_\varepsilon^2\sigma_\nu^2)$, since $\E(\nu\varepsilon)=0$ and $\E(\nu^2\varepsilon^2)=\sigma_\varepsilon^2\sigma_\nu^2$. Within each fold, conditional on its training fit, $C_n$ has mean zero by $\E(\nu\mid X)=0$ and $\E(\varepsilon\mid T,X)=0$, and
+\[
+\mathrm{Var}(\sqrt n\,C_n\mid\text{fits})\le2\bigl(\sigma_\nu^2\|\delta_\ell-\tau\delta_m\|^2+\sigma_\varepsilon^2\|\delta_m\|^2\bigr)=o_p(1).
+\]
+Thus $\sqrt n\,C_n=o_p(1)$. For $B_n$, the fourth moment bounds and Cauchy and Schwarz give within fold conditional variance $O\{(\|\delta_m\|^2\|\delta_\ell\|^2+\|\delta_m\|^4)/n\}$. Combining folds gives $\sqrt n(B_n-b)=o_p(1)$. Also $\hat J_n=J+\|\delta_m\|^2+o_p(1)=J+o_p(1)$, with $J=\sigma_\nu^2$. If $\sqrt n\,b=o_p(1)$, Slutsky's theorem gives $\sqrt n(\hat\tau-\tau)\Rightarrow N(0,\sigma_\varepsilon^2/\sigma_\nu^2)$.
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{crit:prop:alignment}]
+Let the lasso minimize $(2n)^{-1}\|T-X\gamma\|^2+\lambda_{\mathrm L}\|\gamma\|_1$. On exact recovery, put $z=\mathrm{sign}(\gamma_S)$ and $\hat\Sigma=n^{-1}X_S^\top X_S$. The Karush, Kuhn and Tucker condition is $n^{-1}X_S^\top(T-X_S\hat\gamma_S)=\lambda_{\mathrm L}z$, with $T=X_S\gamma_S+\nu$. The outcome regression $Y=X_S\varsigma_S+\tau\nu+\varepsilon$, $\varsigma=\tau\gamma+\beta$, has the same condition because $\mathrm{sign}(\varsigma_S)=z$. Solving gives
+\[
+\hat\gamma_S-\gamma_S=u_m-w,\qquad \hat\varsigma_S-\varsigma_S=u_\ell-w,
+\]
+where
+\[
+w=\lambda_{\mathrm L}\hat\Sigma^{-1}z,\qquad u_m=\hat\Sigma^{-1}X_S^\top\nu/n,\qquad u_\ell=\hat\Sigma^{-1}X_S^\top(\tau\nu+\varepsilon)/n,
+\]
+so the two coefficient errors share the shrinkage vector $w$. With identity covariance, $\|\delta_m\|^2=\|u_m-w\|^2$, $\|\delta_\ell\|^2=\|u_\ell-w\|^2$ and $\langle\delta_m,\delta_\ell\rangle=(u_m-w)^\top(u_\ell-w)$. Sub-Gaussian rows and $s\log^2p=o(n)$ give $\|\hat\Sigma-I_s\|_{\mathrm{op}}=O_p(\sqrt{s/n})=o_p(1)$, hence $\|w\|^2=\lambda_{\mathrm L}^2s\{1+o_p(1)\}$. Also $\E\|X_S^\top\nu/n\|^2=s\sigma_\nu^2/n$, so $\|u_m\|^2=O_p(\sigma_\nu^2s/n)$ and $\|u_\ell\|^2=O_p\{(\tau^2\sigma_\nu^2+\sigma_\varepsilon^2)s/n\}$. Since $\lambda_{\mathrm L}^2s\asymp\sigma^2s\log p/n$, with $\sigma$ the penalty's noise scale, both ratios $\|u_m\|^2/\|w\|^2$ and $\|u_\ell\|^2/\|w\|^2$ are $O_p(1/\log p)=o_p(1)$. Cauchy and Schwarz makes every product of a $u$ with $w$ or with the other $u$ $o_p(\|w\|^2)$. Thus the three inner products equal $\lambda_{\mathrm L}^2s\{1+o_p(1)\}$, which gives the stated limits and $\rho_\delta\to1$. Finally $\sqrt n\,\langle\delta_m,\delta_\ell\rangle\asymp\sigma^2s\log p/\sqrt n\to0$ exactly when $s\log p=o(\sqrt n)$. Cross fitting replaces $n$ by $n(K-1)/K$, changing constants only.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{crit:thm:atten}]
+Write $Q=Q_n$ and $H=H_n$ for the fold weighted channels. Since $H=o_p(Q)$, $b=H-\tau Q=-\tau Q+o_p(Q)$. The proof of Theorem~\ref{crit:thm:sharp}, without assuming $\sqrt n\,b=o_p(1)$, gives $S_n+C_n+B_n-b=O_p(n^{-1/2})=o_p(Q)$ because $Q\gg n^{-1/2}$. Also $\hat J_n=J+Q+o_p(1)=(J+Q)\{1+o_p(1)\}$ since $J>0$. Therefore
+\[
+\hat\tau - \tau = -\frac{\tau Q}{J + Q} + o_p\Bigl(\frac{Q}{J + Q}\Bigr) = -\tau(1 - \mathcal R) + o_p(1 - \mathcal R),
+\]
+because $1 - \mathcal R = Q/(J + Q)$. The fourth moment bounds enter through $B_n - b$ and cannot be dropped. Take $\tau \ne 0$, $\delta_\ell \equiv 0$ and $\delta_m = a\mathbf 1_A$ with $\Prob_X(A) = 1/n$ and $a = n^{3/8}$. Then $Q = n^{-1/4} \gg n^{-1/2}$ and $\langle\delta_m,\delta_\ell\rangle = 0$, but $B_n = -\tau QN_n$ with $N_n \Rightarrow \mathrm{Poisson}(1)$, so with probability tending to $e^{-1}$ no observation falls in $A$, the displayed term is absent and the representation fails.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{crit:thm:single}]
+Condition on the training part, so that $\hat\eta$ is a constant and the $N = n_E$ evaluation observations are independent draws from the model. Write $r_i = Y_i - \hat\ell(X_i)$, $h_i = \hat\nu_i r_i$ and $q_i = \hat\nu_i^2$, and let $A = N^{-1}\sum h_i$, $B = N^{-1}\sum q_i$, $a = \E h$ and $d = \E q$. Expanding as in the proof of Theorem~\ref{crit:thm:sharp}, $a = \tau J + \langle\delta_m,\delta_\ell\rangle$ and $d = J + \|\delta_m\|^2 \ge J$, so $a/d = \tau + \Delta(\hat\eta)$.
+
+\emph{The exact decomposition.} Put $u=A-a$, $v=B-d$, $\psi=\{h-(a/d)q\}/d$ and $L=N^{-1}\sum\psi_i=u/d-av/d^2$. Then
+\[
+\frac AB-\frac ad=\frac{dL}{B}=L-W,\qquad W=\frac{vL}{B}.
+\]
+Since $\E\psi=0$, $\mathrm{Var}(L\mid\hat\eta)=\mathrm{Var}(\psi)/N$, and $\hat\tau=\tau+\Delta(\hat\eta)+L-W$.
+
+\emph{Inverse moments.} A conditional density of $\nu$ bounded by $\bar f/2$ gives $\Prob(q\le t)\le\bar f\sqrt t$ uniformly over fits. For $S=\sum_{i\le N}q_i$ the event $S\le t$ forces every $q_i\le t$, so independence gives $\Prob(S\le t)\le\bar f^{\,N}t^{N/2}$. Thus, for $N>2r$,
+\[
+\E S^{-r}\le\int_0^\infty\min\{1,\bar f^{\,N}z^{-N/(2r)}\}\,dz
+=\bar f^{2r}\Bigl(1+\frac{2r}{N-2r}\Bigr).
+\]
+The condition $N\ge17$ covers every $r\le8$. A one sided Bernstein inequality for the lower tail of nonnegative summands gives $\Prob(B\le d/2)\le\exp\{-Nd^2/(8\E q^2)\}$.
+
+\emph{The conditional mean.} Since $\E L = 0$, $\E(\hat\tau \mid \hat\eta) = \tau + \Delta(\hat\eta) + \delta_N$ with $\delta_N = -\E(W \mid \hat\eta)$. On $\{B \ge d/2\}$ we have $|W| \le 2|v||L|/d$, and Cauchy and Schwarz gives $\E(|W|\mathbf 1\{B \ge d/2\}) \le 2\|v\|_2\|L\|_2/d \le 2(\mathrm{Var}\,q\,\mathrm{Var}\,\psi)^{1/2}/(dN)$. On $\{B < d/2\}$ we have $|v| \le d$, so $|W| \le d|L|/B$ and H\"older gives $\E(|W|\mathbf 1\{B < d/2\}) \le d\|L\|_2(\E B^{-4})^{1/4}\Prob(B < d/2)^{1/4}$, which is exponentially small in $N$ against $\E B^{-4} = N^4\E S^{-4}$. The constants depend only on $J \le d$, the moment bounds and $\bar f$, so $|\delta_N| \le C_1/N$ for every fit, and in particular $\|\delta_N\|_2 \le C_1/N$. Only fourth moments enter here.
+
+\emph{The conditional variance.} Since $\hat\tau=\tau+\Delta+L-W$,
+\[
+\mathrm{Var}(\hat\tau\mid\hat\eta)=\frac{\mathrm{Var}(\psi)}N+\tilde\delta_N,\qquad
+|\tilde\delta_N|\le2\|L\|_2\|W\|_2+\|W\|_2^2.
+\]
+The eighth moment assumptions give $\|L\|_4+\|v\|_4\le CN^{-1/2}$ by the fourth moment formula for sums of independent centred variables. Put $E_N=\{B<d/2\}$. On its complement, $|W|\le2|vL|/d$, so
+\[
+\|W\mathbf1_{E_N^c}\|_2\le\frac2d\|v\|_4\|L\|_4\le C/N.
+\]
+On $E_N$, $|W|\le d|L|/B$. Hölder's inequality gives
+\[
+\|W\mathbf1_{E_N}\|_2\le d\|L\|_4(\E B^{-8})^{1/8}\Prob(E_N)^{1/8}.
+\]
+The inverse-moment bound $\E B^{-8}\le17\bar f^{16}N^8$ and the exponential bound for $\Prob(E_N)$ make this at most $CN^{1/2}e^{-cN}$ for some $c>0$. Hence $\|W\|_2\le C/N$, and the displayed variance bound yields $\|\tilde\delta_N\|_1\le C_2N^{-3/2}$.
+
+\emph{The sandwich.} Put $\theta_b=\tau+\Delta(\hat\eta)$ and $\psi_b=\hat\nu(r-\theta_b\hat\nu)=h-(a/d)q=d\psi$. Then $\hat\tau-\theta_b=(N^{-1}\sum\psi_{b,i})/B$. At a fixed fit, as $N\to\infty$, $B\to d$ and $\hat\tau\to\theta_b$. The law of large numbers gives
+\[
+N\widehat{\mathrm{Var}}(\hat\tau)=\frac{N^{-1}\sum_i\hat\nu_i^2(r_i-\hat\tau\hat\nu_i)^2}{B^2}\longrightarrow\frac{\mathrm{Var}(\psi_b)}{d^2}=\mathrm{Var}(\psi).
+\]
+Thus the sandwich estimates the leading conditional variance. Recentring at $\hat\tau$ removes $\Delta(\hat\eta)$; a single fit cannot measure its variation across fits.
+
+\emph{The unconditional variance.} By Cauchy and Schwarz $|\hat\tau| \le (\sum r_i^2/\sum\hat\nu_i^2)^{1/2}$, whose square has finite mean by the fourth moments of $r$ and the inverse moments above, so $\E\hat\tau^2 < \infty$ and the law of total variance applies:
+\[
+\mathrm{Var}(\hat\tau) = \E\,\mathrm{Var}(\hat\tau \mid \hat\eta) + \mathrm{Var}\{\Delta(\hat\eta) + \delta_N\} = \frac{\E\,\mathrm{Var}(\psi_{\hat\eta})}{N} + \sigma_\Delta^2 + R_N,
+\]
+with $R_N = \E\tilde\delta_N + 2\,\mathrm{Cov}(\Delta, \delta_N) + \mathrm{Var}(\delta_N)$. Cauchy and Schwarz gives $|R_N| \le C_2N^{-3/2} + 2\sigma_\Delta C_1/N + C_1^2/N^2$.
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{crit:prop:dufour}]
+Fix $L$ and $\eta\in(0,(1-\alpha)/2)$, and choose $j$ so the supremum total variation distance over $|\tau|,|\tau'|\le L$ is below $\eta$. Uniform coverage and the total variation bound give $\Prob_{j,0}(\tau'\in\mathcal K_n)\ge1-\alpha-\eta$ for every $\tau'\in[-L,L]$. Tonelli's theorem applies by joint measurability of the graph, so
+\[
+\E_{j,0}\,\mathrm{Leb}(\mathcal K_n)\ge\int_{-L}^{L}\Prob_{j,0}(\tau'\in\mathcal K_n)\,d\tau'\ge2L(1-\alpha-\eta)\ge L(1-\alpha).
+\]
+Since $L$ is arbitrary the supremum is infinite. In the Gaussian family, $(X,T)$ has the same law under $P_{j,\tau}$ and $P_{j,0}$, and the conditional outcome means differ by $\tau\nu$ with common variance $\sigma_\varepsilon^2$. Thus
+\[
+\KL(P_{j,\tau}^{\otimes n}\,\|\,P_{j,0}^{\otimes n})=\frac{n\E(\tau\nu)^2}{2\sigma_\varepsilon^2}=\frac{n\tau^2j}{2\sigma_\varepsilon^2}.
+\]
+Pinsker gives $\|P_{j,\tau}^{\otimes n}-P_{j,0}^{\otimes n}\|_{\mathrm{TV}}\le|\tau|\sqrt{nj}/(2\sigma_\varepsilon)$. The triangle inequality through $P_{j,0}$ gives $L\sqrt{nj}/\sigma_\varepsilon$ for $|\tau|,|\tau'|\le L$, tending to zero as $j\downarrow0$.
+\end{proof}

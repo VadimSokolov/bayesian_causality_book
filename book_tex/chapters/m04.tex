@@ -1,0 +1,495 @@
+\chapter{The Inverse Weighting Lineage}\label{ch:ipw}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+From Horvitz and Thompson to the augmented score, every improvement on inverse weighting has moved weight off the weights and onto an outcome model. Weights explode under weak overlap, trimming changes the estimand, and Basu's elephants show that design unbiasedness says little about the sample in hand. In the Robins, Ritov and Wasserman example a prior that ignores the known propensity is off by 0.157, a prior coupled to it matches Horvitz and Thompson, and a hierarchical estimator drops the $1/p$ factor from the Horvitz Thompson and H\'ajek variances.
+\end{tcolorbox}
+
+Double machine learning descends from a long line of estimators that reweight observed outcomes by the inverse of their probability of being observed\index{inverse probability weighting|textbf}\index{IPW|see{inverse probability weighting}}\index{inverse propensity weighting|see{inverse probability weighting}}\index{inverse weighting|see{inverse probability weighting}}. The line runs from Horvitz and Thompson\index{Horvitz Thompson estimator}'s 1952 survey sampling estimator, through the 1990s work of Robins and his collaborators on missing data and causal inference, to the augmented score of Chapter~\ref{ch:dml}. The lineage clarifies what DML inherits and what it cannot escape.
+
+\section{Horvitz and Thompson}
+
+In survey sampling\index{survey sampling|textbf} a finite population of $N$ units has values $y_1, \ldots, y_N$. A sample is drawn with known inclusion probabilities\index{inclusion probability|textbf} $\pi_1, \ldots, \pi_N$. The Horvitz Thompson estimator\index{Horvitz Thompson estimator|textbf} of the population total is
+\[
+\hat Y_{\mathrm{HT}} = \sum_{i \in \text{sample}} \frac{y_i}{\pi_i}.
+\]
+
+\begin{proposition}
+$\hat Y_{\mathrm{HT}}$ is unbiased\index{Horvitz Thompson estimator!unbiasedness|textbf} for $\sum_{i=1}^N y_i$ over the sampling design, whatever the values $y_i$, provided every $\pi_i > 0$.
+\end{proposition}
+
+\begin{proof}
+Write $R_i$ for the indicator that unit $i$ is sampled. Then $\hat Y_{\mathrm{HT}} = \sum_{i=1}^N R_i y_i / \pi_i$ and $\E R_i = \pi_i$.
+\end{proof}
+
+No model for the $y_i$ is needed, but small $\pi_i$ give sampled units enormous weights and high variance.
+
+The variance depends on the design through the joint inclusion probabilities $\pi_{ij} = \Prob(R_i = R_j = 1)$, with $\pi_{ii} = \pi_i$:
+\[
+\mathrm{Var}(\hat Y_{\mathrm{HT}}) = \sum_{i=1}^N\sum_{j=1}^N (\pi_{ij} - \pi_i\pi_j)\frac{y_iy_j}{\pi_i\pi_j}.
+\]
+Under independent Bernoulli sampling $\pi_{ij} = \pi_i\pi_j$ for $i \neq j$ and the variance reduces to $\sum_i (1 - \pi_i)y_i^2/\pi_i$, the case of Section~\ref{sec:weak}; fixed size designs keep the cross terms. An unbiased estimate of this variance needs every $\pi_{ij} > 0$, a condition on pairs that unbiasedness of the total does not require.
+
+The causal analogue replaces sampling by treatment. A unit's $Y(1)$ is observed with probability $e(X)$. The inverse probability weighted estimator\index{Horvitz Thompson estimator} of the average treatment effect is
+\begin{equation}
+\hat\tau_{\mathrm{IPW}} = \frac{1}{n}\sum_{i=1}^n \left\{\frac{T_i Y_i}{e(X_i)} - \frac{(1-T_i)Y_i}{1 - e(X_i)}\right\},
+\label{eq:ipw}
+\end{equation}
+unbiased when $e$ is known, $0 < e(x) < 1$ for all $x$, and ignorability\index{ignorability} holds.
+
+\section{Basu's elephants}
+
+In a 1971 essay Basu told a story\index{Basu elephants@Basu's elephants|textbf}\index{paradoxes|seealso{Basu's elephants; inhalation paradox; Simpson's paradox; Stein's paradox; weak paradoxes}} that has become the standard objection to design based inference\index{design based inference|textbf}. A circus owner plans to ship his 50 elephants. He knows from three years ago that an elephant called Sambo was of average weight, and plans to weigh Sambo and multiply by 50.
+
+The circus statistician is horrified and insists on a sampling design: Sambo with probability $99/100$ and each of the other 49 elephants with probability $1/4900$. Sambo is selected, and the Horvitz Thompson estimate is Sambo's weight divided by $99/100$, about one elephant's weight as the estimate of the total for fifty. Had the largest elephant, Jumbo, been selected, the answer would have been Jumbo's weight times 4,900. The statistician is sacked and becomes a teacher of statistics.
+
+Basu's point is that the Horvitz Thompson estimator is unbiased over a design no sensible person cares about, and absurd for the data in hand. The owner's model, that Sambo is typical, contains all the useful information; the design probabilities contain almost none. The causal analogue is direct: a treated unit with propensity $e(x) = 0.01$ receives weight 100 in \eqref{eq:ipw}, and if its outcome is unusual the estimate moves accordingly.
+
+\section{The H\'ajek correction and stabilized weights}\label{sec:hajek}
+
+H\'ajek's ratio estimator\index{Hajek estimator@H\'ajek estimator|textbf} normalizes the weights:
+\[
+\hat\mu_{1,\mathrm{H}} = \frac{\sum_i T_i Y_i / e(X_i)}{\sum_i T_i / e(X_i)}.
+\]
+It is no longer exactly unbiased, but it shifts by exactly any constant added to all outcomes, and its variance is usually much smaller. In causal inference it is called the normalized, or self normalized, inverse weighting estimator.
+
+Horvitz and Thompson divide $\sum_i T_iY_i/e(X_i)$ by $n$; H\'ajek divides by the realized weight sum $\sum_i T_i/e(X_i)$, whose expectation is $n$ but which a few small propensities can push far from it. If this sum is thirty percent above $n$, the Horvitz Thompson estimate is inflated by thirty percent relative to H\'ajek. Stabilized weights\index{stabilized weights|textbf}\index{inverse probability weighting!stabilized|textbf}, used in marginal structural models, multiply each inverse weight by the marginal probability of the observed treatment. Their expected weight is one, but their realized sum remains random. Within an arm the multiplier is a constant that cancels from a normalized mean, adding nothing to H\'ajek. Neither device bounds the weights under poor overlap.
+
+
+
+\section{Weights under weak overlap}
+
+How bad can weighting\index{inverse probability weighting!under weak overlap|textbf} be? We simulate $n = 1000$ units with $X \sim N(0,1)$, propensity $e(x) = \expit(sx)$, and outcome $Y = X + T + \varepsilon$ with $\varepsilon \sim N(0,1)$, at slopes $s = 0.5, 1, \ldots, 4$ with 300 replications each, weighting by the true propensity. As the selection slope $s$ grows, overlap deteriorates\index{weak overlap|textbf}\index{overlap!weak|textbf}: some treated units have tiny propensities and some controls propensities close to one.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{ipw_var.pdf}
+\caption{Inverse weighting as overlap deteriorates, 300 replications per slope. Left: median of the largest weight in the sample. Right: standard deviation of the 300 IPW estimates at each slope (dots) and the exact standard deviation (dashed), on a log scale; the replications fall below it beyond $s = 2.5$.}
+\label{fig:ipw}
+\end{figure}
+
+In Figure~\ref{fig:ipw} the median largest weight grows from about 5 at $s = 0.5$ to about 113 at $s = 4$. The standard deviation of the 300 estimates grows erratically from 0.09 to between 0.5 and 0.9. The exact variance of \eqref{eq:ipw} is $\{4 + \exp(s^2/2)(2s^2 - 2s + 5)\}/n$ (Exercise~\ref{ex:ch05:3}), giving standard deviations of 0.095 at $s = 0.5$, 0.27 at $s = 2$, 1.2 at $s = 3$ and 9.3 at $s = 4$. The replications agree within about a fifth up to $s = 2.5$, but fall two, four and seventeen times below the exact values at $s = 3$, 3.5 and 4: they seldom contain the rare units with enormous weights that dominate the variance. Where the estimator is worst, the replications understate its variance, and a confidence interval computed from one data set is not to be trusted either.
+
+We checked that claim directly, at each slope with 20,000 data sets of the same design ($n = 1000$, known propensity, $\tau = 1$), once with the outcome mean $g(x) = x$ and once with $g(x) = x + 0.25x^3$. Five intervals were formed: 95 percent influence function intervals for Horvitz and Thompson, for H\'ajek, for the augmented score with the true outcome means, and for the augmented score with linear outcome regressions fitted arm by arm with fivefold cross fitting, and a 95 percent credible interval from Bayesian linear regression of the outcome on an intercept, treatment and covariate ($N(0, 10^2)$ priors, known unit noise variance).
+
+At $s = 4$ the weighted intervals cover the effect in 62 percent (Horvitz and Thompson) and 57 percent (H\'ajek) of the data sets when $g$ is linear, and in 44 and 45 percent when it is cubic. The augmented score with true means stays within two points of 95 percent, and with fitted linear means covers 93 percent (linear $g$) and 84 percent (cubic) at $s = 4$. The Bayesian linear regression covers 95 percent when its mean function is right, but under the cubic outcome it covers 8 percent at $s = 2$ and under 0.1 percent from $s = 3.5$, because the confounding through $X$ is left in the residual. Weighting fails through its variance, the misspecified model through its bias (Figure~\ref{fig:ipwcov}).
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{ipw_overlap_coverage.pdf}
+\caption{Coverage of nominal 95 percent intervals (top) and median interval width (bottom) as overlap deteriorates, $n = 1000$, 20,000 replications per point; left $g(x) = x$, right $g(x) = x + 0.25x^3$. Binomial standard errors of the coverages are at most 0.0035.}
+\label{fig:ipwcov}
+\end{figure}
+
+The augmented score of Chapter~\ref{ch:dml} still divides residuals by $e(X)$ and $1 - e(X)$. With true outcome regressions, its variance here is $2\{1 + \exp(s^2/2)\}/n$ (Exercise~\ref{ex:ch05:3}, applied to both arms), giving a standard deviation of 2.4 at $s = 4$ against 9.3 for \eqref{eq:ipw}. A good outcome model limits the damage by keeping residuals small; with a poor one, weighted residuals behave as badly as \eqref{eq:ipw}.
+
+\section{Trimming changes the question}
+
+The standard remedy for poor overlap\index{overlap!trimming|textbf} is trimming\index{trimming|textbf}: discard units with $e(x)$ outside $[\alpha, 1 - \alpha]$. Crump, Hotz, Imbens and Mitnik (2009) showed how to choose $\alpha$ to minimize variance. Li, Morgan and Zaslavsky (2018) proposed overlap weights\index{overlap weighting}, $1 - e(x)$ for treated units and $e(x)$ for controls, which downweight units near the extremes smoothly and target the population with covariate density proportional to $e(x)\{1 - e(x)\}$.
+
+Both remedies are sensible and both change the estimand\index{estimand!changed by trimming|textbf}. The new estimands are accounting identities with particular choices of $Q$, chosen not because they answer the user's question but because they make an estimator behave.
+
+A Bayesian faces the same lack of overlap. Where one arm is scarce, the posterior for $\tau(x)$ rests on the prior and on extrapolation. A prior that lets $\tau(x)$ vary gives wide intervals there, and for $\tau_Q$ when $Q$ puts mass there; hard pooling can give a narrow interval with no local data behind it. Report $\tau_Q$ for the user's $Q$ and check how its interval moves when the prior on $\tau(x)$ is loosened.
+
+In the language of Chapter~\ref{ch:mccullagh}, let $\mathcal{X}_\alpha = \{x : \alpha \leq e(x) \leq 1 - \alpha\}$. The trimmed estimand\index{trimming!changes the estimand|textbf} is
+\[
+\tau_\alpha = \frac{\int_{\mathcal{X}_\alpha} \tau(x)\,Q(dx)}{Q(\mathcal{X}_\alpha)},
+\]
+which is $\tau_{Q_\alpha}$ for the restriction $Q_\alpha$ of $Q$ to $\mathcal{X}_\alpha$. The overlap\index{overlap} weighted estimand is $\tau_{Q_e}$ with $Q_e(dx) \propto e(x)\{1 - e(x)\}Q(dx)$.
+
+\section{Double robustness and the Kang and Schafer example}
+
+The augmented estimator is doubly robust\index{double robustness|textbf}\index{doubly robust|see{double robustness}}: consistent if either the outcome model or the propensity model is correct. Kang and Schafer (2007) tested this property in what became a standard benchmark\index{Kang and Schafer example|textbf}.
+
+Their design has four latent covariates that determine both treatment and outcome, but the analyst observes only nonlinear transformations of them. Both models, fitted to the observed transformations, are therefore mildly misspecified. The augmented estimator then performed badly, sometimes worse than a simple regression estimator, because a few units with tiny estimated propensities received enormous weights that amplified small errors in the outcome model.
+
+Kang and Schafer concluded that when both models are wrong, the usual case, double robustness guarantees nothing and the weighting component can make matters worse. In the discussion, Robins, Sued, Lei Gomez and Rotnitzky (2007) proposed bounded versions of the augmented estimator that perform better.
+
+\section{Balancing weights}
+
+Another response to unstable weights is to choose weights that balance covariates directly rather than invert an estimated propensity\index{balancing weights|textbf}. Hainmueller's (2012) entropy balancing\index{entropy balancing|textbf} chooses control weights as close as possible to uniform, in Kullback and Leibler divergence, subject to exact balance of chosen covariate moments with the treated group. Imai and Ratkovic's (2014) covariate balancing propensity score\index{propensity score} fits a propensity model whose implied weights balance covariates. Zubizarreta's (2015) stable balancing weights minimize weight variance subject to approximate balance.
+
+If $\mu_0(x) = \phi(x)^\top\beta$ for a vector of features $\phi$, any control weights $w_i$ for which $\sum_i w_i\phi(X_i)$ equals the treated mean of $\phi$ give $\sum_i w_iY_i$ an expectation equal to the treated mean of $\mu_0$, whatever $\beta$ is, and the weighted difference in means is unbiased for the effect on the treated. Which features to balance is a modelling question about which functions of $x$ drive the outcome; the methods differ only in how they trade exact balance against dispersion of the weights.
+
+Balancing weights therefore implicitly fit a linear outcome model in the balanced features, a step from Horvitz and Thompson\index{Horvitz Thompson estimator} to a full outcome model. A regression on the same features gets there directly: least squares with a full rank design implies control weights that balance the features exactly, some of them negative, while a Bayesian regression with a shrinkage prior gives up a little balance for less dispersed weights and reports a posterior as well. The practical difference is small when the features are few and well chosen. A balancing method with a long list of moments produces dispersed weights or fails to find any, while a shrinkage prior on the same list decides from the data which moments matter.
+
+\section{Bayesian views of the propensity score}
+
+Under ignorability and prior independence of outcome and treatment parameters, the propensity score\index{propensity score!Bayesian views of|textbf} drops out of the outcome posterior \eqref{eq:ignorable}, yet Bayesian analysts have used it for decades. Three uses are sound.
+
+\paragraph{As a covariate.} Including the estimated propensity, or a flexible function of it, as a covariate in the outcome model protects against misspecification in the direction that matters for confounding. The device, used by the Bayesian causal forest and the coupled horseshoe of Chapter~\ref{ch:horseshoe}, is justified by the regularization induced confounding argument of Section~\ref{sec:rrw}.
+
+\paragraph{As a dimension reduction.} Rosenbaum\index{Rosenbaum, Paul R.!propensity score} and Rubin's\index{Rubin, Donald B.!propensity score} 1983 theorem says that if treatment is ignorable given $X$ then it is ignorable given $e(X)$. Modelling the outcome as a function of $e(X)$ alone is a legitimate, though crude, outcome model.
+
+\paragraph{As a prior input.} When the propensity is known, as in the Robins and Ritov example of Section~\ref{sec:rrw}, it is prior information about selection and belongs in the prior.
+
+A fourth use needs care. A joint Bayesian model of propensity and outcome is coherent, but outcomes can feed back into the propensity estimate and pull it away from the assignment mechanism, breaking the design stage logic (Zigler and coauthors 2013). Fitting the propensity first and fixing it, or using a modular posterior, avoids this. The coupled horseshoe\index{horseshoe prior} of Chapter~\ref{ch:horseshoe} shares scales, but each model's coefficients use only its own data, limiting feedback to scale parameters.
+
+\section{Matching and Bayesian imputation: a care management example}\label{ss:ipw:health}
+\input{chapters/health_numbers}
+
+Insurer programs are almost never randomized, so health services researchers and actuaries rely on propensity score matching. In a diabetes care management program, nurses call members, review medications, schedule eye and foot exams and follow up after hospital discharge. The insurer pays per enrolled member and asks whether claims fall by more than the fee. Enrollment targets members who are expensive, poorly controlled or have several comorbidities, and high costs tend to persist. Comparing enrolled and nonenrolled members confounds the program with referral.
+
+We illustrate with a synthetic claims file of \hcnmem\ members built to resemble such evaluations. Age is $N(58, 10^2)$, HbA1c is $N(7.8, 1.2^2)$, the number of comorbidities is Poisson with mean $1.5$, and log prior year cost is $N(8.6, 0.9^2)$ plus $0.15$ per comorbidity plus $0.10$ per point of HbA1c above $7.8$. Write $a$, $h$, $c$ and $l$ for age less 58 divided by 10, HbA1c less $7.8$, comorbidities less $1.5$ and log prior cost less $8.8$. Enrollment is logistic with logit $-1.6 + 0.2a + 0.5h + 0.35c + 0.9l$, which favours sicker and costlier members, and \hcntreat\ members enroll. Next year cost is $\exp(8.8 + 0.06a + 0.12h + 0.10c + 0.65l + 0.8\varepsilon)$ with $\varepsilon$ standard normal, so it is log normal and persistent in prior cost. The program multiplies each enrolled member's cost by $e^{-0.12}$, a cut of about 11\%. The fee is \$400 per enrolled member per year. One file is generated (seed 7) and every estimator below is applied to it, so the standard errors and intervals describe that file and not a repeated sampling experiment. All figures are synthetic and illustrative, not estimates for any real program.
+
+\paragraph{The naive comparison.} Enrolled members cost \$\hcmeantreat\ next year against \$\hcmeancontrol\ for the rest, an apparent increase of \$\hcnaive\ per member. Read naively, the program costs money twice: the fee and the higher claims. Table~\ref{ss:ipw:tab:balance} shows why. Before matching, enrolled members are more than three quarters of a standard deviation more expensive in the prior year and more than half a standard deviation worse in HbA1c and comorbidity count.
+
+\paragraph{Matching.} We fit a logistic regression for enrollment on the four covariates and match greedily on the estimated logit of the propensity score, without replacement and within a caliper of $0.2$ standard deviations of the estimated logit across all members: enrolled members are taken in decreasing order of the logit, and each is paired with the nearest unused nonenrolled member if one lies within the caliper. Of the \hcntreat\ enrolled members, \hcnmatch\ find a match. The rest sit at the top of the propensity range, where nonenrolled members are scarce: a handful have no nonenrolled member within the caliper at all, and the others find that the nearby ones were taken by earlier matches. Overlap in the sense of Section~\ref{sec:ignorability} holds, since a logistic propensity lies strictly between 0 and 1, but in a finite file it is thin at the top, and matching without replacement turns thin overlap into discarded members. After matching every standardized mean difference is at most $0.05$ in absolute value.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Covariate & Before matching & After matching\\
+\midrule
+Age & $\hcsmdageB$ & $\hcsmdageA$\\
+HbA1c & $\hcsmdhbaB$ & $\hcsmdhbaA$\\
+Comorbidities & $\hcsmdcomB$ & $\hcsmdcomA$\\
+Log prior year cost & $\hcsmdpriorB$ & $\hcsmdpriorA$\\
+\bottomrule
+\end{tabular}
+\caption{Standardized mean differences, enrolled minus nonenrolled, in the synthetic care management example (one file of \hcnmem\ members).}
+\label{ss:ipw:tab:balance}
+\end{table}
+
+The matched estimate of the change in next year cost is \$\hcmatch\ per enrolled member, with standard error \$\hcmatchse. The sign has reversed. After the \$400 fee, estimated savings are about \$\hcnetmatch\ per matched member, roughly \$\hcnetbook\ million a year across the \hcnmatch\ matched members. This is less than one standard error, so matching cannot tell whether the program pays. The target covers matchable members, not all \hcntreat\ enrolled, so the estimate is not scaled to the whole program. In this synthetic population the true effect on the matched members is \$\hctruthm: matching misses about two thirds of the saving. Even standardized differences of at most $0.05$ leave matched nonenrolled members cheaper in expectation: exponential, skewed costs turn small covariate differences into a gap large next to the saving.
+
+\paragraph{The Bayesian version.} Rubin's (1978) prescription is to model the outcome and impute the missing potential outcomes. Among nonenrolled members we fit $\log Y_i \mid x_i \sim N(d_i^\top\beta, \sigma^2)$ with $d_i = (1, a_i, h_i, c_i, l_i)^\top$, under the noninformative prior $\pi(\beta, \sigma^2) \propto 1/\sigma^2$. For each of 2,000 posterior draws we impute the untreated cost of every enrolled member from the posterior predictive distribution and average observed minus imputed cost, so the target is the average effect on the \hcntreat\ enrolled members of this file. Each imputation is drawn without reference to the member's observed treated cost, which is the working assumption that the two potential outcomes are conditionally independent given the covariates and the parameters. Section~\ref{sec:imputation} explains that this association is not identified by the data; the simulation in fact sets $Y_i(1) = e^{-0.12} Y_i(0)$, perfect dependence, so the width of the interval and the probability below rest on a choice the data cannot check. Under this prior the predictive distribution of log cost is Student $t$, so predictive cost, and with it the posterior mean of the effect, is not finite, although with more than 15,000 degrees of freedom no set of 2,000 draws would show it; we therefore report posterior medians and quantiles. The posterior median of the effect on the treated is \$\hcbayes\ with central 95\% interval (\$\hcbayeslo, \$\hcbayeshi), which covers the true value of \$\hctruth\ for all enrolled members. This estimand includes the high propensity members that matching discarded, and it is larger in magnitude because the program saves most where costs are highest. The posterior also answers the insurer's question: the probability that savings exceed the \$400 fee is above $0.99$, and the posterior median net saving is \$\hcnetbayes\ per enrolled member. No point estimate with a standard error provides that probability directly.
+
+\paragraph{Lessons.} Prior year cost is the dominant confounder, and without it no adjustment is credible. A before and after comparison of the enrolled alone is no substitute: regression to the mean pulls high cost members down, any rise in costs across the whole file pushes them up, and the bias can go either way. In this file average cost is higher next year than in the prior year, that rise outweighs regression to the mean, and the comparison understates the saving. Claims are skewed, with a heavy right tail, so a mean based estimate is noisy; a model for the cost distribution, here log normal and in practice a two part model with a point mass at zero, uses the data more efficiently and delivers distributional effects, such as the change in the probability of a member exceeding a stop loss threshold, that matter for reinsurance. In high dimensional claims data, with thousands of diagnosis and procedure codes as candidate confounders, the outcome model needs the horseshoe prior of Chapter~\ref{ch:horseshoe}.
+
+\section{The weighting estimator as a posterior mean}
+
+The inverse weighted estimator is close to a posterior mean without being one. In a covariate cell $x$ with $n_x$ units and $n_{x1}$ treated, the inverse weighted estimate of the treated potential outcome mean $\mu_1(x)$ is the observed treated mean times $n_{x1}/\{n_xe(x)\}$. Under a flat prior and normal likelihood the observed mean is the posterior mean when $n_{x1} > 0$; when $n_{x1} = 0$, weighting returns zero and the flat prior gives no posterior at all. Since $n_{x1} \sim \mathrm{Binomial}\{n_x, e(x)\}$, a cell with $n_x = 20$ and $e(x) = 0.1$ expects two treated units, so the factor $n_{x1}/2$ equals one with probability 0.29, zero with probability 0.12, and two or more with probability 0.13. The factor has expectation one but adds noise without information, which is why weighting is typically worse in mean squared error than cellwise regression when cells are well populated.
+
+When cells are sparse and many have no treated units, the regression estimator needs a model to fill the empty cells, while the weighted estimator averages over the units it has. This is the regime of Robins and Ritov\index{Robins and Ritov example} (Section~\ref{sec:rrw}), where the choice of prior becomes decisive.
+
+\section{The Robins, Ritov and Wasserman challenge}\label{sec:rrw}
+
+The strongest argument against Bayesian causal inference is an example. Robins and Ritov\index{Robins and Ritov example|textbf}\index{Robins Ritov Wasserman example|see{Robins and Ritov example}} introduced it in 1997; Wasserman popularized it. The example appears to show that any Bayesian procedure whose prior ignores the known propensity score\index{propensity score}\index{propensity score!known|textbf} must fail while Horvitz and Thompson succeed. There is no misspecification and no hidden confounder, only many cells, a known selection probability for each, and a Bayesian who declines to use it. The reply is short: the propensity score is prior information, and a prior that uses it need not fail.
+
+\subsection{The example}
+
+Let $X$ take values in $K \gg n$ cells; equivalently, take $X$ uniform on a high dimensional cube and assume nothing about smoothness. Each cell $x$ has a known selection probability\index{selection probability|textbf} $e(x) \in [\delta, 1 - \delta]$ and an unknown outcome probability $\vartheta(x) \in [0,1]$.
+
+Each unit draws $X$ uniformly, is selected with $R \sim \mathrm{Bernoulli}\{e(X)\}$, and if selected reveals $Y \sim \mathrm{Bernoulli}\{\vartheta(X)\}$. The target is
+\[
+\psi = \E\,\vartheta(X) = \frac{1}{K}\sum_{x} \vartheta(x),
+\]
+the mean outcome in the population. In causal language, $R$ is treatment, $Y$ is the potential outcome under treatment, $e$ is the propensity score, and $\psi$ is the mean of $Y(1)$.
+
+\paragraph{The Horvitz Thompson estimator.} Since $e$ is known,
+\[
+\hat\psi_{\mathrm{HT}} = \frac{1}{n}\sum_{i=1}^n \frac{R_i Y_i}{e(X_i)}
+\]
+is unbiased with variance at most $1/(n\delta)$. It converges at the $\sqrt{n}$ rate uniformly over all $\vartheta$, however rough.
+
+\paragraph{The likelihood.} Up to a factor that involves $e$ and not $\vartheta$,
+\[
+L(\vartheta) \propto \prod_{i: R_i = 1} \vartheta(X_i)^{Y_i}\{1 - \vartheta(X_i)\}^{1 - Y_i}.
+\]
+So for any prior on $\vartheta$ independent of $e$, the posterior for $\vartheta$, and hence for $\psi$, does not depend on $e$ at all.
+
+\subsection{The failure}
+
+Since $K \gg n$, most cells are never visited, their posterior for $\vartheta(x)$ equals the prior, and the posterior for $\psi$ is dominated by the prior over unvisited cells\index{Robins and Ritov example!the failure|textbf}.
+
+\begin{proposition}
+Suppose $\vartheta(x)$ are a priori independent across cells, each with prior mean $\mu_0$, and independent of $e$. If $n/K \to 0$, then the posterior mean of $\psi$ converges in probability to $\mu_0$ whatever the true $\vartheta$.
+\end{proposition}
+
+\begin{proof}
+Unvisited cells keep prior mean $\mu_0$; each of the at most $n$ visited posterior means differs from $\mu_0$ by at most one. Thus $|\E(\psi \mid \text{data}) - \mu_0| \leq n/K \to 0$.
+\end{proof}
+
+The Bayesian estimate is inconsistent, while Horvitz and Thompson\index{Horvitz Thompson estimator} converge at the parametric rate.
+
+A hierarchical prior, with the cell probabilities exchangeable around an unknown mean, would learn $\mu_0$ from the data, but it would learn the mean among selected units, which is $\E\{e(X)\vartheta(X)\}/\E\,e(X)$, not $\psi$. When $\vartheta$ and $e$ are correlated, the two differ and the hierarchical posterior converges to the wrong answer: the selected units are not representative, and a prior that ignores selection cannot know it.
+
+\subsection{A simulation of the failure}
+
+We set $K = 20{,}000$ cells and $n = 2{,}000$ units\index{Robins and Ritov example!a simulation of the failure|textbf}\index{simulation study!Robins and Ritov failure|textbf}. Selection probabilities are uniform on $[0.05, 0.95]$. Outcome probabilities depend on selection: $\logit\vartheta(x) = -1 + 6\{e(x) - 0.5\} + \eta(x)$, with $\eta(x) \sim N(0, 0.3^2)$. Units likely to be selected have high outcome probability, so the selected units overstate $\psi$.
+
+We compare three estimators over 200 replications: Horvitz Thompson; the posterior mean under independent uniform priors on each $\vartheta(x)$; and an empirical Bayes\index{empirical Bayes} version of the coupled prior \eqref{eq:coupled} introduced below. For the last, a logistic regression of the selected outcomes on $\logit e$ gives a fitted probability $m_x = \expit\{\hat a + \hat b\,\logit e(x)\}$ for every cell, each $\vartheta(x)$ gets a $\mathrm{Beta}\{10m_x, 10(1 - m_x)\}$ prior, worth ten observations, and the estimate is the average over all $K$ cells of the posterior means $(10m_x + S_x)/(10 + N_x)$, where $N_x$ and $S_x$ count the selected units and successes in cell $x$. The beta prior stands in for the logistic normal of \eqref{eq:coupled}, $\sigma_\eta$ is not estimated, and the uncertainty in $\hat a$ and $\hat b$ is ignored.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{robins_ritov.pdf}
+\caption{Error of three estimators in the Robins and Ritov example, 200 replications, $K = 20{,}000$ and $n = 2{,}000$.}
+\label{fig:rr}
+\end{figure}
+
+\begin{table}[ht]
+\centering
+\caption{Bias and root mean squared error in the Robins and Ritov example.}
+\label{tab:rr}
+\begin{tabular}{lcc}
+\toprule
+Estimator & Bias & RMSE \\
+\midrule
+Horvitz Thompson & 0.002 & 0.014 \\
+Independent priors & 0.157 & 0.157 \\
+Prior coupled to $e(x)$ & 0.005 & 0.013 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In Figure~\ref{fig:rr} and Table~\ref{tab:rr}, the independent prior posterior is off by 0.157 with almost no spread: confidently wrong, as the proposition predicts. The coupled prior matches Horvitz and Thompson.
+
+\subsection{The resolution}
+
+Sims's response to Wasserman was that a Bayesian who knows $e$, and believes $\vartheta$ may be related to it, should say so in the prior\index{Robins and Ritov example!the resolution|textbf}. The prior independence of $\vartheta$ and $e$ is not a requirement of Bayesian inference; it is a modelling choice, and in this example a bad one.
+
+Formally, replace the independent prior by a prior in which $\vartheta(x)$ depends on $e(x)$\index{coupled prior!for the selection probability|textbf}:
+\begin{equation}
+\logit\vartheta(x) = a + b\,\logit e(x) + \eta(x), \qquad \eta(x) \sim N(0, \sigma_\eta^2).
+\label{eq:coupled}
+\end{equation}
+Now cells are partially exchangeable given $e$: two cells with the same selection probability are judged alike, others are not. Write $\xi = (a, b, \sigma_\eta)$ and $q_\xi(p) = \E\,\expit\{a + b\,\logit p + \sigma_\eta Z\}$ with $Z \sim N(0, 1)$. Given $e(X) = p$, a selected unit's outcome is Bernoulli with probability $q_\xi(p)$, so $\xi$ is learned from the selected units, across which $e$ varies. What matters for $\psi$ is the fitted curve $q_\xi$: given $\xi$, the posterior for an unvisited cell has median $\expit\{a + b\,\logit e(x)\}$ and mean $q_\xi\{e(x)\}$, which is the right place, and its posterior mean is $q_\xi\{e(x)\}$ averaged over the hyperposterior of $\xi$.
+
+\begin{theorem}
+Suppose the true $\vartheta$ is drawn from \eqref{eq:coupled} at an interior $\xi_0$, the hyperprior on $\xi$ has a continuous positive density at $\xi_0$, the empirical distribution of $e$ over the cells converges, and the marginal model of the selected outcomes, Bernoulli with probability $q_\xi\{e(X)\}$, meets the conditions of the parametric Bernstein von Mises theorem of Appendix~\ref{app:theory}, nonsingular Fisher information included. If $K/n^{3/2} \to \infty$, the posterior for $\psi$ concentrates at the truth at the $\sqrt{n}$ rate.
+\end{theorem}
+
+\begin{proof}[Sketch]
+The number of selected units is binomial with mean at least $n\delta$. The expected number of pairs of draws that land in the same cell is $n(n - 1)/(2K) = o(\sqrt{n})$, since $K/n^{3/2} \to \infty$. Each such pair changes the log likelihood ratio between $\xi_0$ and a point within $O(n^{-1/2})$ of it by $O(n^{-1/2})$. Repeated cells therefore change that ratio by $o_p(1)$, so the stated conditions give a posterior for $\xi$ that concentrates at $\xi_0$ at the $\sqrt{n}$ rate. Given $\xi$, the average over the cells is $K^{-1}\sum_x q_\xi\{e(x)\}$ up to $O_p(K^{-1/2})$, a smooth function of $\xi$ whose posterior inherits the rate by the delta method. Visited cells change the average by $O(n/K)$. Both remainders are $o(n^{-1/2})$ because $K/n^{3/2} \to \infty$. The simulation of this section, with $K = 20{,}000$ and $n = 2{,}000$, lies outside this regime ($n/K = 0.1$ against $n^{-1/2} = 0.022$), so the theorem does not cover it.
+\end{proof}
+
+If \eqref{eq:coupled} is misspecified and the hyperposterior concentrates at a finite $\xi^\ast$, that point best fits the selected units, minimizing
+\[
+\E[e(X)\,\KL\{\mathrm{Bernoulli}(\vartheta(X)) \,\|\, \mathrm{Bernoulli}(q_\xi\{e(X)\})\}].
+\]
+Concentration at a finite point can fail: $\vartheta \equiv 0$ pushes $a$ to $-\infty$. When $n/K \to 0$, the posterior mean of $\psi$ is off by $K^{-1}\sum_x [q_{\xi^\ast}\{e(x)\} - \vartheta(x)]$, the curve's misfit averaged over all cells, not over the selected ones. The remedy is a more flexible regression: a spline, or a horseshoe\index{horseshoe prior} expansion in basis functions of $e$. With enough flexibility and enough selected units in every stratum of $e$ for the prior to wash out, the posterior mean approaches H\'ajek stratified by $e$ (Ritov, Bickel, Gamst and Kleijn 2014).
+
+\subsection{The Sims and Wasserman exchange}
+
+Around 2012 the example was argued over on Wasserman's blog\index{Sims and Wasserman exchange|textbf}. Robins and Wasserman held, in substance, that a prior depending on $e$ is a frequentist device in Bayesian clothing, since $e$ does not appear in the likelihood for $\vartheta$. Sims (2012) answered that $e$ is known before the data, and anything known before the data may enter the prior. The likelihood principle\index{likelihood principle} constrains how data enter inference, not which prior information may be used.
+
+We side with Sims; the coupled prior is a parametric version of his proposal. If the analyst genuinely believes that $\vartheta$ and $e$ are unrelated, an exchangeable hierarchical prior that ignores $e$ is correct, the selected units are representative, and that posterior is consistent; independent cell priors with a fixed centre are not, as the proposition above shows. The failure arises when the prior contradicts what the analyst actually believes.
+
+\subsection{A Bayesian derivation of binned H\'ajek}
+
+Partition the range of $e$ into bins\index{Hajek estimator@H\'ajek estimator!binned} and give each bin its own exchangeable prior on $\vartheta$, a fully flexible version of the coupled prior. As the bins shrink, slowly enough that each keeps many selected units, the selected units in a bin are a simple random sample of its cells. In the simplest version every cell of bin $j$ shares one outcome probability with a $\mathrm{Beta}(\alpha_j, \beta_j)$ prior, and if the bin holds a share $W_j$ of the cells, $M_j$ selected units and $S_j$ successes, the posterior mean of $\psi$ is $\sum_j W_j(\alpha_j + S_j)/(\alpha_j + \beta_j + M_j)$; with $\alpha_j = \beta_j = 1$ this is the bin posterior of Section~\ref{sec:weak}. As the $M_j$ grow it approaches $\sum_j W_jS_j/M_j$; a bin with no selected unit keeps its prior mean.
+
+Estimating the shares from the sample and dropping empty bins turns this into the binned H\'ajek estimator, H\'ajek weighting stratified by propensity. Horvitz and Thompson differ from it in normalization and in the absence of binning, and have a different first order variance. So binned H\'ajek is, to this approximation, the limit of posterior means under a nonparametric prior in which $\vartheta$ is exchangeable given $e$: not a rival to Bayes but a special case, with a very weak prior on how outcomes depend on selection.
+
+\subsection{CODA and the curse of dimensionality}
+
+Classical asymptotics fix the model as the sample grows. Robins and Ritov let the complexity of $\vartheta$ grow too, calling this curse of dimensionality appropriate, or CODA, theory\index{curse of dimensionality appropriate asymptotics|textbf}\index{CODA|see{curse of dimensionality appropriate asymptotics}}.
+
+The CODA question is whether an estimator converges uniformly over a class of $\vartheta$ so large that no estimator of $\vartheta$ itself converges: whether, for a class $\Theta$,
+\[
+\sup_{\vartheta \in \Theta} \E_\vartheta(\hat\psi - \psi)^2 \to 0
+\]
+at a stated rate as $n \to \infty$. Horvitz and Thompson do, for $\psi$, because the bound $1/(n\delta)$ on their variance does not depend on $\vartheta$. Bayesian estimators with priors that do not use $e$ do not. Ritov, Bickel, Gamst and Kleijn's 2014 paper examines which Bayesian procedures are CODA, and finds that those using $e$ in the prior, or using the propensity score\index{propensity score} as a covariate, can be.
+
+
+
+\subsection{What the example does and does not show}
+
+The example shows that a prior ignoring known selection probabilities can fail badly in high dimensions\index{Robins and Ritov example!what it does and does not show|textbf}. It does not show that Bayesian inference fails, only that a particular prior does.
+
+The Horvitz Thompson estimator is good only for $\psi$. Ask for a quantile of $\vartheta(X)$, $\vartheta$ in a subgroup, or the effect on a new population with different covariate law, and a new weighted estimator must be built. The coupled posterior delivers all of them.
+
+When $\vartheta$ is smooth in $x$, a smooth prior learns about unvisited cells from visited neighbours, so prior independence of $\vartheta$ and $e$ does little harm. The example bites only when $\vartheta$ is so rough that $x$ carries no information across cells, but $e$ does. That is when the analyst should model $\vartheta$ as a function of $e$.
+
+\paragraph{When the propensity is estimated.}
+In observational studies $e$ must be estimated from the same high dimensional data, and may be as rough as $\vartheta$. Yet treatment is observed for every unit, while each outcome model sees only one arm. The propensity can therefore often be estimated well even when the outcome surface cannot, and using it in the outcome prior transfers that information. This asymmetry supports the propensity covariate device and the Bayesian causal forest\index{Bayesian causal forest}'s use of $\hat e(X)$ as a covariate.
+
+\subsection{Regularization induced confounding}
+
+The same mechanism appears in the partially linear model of Chapter~\ref{ch:dml} as regularization induced confounding\index{regularization induced confounding|textbf} (Hahn, Carvalho, Puelz and He 2018). A shrinkage prior on the confounder coefficients, independent of the treatment model, shrinks a true confounder toward zero. Its outcome variation is attributed to the correlated treatment, biasing $\tau$ in the direction of the confounding.
+
+The remedy is the same: an unpenalized propensity covariate $\hat m(X)$, this chapter's $\hat e(X)$, lets the outcome prior depend on the treatment model and protects the confounding direction from shrinkage. In Section~\ref{sec:ricsim} of Chapter~\ref{ch:horseshoe}, coupling to the whole sample propensity reduced independent horseshoe bias from 0.059 to $-0.023$; DML bias was 0.009 (Table~\ref{tab:ric}). At $p = 50$, least squares on all the covariates matched the coupled posterior (root mean squared error 0.084 for both, least squares bias $-0.002$). At $p = 150$ and 300, DML stayed more accurate while coupled bias grew to $-0.045$ and $-0.071$. With thirty weak confounders at $p = 150$, the order reversed: coupled bias 0.004 against DML's 0.069.
+
+\section{Horvitz Thompson, H\'ajek and the weak paradoxes}\label{sec:weak}
+
+This section develops the work of Datta and Polson (2026) on inverse probability weighting\index{inverse probability weighting}. We set the Horvitz Thompson\index{Horvitz Thompson estimator} and H\'ajek\index{Hajek estimator@H\'ajek estimator} estimators side by side, criticize H\'ajek as a halfway house to a model that does not go far enough, and reply to the claim of Ritov, Bickel, Gamst and Kleijn about the hierarchical Bayes estimator in the Robins, Ritov and Wasserman problem\index{weak paradoxes|textbf}, a claim that is true as stated and misleading in what it leaves out.
+
+\subsection{Two estimators}
+
+In survey notation the estimators of Section~\ref{sec:hajek} read as follows. Let units $k = 1, \ldots, n$ have fixed bounded outcomes $Y_k$, observed when $R_k = 1$, with independent $R_k \sim \mathrm{Bernoulli}(p_k)$ and $p_k \geq \delta > 0$ known. Write
+\[
+\hat S = \sum_{k=1}^n \frac{R_k Y_k}{p_k}, \qquad \hat n = \sum_{k=1}^n \frac{R_k}{p_k}.
+\]
+The Horvitz Thompson and H\'ajek estimators of the mean $\psi$ are
+\[
+\hat\psi_{\mathrm{HT}} = \frac{\hat S}{n}, \qquad \hat\psi_{\mathrm{H}} = \frac{\hat S}{\hat n}.
+\]
+Horvitz and Thompson are exactly unbiased over the design. H\'ajek is a ratio, nonlinear and biased at order $1/n$, and it does not need $n$, which is why it is the only option when the population size is unknown. Trotter and Tukey\index{Horvitz Thompson estimator!Trotter and Tukey interpolation|textbf} in 1956 interpolated between them,
+\[
+\hat\psi_{\lambda} = \frac{\hat S}{(1 - \lambda)n + \lambda\hat n},
+\]
+and Khan and Ugander studied this family in 2023 as adaptive normalization\index{adaptive normalization|textbf}, choosing $\lambda$ from the data so that the asymptotic variance is never above that of either endpoint.
+
+In this family $\lambda = 0$ trusts the design, $\lambda = 1$ trusts the realized sample, and an intermediate $\lambda$ hedges. Adaptive normalization chooses the hedge to minimize an estimated variance, which is already a step toward modelling, since that variance depends on the outcomes.
+
+\subsection{When H\'ajek wins, and why}
+
+S\"arndal, Swensson and Wretman (2003) identify three situations in which H\'ajek tends to have lower variance than Horvitz and Thompson\index{Hajek estimator@H\'ajek estimator!when it wins}: when the outcomes are close to their mean, the extreme case being a constant outcome; when the sample size is random with equal inclusion probabilities; and when inclusion probabilities are negatively correlated with outcomes, so that large outcomes carry large weights. Basu\index{Basu elephants@Basu's elephants}'s circus is the first: whichever elephant is drawn, H\'ajek estimates the total as fifty times its weight.
+
+
+
+\begin{proposition}
+To first order,
+\[
+\hat\psi_{\mathrm{H}} - \psi \approx \frac{1}{n}\sum_{k=1}^n \frac{R_k(Y_k - \psi)}{p_k},
+\qquad
+\hat\psi_{\mathrm{HT}} - \psi = \frac{1}{n}\sum_{k=1}^n \left(\frac{R_kY_k}{p_k} - \psi\right).
+\]
+H\'ajek is Horvitz and Thompson applied to the centred outcomes $Y_k - \psi$.
+\end{proposition}
+
+\begin{proof}
+Write $\hat\psi_{\mathrm{H}} - \psi = (\hat S - \psi\hat n)/\hat n$ and replace $\hat n$ by its expectation $n$ in the denominator.
+\end{proof}
+
+Centring removes the variance due to the level of the outcome. If every outcome equals $c$, Horvitz and Thompson still vary because $\hat n$ varies, while H\'ajek is exact. In survey language, H\'ajek is the model assisted estimator whose working model is a common mean. Under the independent Bernoulli design the first order variances of Horvitz and Thompson and of H\'ajek differ by $n^{-2}\psi\sum_k (1 - p_k)(2Y_k - \psi)/p_k$, so H\'ajek wins exactly when this difference is positive. Large outcomes on units with small $p_k$ push it up, which is the third situation, but a negative correlation between $p_k$ and $Y_k$ does not guarantee it: with equal numbers of units of the types $(p_k, Y_k) = (0.01, 0)$, $(0.1, 1)$ and $(0.99, 0)$ the correlation is negative, yet H\'ajek's first order variance is $5.0/n$ against $3/n$ for Horvitz and Thompson.
+
+\subsection{A critique of the H\'ajek estimator}
+
+The proposition also shows what H\'ajek does not do\index{Hajek estimator@H\'ajek estimator!critique of}. In the setting of the Robins, Ritov and Wasserman example, with cells $b = 1, \ldots, B$, outcome probabilities $\theta_b$ and selection probabilities $p_b$ (Section~\ref{sec:rrw} writes $K$, $x$, $e(x)$ and $\vartheta(x)$ for $B$, $b$, $p_b$ and $\theta_b$), its asymptotic variance is
+\[
+\mathrm{Var}(\hat\psi_{\mathrm{H}}) \approx \frac{1}{n}\cdot\frac{1}{B}\sum_{b=1}^B \frac{\theta_b(1 - \theta_b) + (\theta_b - \psi)^2}{p_b},
+\]
+while for Horvitz and Thompson the numerator is $\theta_b$ and a $-\psi^2$ term is subtracted outside the sum. Both variances carry the factor $1/p_b$: H\'ajek lowers the numerator in cells with $\theta_b > \psi/2$, raises it in cells with $\theta_b < \psi/2$, and does nothing about the denominator. As some selection probabilities approach zero, both estimators degrade. In the first design of Table~\ref{tab:weak} the outcome probabilities are uniform on $[0.1, 0.9]$ and independent of selection, and the mean of $1/p_b$ over $[0.01, 0.99]$ is about 4.7. The two formulas then give about 2.1 for Horvitz and Thompson and 1.2 for H\'ajek on the scale of the table (mean squared error times 100), against the simulated 2.08 and 0.96.
+
+We draw four criticisms from this. First, H\'ajek is a model that will not admit it is one: its gain over Horvitz and Thompson comes entirely from an implicit common mean. Its fix for Basu's circus, ratio estimation with an auxiliary size variable $A_k$, is a regression model through the origin. Once a model does the work, the analyst should state it and choose it well.
+
+Second, H\'ajek keeps the weights. Every observed outcome is still multiplied by $1/p_k$, and a tiny $p_k$ lets one unit dominate numerator and denominator together. The ratio partly cancels the damage but cannot remove it.
+
+Third, H\'ajek cannot borrow strength: two cells with similar selection probabilities and outcome rates share only a normalizer. This is where Stein's paradox\index{Stein paradox@Stein's paradox|textbf} enters: for Gaussian observations with known variance, in three or more dimensions the James Stein estimator\index{James Stein estimator|textbf}, which pools, dominates the cellwise estimator of the vector of means under summed squared error (James and Stein 1961). The cells here are Bernoulli and the target is one average, so the theorem does not transfer as it stands, but it is the reason to expect pooling to help, and neither Horvitz and Thompson nor H\'ajek pools.
+
+Fourth, H\'ajek gives no distribution: a point estimate and a linearized variance, but no posterior for $\psi$, no answer for any other functional, and no indication of which cells drive the uncertainty.
+
+\subsection{The weak paradoxes}
+
+Datta and Polson study what J.~K. Ghosh\index{Ghosh, Jayanta K.!weak paradoxes|textbf} called weak paradoxes\index{weak paradoxes}: Basu's circus and the Robins, Ritov and Wasserman example of Section~\ref{sec:rrw}. Several Bayesian responses have been proposed.
+
+Li, in 2010, made the cell probabilities exchangeable around a hypermean $h$, $\theta_b \sim \mathrm{Beta}(\alpha_T h, \alpha_T(1 - h))$, with a $\mathrm{Beta}(\alpha_F, \alpha_F)$ prior on $h$. With $\alpha_F = 1$ and no cell observed twice, the posterior mean of $h$ is
+\[
+\hat\psi_{\mathrm{Li}} = \frac{\sum_k R_kY_k + 1}{\sum_k R_k + 2}.
+\]
+This is the estimator we study. The finite population mean $\psi = B^{-1}\sum_b \theta_b$ is not $h$: with $M = \sum_k R_k$ selected units and $S = \sum_k R_kY_k$ successes, its posterior mean is $\hat\psi_{\mathrm{Li}} + (S - M\hat\psi_{\mathrm{Li}})/\{B(\alpha_T + 1)\}$, and the correction vanishes when the selected units are a small fraction of the cells.
+
+Ghosh (2015) grouped the selection probabilities into $J \ll B$ bins and applied the weighting within bins, with each bin's mean selection probability in place of the individual $p_k$. Sims (2012) proposed treating $\theta$ as a step function of $p$, constant within segments of the range of $p$, a Bayesian version of the same binning. Harmeling and Toussaint (2007) replaced the Bernoulli outcome by a Gaussian with a hierarchical prior and showed that the posterior mean beats Horvitz and Thompson in mean squared error.
+
+\subsection{Li's estimator revisited}
+
+Ritov, Bickel, Gamst and Kleijn asserted that Li's estimator\index{Li estimator@Li's estimator|textbf} is consistent only if $\E(Y \mid R = 1) = \E(Y)$, that is, only if selection is unrelated to the outcome. Datta and Polson gave a proof and a sharper statement. Write
+\[
+\bar p = \frac{1}{B}\sum_b p_b, \qquad \sigma_{\theta,p} = \frac{1}{B}\sum_b \theta_b p_b - \bar p\,\psi.
+\]
+
+\begin{theorem}[Datta and Polson]
+As $n \to \infty$,
+\[
+\E(\hat\psi_{\mathrm{Li}}) \to \psi + \frac{\sigma_{\theta,p}}{\bar p},
+\]
+and the variance of $\hat\psi_{\mathrm{Li}}$ is of order $1/n$ with a constant that involves only $\bar p$ and $B^{-1}\sum_b\theta_bp_b$, not the individual $1/p_b$.
+\end{theorem}
+
+\begin{proof}[Sketch]
+The draws are independent, so $M = \sum_k R_k$ is binomial with $n$ trials and success probability $\bar p$, and given $M$ the number of successes $S = \sum_k R_kY_k$ is binomial with $M$ trials and success probability $q = B^{-1}\sum_b\theta_bp_b/\bar p = \psi + \sigma_{\theta,p}/\bar p$. Hence $\E(\hat\psi_{\mathrm{Li}} \mid M) = (Mq + 1)/(M + 2) = q + (1 - 2q)/(M + 2)$, and since $M/n \to \bar p > 0$ and the second term is bounded, $\E(\hat\psi_{\mathrm{Li}}) \to q$. The variances of numerator and denominator and their covariance are linear in $n$ with constants built from $\bar p$ and $B^{-1}\sum_b\theta_bp_b$; the delta method for a ratio gives the stated order.
+\end{proof}
+
+The theorem confirms Ritov and coauthors' claim: bias vanishes exactly when $\sigma_{\theta,p} = 0$. But Li's estimator needs no lower bound $p_b \geq \delta$: its variance contains no $1/p_b$. Its failure is the covariance between selection and outcome. Modelling that relation with the coupled prior of Section~\ref{sec:rrw} keeps the immunity to small $p_b$: rare cells are filled by extending the fitted relation instead of dividing rare observations by $p_b$. In the simulation below, coupling reduces bias from $0.050$ to $-0.001$ when selection is related to outcome; when unrelated, its error is about one and a half times Li's.
+
+Ghosh's binning made Bayesian is a different case. With many selected units in every bin, its posterior mean is close to binned H\'ajek. In the simulation below binned H\'ajek has about H\'ajek's error, about twice Li's, when selection is unrelated to outcome. With ten bins and $n = 100$ draws that limit is far off: the prior pulls each bin toward one half, and the bin posterior of the simulation behaves quite differently.
+
+Linero (2024) argues that in high dimensional and nonparametric models, Bayesian ignorability\index{ignorability} encodes an informative prior that selection bias is small.
+
+\subsection{A simulation of six estimators}
+
+We repeated and extended the simulation\index{simulation study!six estimators|textbf} of Datta and Polson. There are $B = 1{,}000$ cells with selection probabilities equally spaced on $[0.01, 0.99]$ and $n = 100$ draws of a cell chosen uniformly, so most cells are never seen. Outcome probabilities are uniform on one of four ranges and independent of selection. A fifth design makes selection informative, with $\theta_b = 0.5p_b + 0.5U_b$, $U_b$ uniform on $[0,1]$, and selection probabilities on $[0.1, 0.9]$. We compare Horvitz and Thompson, H\'ajek, Li's estimator, binned H\'ajek with ten bins, and the coupled prior, which centres each cell's outcome probability on a logistic regression on $\logit p_b$ fitted to the observed cells, each cell then having a beta prior with that mean and a weight of five observations. The sixth, a bin posterior, puts independent uniform priors on the mean outcome probability in ten bins of the selection probability and weights the bin means by the known shares of cells in the bins. Each design is replicated 5,000 times.
+
+\begin{table}[ht]
+\centering
+\caption{Mean squared error times 100 in the weak paradox simulation. In the first four rows selection is independent of outcome; in the last row selection is related to the outcome. 5,000 replications; Monte Carlo standard errors are at most 0.11 for Horvitz and Thompson (HT) and 0.02 for the others except the bin posterior (0.004 to 0.013), and the paired standard errors of the differences between the coupled prior and the other estimators are 0.007 to 0.016 (HT excepted).}
+\label{tab:weak}
+\small
+\begin{tabular}{lcccccc}
+\toprule
+Design & HT & H\'ajek & Li & Binned & Coupled & Bin post. \\
+\midrule
+$\theta \sim U[0.1, 0.9]$ & 2.08 & 0.96 & 0.47 & 0.92 & 0.71 & 0.22 \\
+$\theta \sim U[0.1, 0.4]$ & 1.19 & 0.75 & 0.37 & 0.70 & 0.56 & 1.13 \\
+$\theta \sim U[0.35, 0.65]$ & 2.18 & 0.98 & 0.46 & 0.92 & 0.70 & 0.22 \\
+$\theta \sim U[0.6, 0.9]$ & 2.91 & 0.71 & 0.36 & 0.69 & 0.54 & 1.15 \\
+Outcome related & 0.92 & 0.67 & 0.70 & 0.66 & 0.60 & 0.25 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{ipw_weak.pdf}
+\caption{Left: mean squared error of six estimators (5,000 replications) when selection is unrelated to the outcome. Right: errors when selection is related to the outcome, where Li's estimator is biased upward.}
+\label{fig:weak}
+\end{figure}
+
+Table~\ref{tab:weak} and Figure~\ref{fig:weak} reproduce the qualitative findings of Datta and Polson. When selection is unrelated to outcome, Li's hierarchical estimator has the smallest error of the five older estimators in every design, three to eight times smaller than Horvitz and Thompson, with H\'ajek and binned H\'ajek in between. When selection is related to outcome, Li's estimator is biased upward by 0.050, close to the 0.053 the theorem predicts, and its error is no better than H\'ajek's. The coupled prior is ahead of binned H\'ajek and H\'ajek in that design (0.60, 0.66 and 0.67; the gaps are 8.6 and 9.6 paired standard errors of 0.007) and is second best of the five when selection is unrelated to outcome, paying about one and a half times Li's error for estimating a regression on $\logit p$ that turns out flat. Its lead over H\'ajek and binned H\'ajek is more than ten paired standard errors in each of the four designs with selection unrelated to outcome.
+
+The bin posterior is best near one half or under informative selection (0.22 to 0.25, against 0.46 to 0.70 for Li and 0.60 to 0.71 for the coupled prior), but worst among the model based estimators far from 0.5 ($U[0.1, 0.4]$ and $U[0.6, 0.9]$: 1.13 and 1.15, against 0.56 and 0.54 for the coupled prior, and worse than H\'ajek). Its uniform prior adds two observations at one half to every bin, so a bin with $M_j$ selected units and $S_j$ successes is estimated by $(1 + S_j)/(2 + M_j)$. With $n = 100$ draws a bin averages five selected units; the pull toward 0.5 gives biases of $+0.097$ and $-0.099$ in those two designs. About 9 percent of bins are empty and keep the prior mean, accounting for only about 0.022 of that bias. The prior pays off only when centred near the truth.
+
+\subsection{Inverse weighting as importance sampling}
+
+Datta and Polson's second theme is that the same estimators appear in Monte Carlo integration. Estimating $\psi = \int l(x)\,dF(x)$, the mean of a function $l$ under $F$, by sampling from a proposal $g$ and weighting by $f/g$ is Horvitz and Thompson with inclusion probabilities replaced by proposal densities. Self normalized importance sampling\index{importance sampling|textbf}, in which the weights are divided by their sum, is H\'ajek. The improvements known in Monte Carlo transfer back: Riemann sum and trapezoidal estimators that order the draws before summing (Yakowitz and coauthors, 1978; Philippe and Robert, 2001); vertical likelihood integration (Polson and Scott, 2014); nested sampling (Skilling, 2006); and quantile importance sampling (Datta and Polson, 2023), which orders draws by likelihood and can converge much faster for marginal likelihoods. Each replaces the raw weights by a smoother, ordered representation: binning and smoothing by another name.
+
+The causal reading is direct: inverse propensity weighting\index{inverse probability weighting!as importance sampling|textbf} for the average treatment effect is importance sampling from the treated distribution to the population, and its instability when propensities are small is the familiar instability of importance sampling with a poor proposal. The Monte Carlo answer has always been to use the structure of the integrand; the causal analogue is an outcome model.
+
+\subsection{From weak paradoxes to the horseshoe}
+
+Datta and Polson propose a horseshoe\index{horseshoe prior} on cell deviations from a regression on selection probability. The global scale learns how much cells vary beyond what selection explains; local scales let a few differ sharply without pulling the others. This applies the prior of Chapter~\ref{ch:horseshoe} to missing data: model the relation between selection and outcome and borrow strength across cells.
+
+\section{What the lineage teaches}
+
+Three lessons run from Horvitz and Thompson to DML\index{double machine learning!lineage of weighting|textbf}\index{inverse probability weighting!lineage of|textbf}.
+
+Design based unbiasedness is weak: it holds over hypothetical repeated assignments and says little about the actual one. Basu's elephants make this vivid; a treated unit in the far tail makes it practical. The estimator of Figure~\ref{fig:ipw} is unbiased at every selection slope, and at $s = 4$ even 300 replications could not pin down its standard deviation.
+
+Every improvement adds modelling: a common mean (H\'ajek), a linear model (regression), a full outcome model (augmentation), keeping weights only as a correction. DML is the latest step, and it still depends on the weights through its correction term.
+
+Robins and Ritov\index{Robins and Ritov example}'s example (Section~\ref{sec:rrw}) shows that ignoring the informative propensity score\index{propensity score} can be fatal. Model with it; do not weight by it. The coupled prior puts the selection probability where a Bayesian puts prior information, and in the simulation of that section it matched Horvitz and Thompson in error while delivering the posterior that Horvitz and Thompson cannot. The weights were a substitute for a model of the outcomes, and once the model is good enough they are no longer needed.
+
+\section{In practice}
+
+\paragraph{The target.} The target here is $\tau$, or its trimmed or overlap weighted versions, each $\tau_Q = \int \tau(x)\,Q(dx)$ for a different $Q$. All three come from one posterior for the outcome model, each draw $\tau^{(s)}$ giving the draw $\int \tau^{(s)}(x)\,Q(dx)$, and the user chooses $Q$ for substantive reasons. In the cell model, draw $(a, b, \sigma_\eta)^{(s)}$ and, for unvisited cells, $\vartheta(x)$ from \eqref{eq:coupled}; visited cells are updated by their data. Averaging gives $\psi^{(s)}$ for $\psi = K^{-1}\sum_x \vartheta(x)$. Subgroup means, new covariate laws and quantiles use the same draws.
+
+\paragraph{What the analyst does differently.} An analyst who weights should first look at the weights. Report the largest weight and the effective sample size of the weights; a largest weight in the hundreds says that one or two units decide the estimate, as Jumbo would have decided the circus total. Normalize, though H\'ajek leaves a bias of order $1/n$. If trimming or overlap weighting is used, state the new estimand and the fraction of units it drops. An analyst who fits the outcome model instead reports where the posterior for $\tau(x)$ is wide and gives $\tau_Q$ for the $Q$ the user wants with an interval that reflects the poor overlap. When the propensity is known or well estimated, put it in the outcome model as a covariate or in the prior, as \eqref{eq:coupled} does, rather than dividing by it.
+
+\paragraph{Against DML.} DML's augmented score keeps the weights as a correction, so it inherits the behaviour of Figure~\ref{fig:ipw} when overlap is weak and the outcome model is poor; Kang and Schafer's benchmark showed the correction making matters worse when both models were mildly wrong. The coupled prior matched Horvitz and Thompson in the Robins and Ritov simulation and stayed within about one and a half times the error of the best of the five older estimators in Table~\ref{tab:weak}. DML is adequate in the regime it was built for: good overlap, a well estimated outcome model, one functional wanted, and a sample large enough for the asymptotics. There the weighted correction is small and cheap, and the posterior adds little to the point estimate.
+
+\section*{Notes}
+
+H\'ajek (1971) proposed the ratio estimator in his comment on Basu's essay.
+
+Double robustness and the augmented estimator begin with Robins, Rotnitzky and Zhao (1994); Tsiatis (2006) gives the semiparametric theory. The efficiency bound is Hahn's (1998), and efficient estimation with an estimated propensity score is due to Hirano, Imbens and Ridder (2003).
+
+Wasserman (2004) popularized Robins and Ritov's (1997) example. Putting the estimated propensity into the outcome model is the targeted selection adjustment of Hahn, Murray and Carvalho (2020), which answers the regularization induced confounding studied by Hahn, Carvalho, Puelz and He (2018); the Bayesian causal forest is in Chapter~\ref{ch:bart}.
+
+Section~\ref{sec:weak} is the work of Jyotishka Datta and Nick Polson (Datta and Polson 2026): the theorem on Li's estimator, the simulation we repeat and extend, the importance sampling link and the proposal of a horseshoe on cell probabilities.
+
+For marginal structural models with time varying treatments, see Robins, Hern\'an and Brumback (2000) and Hern\'an and Robins (2020).
+
+\begin{exercises}
+\item\label{ex:ch05:1} Compute the variance of the Horvitz Thompson estimator in Basu's circus, assuming Sambo weighs the population average and the other weights have standard deviation $\sigma$.
+\item\label{ex:ch05:2} Find a model for the treated outcomes under which the H\'ajek estimator is the posterior mean of $\mu_1$, and explain what that model assumes about units with small propensity.
+\item\label{ex:ch05:3} In the simulation of Figure~\ref{fig:ipw}, show that $\E\{1/e(X)\} = 1 + \exp(s^2/2)$, and deduce that the variance of \eqref{eq:ipw} grows at least like $\exp(s^2/2)$. Then show that the variance is exactly $\{4 + \exp(s^2/2)(2s^2 - 2s + 5)\}/n$ and compare its square root with the 300 replication values of the figure.
+\item\label{ex:ch05:4} Show that the overlap weighted estimand equals the partially linear DML estimand of Exercise~\ref{ex:ch04:1} when treatment is binary.
+\item\label{ex:ch05:5} Construct an example in which trimming at $\alpha = 0.05$ changes the sign of the estimand.
+\item\label{ex:ch05:6} Discuss whether Basu's example is a fair criticism of the augmented estimator \eqref{eq:aipw}.
+
+\item\label{ex:ch06:1} Show that when $n \to \infty$ with $n/K \to 0$ the hierarchical posterior with exchangeable $\vartheta(x)$, independent of $e$, converges to $\E\{e(X)\vartheta(X)\}/\E\,e(X)$.
+\item\label{ex:ch06:2} Show that no prior on $\vartheta$ makes the Horvitz Thompson estimator the posterior mean of $\psi$ for every data set.
+\item\label{ex:ch06:3} Extend the coupled prior \eqref{eq:coupled} to a horseshoe expansion in a spline basis of $\logit e(x)$, and argue that when the number of segments grows slowly enough that every segment of the range of $e$ contains selected units, and the global scale is large, its posterior mean approaches the H\'ajek estimator stratified by $e$.
+\item\label{ex:ch06:4} In the regularization induced confounding setup, derive the bias of the posterior mean of $\tau$ under independent normal priors on the confounder coefficients, as a function of the prior variance.
+\item\label{ex:ch06:5} Suppose $e$ is not known but estimated. Explain how uncertainty in $\hat e$ should enter the coupled posterior, and compare with how it enters the augmented estimator.
+\item\label{ex:ch06:6} Construct a version of the example in which $\vartheta$ is smooth in $x$ and show by simulation that an independent smooth prior performs well.
+
+\item\label{ex:chweak:1} Derive the first order variance of the H\'ajek estimator in the cell model and confirm the formula in the critique of Section~\ref{sec:weak}.
+\item\label{ex:chweak:2} Linearize the Trotter and Tukey estimator about $(\E\hat S, \E\hat n)$ for fixed $\lambda$ and find the value of $\lambda$ that minimizes its first order variance, in terms of $\psi$, $\mathrm{Var}(\hat S)$, $\mathrm{Var}(\hat n)$ and $\mathrm{Cov}(\hat S, \hat n)$.
+\item\label{ex:chweak:3} Under a fixed size design, show that Horvitz and Thompson have zero variance when $Y_k \propto p_k$, and that H\'ajek does not. What changes under the independent Bernoulli design of Section~\ref{sec:weak}? Interpret this through each estimator's implicit model.
+\item\label{ex:chweak:4} Complete the proof of the Datta and Polson theorem by computing the variance of numerator and denominator and their covariance.
+\item\label{ex:chweak:5} Implement Sims's sieve with $J$ segments, a uniform prior on the outcome probability of each segment and a Dirichlet posterior over segment shares, and compare its mean squared error with binned H\'ajek in the design with selection related to outcome.
+\item\label{ex:chweak:6} Write the horseshoe prior on cell probabilities sketched in Section~\ref{sec:weak} and derive a Gibbs sampler using Polya Gamma augmentation.
+\end{exercises}

@@ -1,0 +1,10 @@
+% comp s01, from old m16 line 7
+\section{Why computation is the objection}\label{comp:sec:why}
+
+Cheap computation is one advantage of double machine learning\index{double machine learning}\index{double machine learning!computational cost|textbf}. A cross fitted DML estimate needs a handful of regressions; a posterior needs thousands of Markov chain iterations\index{computational cost of a posterior}. The horseshoe\index{horseshoe prior} sampler is fast enough for the models of this book (Section~\ref{comp:sec:cost}).
+
+A posterior is a set of draws, and every target in this book is a function of the draws, such as a risk difference averaged over a population $Q$ that the analyst chooses (Chapter~\ref{ch:mccullagh}). A sampler is therefore indifferent to the target; a learned map is trained for the parameter we ask of it (Section~\ref{comp:sec:core}).
+
+
+
+The quantile network plays two roles in this book: here it learns a posterior from simulated pairs of parameter and data; in Chapter~\ref{ch:gente} it regresses the outcome on covariates and treatment using observed data, with uncertainty from the Bayesian bootstrap. Chapter~\ref{ch:blp} uses a variant: a regression network learns a posterior mean from simulated pairs, and residuals from cross fitting supply the spread.

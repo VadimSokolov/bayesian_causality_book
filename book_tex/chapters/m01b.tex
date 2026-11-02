@@ -1,0 +1,427 @@
+\chapter{Frameworks for Causal Inference}\label{ch:frameworks}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+The frameworks of Fisher, Neyman and Rubin, Pearl, Robins, Dawid and the econometricians differ on what a cause is and on where identification comes from, design in a randomized experiment and assumption everywhere else, yet they largely compute the same estimators. A reader who wants the Bayesian development can skip the chapter on a first reading and return to it when a later chapter cites one of the frameworks.
+\end{tcolorbox}
+
+Causal inference has no single theory. It has a family of theories that agree on the questions (does this drug lower mortality, does this policy raise employment) but disagree on almost everything else: what a causal claim asserts, what mathematical object encodes it, which assumptions license it, and whether the usual estimands are even the right targets. Whether one writes an effect as a counterfactual or as an intervention, and whether one targets a marginal or a conditional effect, changes both what may be claimed and how the claim must be defended.
+
+A causal conclusion can be earned by design\index{design versus assumption} or by assumption. In a randomized experiment the causal reading follows from how the data were generated. As Harrell (2026) puts it, with no interruption in the flow of data ``there is no explanation for the result other than the experimental manipulation and random variation.'' In an observational study, identification rests on an untestable premise, such as no unmeasured confounding, a valid instrument, parallel trends or continuity at a threshold. The conclusion is as credible as that premise. The frameworks largely agree on the arithmetic; they dispute the meaning and provenance of the assumptions.
+
+\section[The fundamental problem]{The fundamental problem and the language of causation}\label{fw:sec:fundamental}
+
+Almost every modern framework begins, explicitly or implicitly, with the pair of potential outcomes\index{potential outcomes} $\{Y_i(0), Y_i(1)\}$ of a unit $i$ under a binary treatment $T_i \in \{0,1\}$, tied to the observed outcome by the consistency identity \eqref{eq:consistency} of Chapter~\ref{ch:predictive}. The unit effect $\tau_i = Y_i(1) - Y_i(0)$ is never directly observed, so attention shifts to population summaries, chiefly the average treatment effect and the effect on the treated. The naive contrast of observed group means estimates neither in general, but
+\begin{equation}\label{fw:eq:decomp}
+\begin{split}
+\E[Y \mid T=1] - \E[Y \mid T=0] &= \underbrace{\E[Y(1)-Y(0)\mid T=1]}_{\text{effect on the treated}}\\
+&\quad + \underbrace{\E[Y(0)\mid T=1] - \E[Y(0)\mid T=0]}_{\text{selection bias}}.
+\end{split}
+\end{equation}
+The second term is selection bias\index{selection bias|textbf}, or confounding, and it is what the field is about. Every framework is a strategy for it: argue that it is zero by design, or estimate and remove it by assumption.
+
+Holland\index{Holland, Paul W.!fundamental problem of causal inference} (1986), who named the fundamental problem\index{fundamental problem of causal inference}, attached the slogan ``no causation without manipulation''\index{no causation without manipulation|textbf}: a cause must be, at least conceptually, a potential intervention, which excludes immutable attributes such as sex.
+
+The potential outcome notation is not theory neutral. Writing $\{Y(0), Y(1)\}$ as a pair of random variables commits one to a joint distribution over counterfactuals\index{counterfactual|textbf}, including the cross world dependence $\Cov(Y(0), Y(1))$, which no experiment can identify. Dawid's framework (Section~\ref{fw:sec:dawid}) targets exactly this commitment, and Section~\ref{sec:ot} and Chapter~\ref{ch:tianpearl} show what follows when one keeps it and puts a prior on the unidentified coupling.
+
+\section{Fisher: randomization as the reasoned basis for inference}\label{fw:sec:fisher}
+
+The oldest of the modern frameworks is also the most austere. Fisher\index{Fisher, Ronald A.|textbf} (1925, 1935) made physical randomization\index{randomization} the foundation of experimental inference\index{Fisher, Ronald A.!randomization|textbf}\index{randomized experiment}. He did not claim that randomization makes groups equal (in any finite sample they differ on countless covariates), but that it furnishes the probability distribution against which an observed contrast is judged: ``the reasoned basis for inference\index{randomization!as the basis of inference|textbf}.''
+
+Fisher's test addresses the sharp null hypothesis\index{sharp null|textbf}\index{Fisher, Ronald A.!sharp null|textbf} of no effect for any unit,
+\[
+H_0:\quad Y_i(1) = Y_i(0) \quad\text{for all } i.
+\]
+Under $H_0$ the missing outcome equals the observed one, so the only randomness is the assignment, whose distribution the experimenter controls. Enumerating or sampling the assignments the design allows gives the exact reference distribution of any test statistic, without parametric assumptions. In the lady tasting tea\index{lady tasting tea|textbf}, the number of correct identifications under the sharp null is hypergeometric, and the $p$ value is a combinatorial fact.
+
+The randomization test\index{randomization test|textbf} is essentially assumption free for the sharp null, but, as Neyman stressed, it tests that null rather than estimating an effect. It does not by itself deliver intervals, random effects, longitudinal or Bayesian machinery.
+
+The fault line that still divides the field opened at the Royal Statistical Society in 1935, when Neyman presented his analysis of randomized blocks (Neyman, Iwaszkiewicz and Kolodziejczyk 1935) and Fisher responded with characteristic ferocity. Fisher's sharp null against Neyman's weak null of no average effect is a disagreement about the object of inference, which functional of the completed table of potential outcomes is the target. A treatment with exactly zero average effect may help half the units and harm the other half, making the sharp null false and the weak null true.
+
+In the smoking and lung cancer controversy (Chapter~\ref{ch:smoking}) Fisher pressed a common constitutional cause of both the habit and the cancer, dramatizing his doctrine that without randomization a confounder can always be hypothesized.
+
+\section{Neyman and Rubin: potential outcomes and the assignment mechanism}\label{fw:sec:rubin}
+
+Neyman\index{Neyman, Jerzy|textbf} (1923) represented each plot by its yield under each variety\index{Neyman, Jerzy!potential outcomes|textbf}; randomization selects the observed yield. He derived the unbiasedness of the difference in means\index{difference in means|textbf} over randomization and the conservative variance estimator\index{Neyman conservative variance estimator@Neyman's conservative variance estimator} for the average effect $\tau_{\mathrm{fp}}$ of Chapter~\ref{ch:predictive}. Rubin\index{Rubin, Donald B.} (1974, 1978) extended the notation to observational studies\index{Rubin, Donald B.!potential outcomes|textbf} and made the assignment mechanism\index{assignment mechanism} explicit in what Holland\index{Holland, Paul W.!Rubin causal model|textbf} (1986) named the Rubin causal model\index{potential outcomes!Neyman and Rubin tradition|textbf}. Under market equilibrium, a policy applied at scale changes prices for every unit, violating the stable unit treatment value assumption (Chapter~\ref{ch:predictive}).
+
+The assignment mechanism $\Prob(T \mid Y(0), Y(1), X)$ is known in a randomized experiment and assumed in an observational study. Under the strong ignorability\index{ignorability}\index{ignorability!in the Rubin framework|textbf} of Chapter~\ref{ch:predictive}, $\E[Y(t)] = \E_X[\E(Y \mid T=t, X)]$, so the average effect is identified by averaging conditional regressions over the covariate distribution, the adjustment or g formula.
+
+Rosenbaum\index{Rosenbaum, Paul R.!propensity score} and Rubin\index{Rubin, Donald B.!propensity score} (1983), who introduced strong ignorability, proved that the propensity score\index{propensity score} $e(X) = \Prob(T=1 \mid X)$ is a balancing score, $X \indep T \mid e(X)$, and that ignorability given $X$ implies it given $e(X)$ alone. The score presupposes ignorability and cannot manufacture it, and, as Rubin stresses, the design of an observational study, choosing and balancing covariates, can and should be done without seeing the outcomes.
+
+The Rubin causal model is ecumenical about inference, admitting Fisherian randomization tests, Neymanian repeated sampling and Bayesian imputation. In the Bayesian mode (Rubin 1978) one places a model on the science $\Prob(Y(0), Y(1)\mid X,\theta)$ and a prior on $\theta$, imputes the missing potential outcomes from their posterior predictive distribution and reads any estimand off the completed table. An ignorable assignment mechanism whose parameters are a priori independent of $\theta$ then drops out of the posterior \eqref{eq:ignorable}. 
+
+\section{Pearl: structural causal models and the do calculus}\label{fw:sec:pearl}
+
+Where the Rubin model starts from potential outcomes and treats causal structure as an assumption about assignment, Pearl\index{Pearl, Judea|textbf} (1995, 2009) starts from the structure itself, encoded as a directed acyclic graph\index{directed acyclic graph|textbf}\index{DAG|see{directed acyclic graph}}, and derives potential outcomes from it. A structural causal model\index{structural causal model|textbf}\index{Pearl, Judea!structural causal models|textbf} is a system of nonparametric structural equations\index{structural equation}
+\[
+V_j = f_j\bigl(\mathrm{pa}(V_j),\, U_j\bigr), \qquad j = 1,\dots,d,
+\]
+one per variable, with $\mathrm{pa}(V_j)$ its graphical parents and $U_j$ exogenous noise. The equations are assignments: reading the equals sign as ``is computed from'' distinguishes a structural equation from a regression. For identifying the effect of a single treatment the Rubin and Pearl languages are interchangeable: a structural model defines potential outcomes\index{potential outcomes!and structural equations|textbf}, and ignorability assumptions can be read off a graph. They part company on cross world quantities such as mediation (Section~\ref{fw:sec:robins}), and we use whichever is more convenient.
+
+\paragraph{Interventions.} An intervention\index{do operator|textbf}\index{intervention|see{do operator}} $\doint(T=t)$ replaces the equation for $T$ by the constant $t$, leaving the others intact. The resulting interventional distribution $\Prob(Y \mid \doint(T=t))$ in general differs from $\Prob(Y \mid T=t)$, and the problem of identification is to express it, when possible, through the observational distribution.
+
+\paragraph{The do calculus and the back door criterion.} Pearl's three rules of the do calculus\index{do calculus|textbf} (Pearl 1995) are complete, as Shpitser and Pearl (2006) and Huang and Valtorta (2006) proved: an interventional query is identifiable if and only if the rules reduce it to a do free expression. The most used special case is the back door criterion\index{back door criterion|textbf}: a set $X$ suffices for the effect of $T$ on $Y$ if no node in $X$ is a descendant of $T$ and $X$ blocks every path from $T$ to $Y$ that begins with an arrow into $T$. Then
+\begin{equation}\label{fw:eq:backdoor}
+\Prob(Y \mid \doint(T=t)) = \sum_{x} \Prob(Y \mid T=t, X=x)\,\Prob(X=x),
+\end{equation}
+numerically identical to the g formula of Section~\ref{fw:sec:rubin} but read off a graph\index{back door criterion} rather than assumed of an assignment mechanism. The front door criterion\index{front door criterion} goes further, identifying an effect despite an unmeasured confounder by exploiting a fully mediating variable (Appendix~\ref{app:graphs} and Chapter~\ref{ch:smoking}).
+
+\paragraph{The ladder of causation.} Pearl and Mackenzie (2018) popularized a three rung hierarchy\index{ladder of causation|textbf}: association, $\Prob(Y\mid T)$, or seeing; intervention, $\Prob(Y\mid \doint(T))$, or doing; and counterfactuals, $\Prob(Y(t) \mid T=t', Y=y')$, or imagining. The top rung requires the full structural model, functions $f_j$ and noise law, not merely the graph. Hence the graph alone can identify interventional queries, when the confounding structure permits, but not all counterfactual ones, and the probabilities of causation of Chapter~\ref{ch:tianpearl} are, without further assumptions such as monotonicity, only bounded.
+
+\paragraph{Graphs as a discipline.} Graphs make confounding\index{confounding} assumptions visible, imply conditional independences data can contradict, and force the analyst to distinguish confounders, mediators and colliders (Figures~\ref{fig:dagconf} and~\ref{fw:fig:dags}). Adjusting for a confounder removes bias; adjusting for a mediator removes the very effect one wants; adjusting for, or selecting on, a collider\index{collider|textbf} creates an association between otherwise independent causes, the mechanism behind selection and Berkson bias. ``Control for all available covariates'' is therefore not a coherent rule: whether adjustment helps depends on the variable's causal role, a structural assumption, not a statistical fact.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[>={Stealth[length=2mm]},
+  every node/.style={circle,draw,minimum size=7mm,inner sep=0pt,font=\small},
+  unobs/.style={circle,draw,dashed}]
+\begin{scope}
+  \node[unobs] (U) at (1,1.4) {$U$};
+  \node (T) at (0,0) {$T$};
+  \node (M) at (1,0) {$M$};
+  \node (Y) at (2,0) {$Y$};
+  \draw[->] (T) -- (M); \draw[->] (M) -- (Y); \draw[->] (U) -- (T); \draw[->] (U) -- (Y);
+  \node[draw=none,font=\small] at (1,-0.9) {(a) mediator, front door};
+\end{scope}
+\begin{scope}[xshift=4.6cm]
+  \node (T) at (0,1.2) {$T$};
+  \node (Y) at (2,1.2) {$Y$};
+  \node (C) at (1,0) {$C$};
+  \draw[->] (T) -- (C); \draw[->] (Y) -- (C);
+  \node[draw=none,font=\small] at (1,-0.9) {(b) collider};
+\end{scope}
+\end{tikzpicture}
+\caption{Two canonical structures. (a) $M$ is a mediator and $U$ an unobserved confounder of $T$ and $Y$: do not adjust for $M$ if the total effect is wanted; the front door formula identifies it through $M$. (b) $C$ is a collider: adjusting for it or selecting on it induces spurious dependence between $T$ and $Y$. Figure~\ref{fig:dagconf} shows the confounder. Dashed nodes are unobserved.}
+\label{fw:fig:dags}
+\end{figure}
+
+\section{Robins: nonparametric structural models and efficiency}\label{fw:sec:robins}
+
+James Robins\index{Robins, James M.|textbf} developed a nonparametric structural account of counterfactuals\index{Robins, James M.!nonparametric structural models|textbf} and a semiparametric efficiency theory of estimation.
+
+\paragraph{Two structural models, not one.} Pearl's nonparametric structural equation model assumes jointly independent exogenous noises, which implies cross world independencies: untestable constraints that link counterfactuals of different variables under different interventions, such as a mediator under no treatment and the outcome under treatment. Robins's finest fully randomized causally interpretable structured tree graph model assumes only independencies within each single world, which a randomized intervention could in principle verify. It is strictly weaker, identifies the same interventional effects, and declines the cross world commitments. The gap is invisible for total effects but decisive for mediation and path specific effects, where cross world assumptions do the real work.
+
+Take a treatment $T$, a mediator $M$ and an outcome $Y$ whose confounders $X$ are all measured and none of them is affected by $T$. Write $M(t)$ for the mediator under treatment $t$ and $Y(t,m)$ for the outcome with treatment set to $t$ and mediator to $m$, so that $Y(1,M(0))$ is the outcome under treatment with the mediator at the value it would have taken without. The mediation formula
+\[
+\sum_{x,m}\E[Y\mid T=1,M=m,X=x]\,\Prob(M=m\mid T=0,X=x)\,\Prob(X=x)
+\]
+averages the outcome regression under treatment over the law of the mediator under no treatment. It needs overlap in both treatment and mediator: $0<\Prob(T=1\mid X=x)<1$, and $\Prob(M=m\mid T=1,X=x)>0$ wherever $\Prob(M=m\mid T=0,X=x)>0$, so that the regression is estimable at every mediator value the formula weights. Under Pearl's model with independent errors it equals $\E[Y(1,M(0))]$, which together with $\E[Y(1)]$ and $\E[Y(0)]$ identifies the natural direct effect $\E[Y(1,M(0))]-\E[Y(0)]$ and the natural indirect effect $\E[Y(1)]-\E[Y(1,M(0))]$. Under Robins's single world model it does not, because the equality needs the cross world independence $Y(1,m)\indep M(0)\mid X$, which no experiment can check.
+
+\paragraph{Single world intervention graphs.} Richardson and Robins (2013) make the bridge explicit. A single world intervention graph\index{single world intervention graph|textbf}\index{SWIG|see{single world intervention graph}} splits each intervened node into a random natural value and a fixed intervention value, so that its nodes are potential outcomes and ordinary $d$ separation reads off counterfactual independencies. Pearl's graphs and Rubin's notation get a common picture, and ignorability becomes a graphical fact about a single world.
+
+\paragraph{The efficiency view of estimation.} Robins's second contribution treats the observed data law nonparametrically and asks for the smallest achievable variance for a functional such as the average effect, and an estimator attaining it. The answer is organized by the efficient influence function\index{efficient influence function}, the gradient of the functional in the nonparametric model, whose variance is the efficiency bound. Its study (Robins, Rotnitzky and Zhao 1994) yields the augmented inverse weighting estimator, which is doubly robust (consistent if either the outcome regression or the propensity score is correct) and Neyman orthogonal (first order errors in the two estimated nuisances do not contaminate the target). Orthogonality is what later licensed machine learning nuisance estimates in double machine learning (Chernozhukov and coauthors 2018). Targeted maximum likelihood\index{targeted maximum likelihood|textbf}\index{TMLE|see{targeted maximum likelihood}} (van der Laan and Rubin 2006) is a substitution estimator built on the same theory. Chapters~\ref{ch:dml} to~\ref{ch:critique} examine this lineage critically, and Section~\ref{sec:baipw} gives its Bayesian counterpart.
+
+\section{Dawid: causality without counterfactuals}\label{fw:sec:dawid}
+
+Dawid\index{Dawid, A. Philip|textbf} (2000), ``Causal inference without counterfactuals''\index{Dawid, A. Philip!causality without counterfactuals|textbf}, mounted the most sustained statistical critique of the potential outcome apparatus\index{potential outcomes!objections to|textbf}. The joint distribution of $\{Y(0), Y(1)\}$ involves quantities, above all the dependence between an outcome that occurred and one that could not have, that no experiment can test\index{counterfactual!Dawid's critique|textbf}. Inferences about the proportion helped versus harmed depend on $\Cov(Y(0),Y(1))$ and so on assumptions no data can adjudicate.
+
+\paragraph{The decision theoretic alternative.} Dawid (2015, 2021) rebuilds causal inference from quantities observable in some regime, using decision theory\index{decision theory|textbf} and influence diagrams. A nonrandom regime indicator\index{regime indicator|textbf} $F_T\in\{\emptyset,0,1\}$ distinguishes observation, $F_T=\emptyset$, from intervention, $F_T=t$, which sets treatment to $t$. The capital subscript names the variable being set, so $F_T$ is unrelated to the distribution function $F_t$ of $Y(t)$. Causal assumptions become extended conditional independences linking regimes. Ignorable assignment, for instance, is
+\[
+Y \indep F_T \mid (X, T),
+\]
+read as: the law of $Y$ given $X$ and $T$ is the same whether treatment was chosen naturally or set by intervention. In the Lanarkshire milk experiment this is a claim about the teachers: given a child's recorded weight and height, the growth of the children who received milk must have the same law whether the teachers substituted them into the milk group or a ballot placed them there. It fails if the substitutions followed what the teachers saw and nobody recorded, their reading of a child's poverty and nourishment. For $X$ to be sufficient Dawid also requires $X \indep F_T$, the same covariate law in every regime. Every term is observable in some regime, and no cross world quantity appears. Identification manipulates these relations, algebraically close to Pearl's calculus but founded on decision theory. Chapter~\ref{ch:cdt} develops the connection with causal decision theory in economics.
+
+\begin{proposition}\label{ss:prop:dawid}
+If $X \indep F_T$, $Y \indep F_T \mid (X,T)$ and $0<\Prob(T=1\mid X=x,F_T=\emptyset)<1$ for almost every $x$, then for $t\in\{0,1\}$,
+\[
+p(y\mid F_T=t)=\int p(y\mid x,T=t,F_T=\emptyset)\,p(x\mid F_T=\emptyset)\,dx .
+\]
+\end{proposition}
+
+\begin{proof}
+Since $T=t$ under $F_T=t$, total probability gives $p(y\mid F_T=t)=\int p(y\mid x,T=t,F_T=t)\,p(x\mid F_T=t)\,dx$. Then $Y\indep F_T\mid(X,T)$ replaces $F_T=t$ by $F_T=\emptyset$ in the first factor and $X\indep F_T$ does so in the second. Overlap makes the observational factor $p(y\mid x,T=t,F_T=\emptyset)$ well defined for almost every $x$.
+\end{proof}
+
+This is the back door adjustment formula \eqref{fw:eq:backdoor}, obtained without counterfactuals and without a graph. Dawid (2002) shows how the two conditions are read off a directed acyclic graph augmented with $F_T$ as a node (Figure~\ref{ss:fig:dawid}): the absence of arrows from $F_T$ to $X$ and to $Y$ encodes them, so the regime reaches the outcome only through the treatment.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+\tikzset{reg/.style={rectangle,draw,minimum size=8mm,inner sep=0pt}}
+\node[reg] (F) at (0,0) {$F_T$};
+\node[v] (T) at (2.2,0) {$T$};
+\node[v] (Y) at (4.4,0) {$Y$};
+\node[v] (X) at (3.3,1.7) {$X$};
+\draw[e] (F)--(T); \draw[e] (T)--(Y); \draw[e] (X)--(T); \draw[e] (X)--(Y);
+\end{tikzpicture}
+\caption{Dawid's augmented graph. The square node is the regime indicator, a decision rather than a random variable. Under $F_T=t$ the arrow $X\to T$ is overridden.}
+\label{ss:fig:dawid}
+\end{figure}
+
+\begin{remark}
+Dawid's framework also covers the effect on the treated, $\E(Y\mid F_T=1,T^\circ=1)-\E(Y\mid F_T=0,T^\circ=1)$, where $T^\circ$ is the treatment a unit selects before any intervention, with $T=T^\circ$ when $F_T=\emptyset$ and $T^\circ\indep F_T$. An intervention overrides the selection but does not erase it, so the estimand is a property of the joint law under regimes and needs no cross world counterfactual. Recovering it from observational data still takes assumptions linking the regimes, as in Proposition~\ref{ss:prop:dawid}.
+\end{remark}
+
+\paragraph{Beware of the graph.} Dawid (2010) is equally wary of overreading graphs: drawing arrows confers no causal knowledge not already assumed, and choosing them is the causal question, smuggled in as a premise. He and Pearl both target interventional distributions, and they disagree about whether counterfactuals are indispensable (for mediation, attribution and individual claims) or a metaphysical liability to be avoided unless an explicit structural model justifies them.
+
+\section{The econometric tradition}\label{fw:sec:econ}
+
+Econometrics\index{econometric tradition|textbf} developed causal models a generation before Rubin and Pearl. Economists rarely randomize: prices, schooling and policy are chosen by optimizing agents and hence endogenous, while equilibrium quantities are determined simultaneously.
+
+\paragraph{Wright and the origin of instrumental variables.} Sewall Wright (1921, 1934) invented path analysis\index{path analysis|textbf}\index{Wright, Sewall!path diagrams}, standardized linear structural equations\index{structural equation|textbf} drawn as arrows with path coefficients, the ancestor of Pearl's graphs. The instrumental variable\index{instrumental variable!history of} idea first appears in Wright (1928), attributed both to Philip Wright and to his son Sewall. A supply shifter identifies demand elasticity from jointly determined price and quantity by moving equilibrium along the demand curve without shifting demand. In $Y = \tau T + U$ with $\Cov(T,U)\neq 0$, an instrument $Z$ with $\Cov(Z,T)\neq 0$ and $\Cov(Z,U)=0$ identifies
+\begin{equation}\label{fw:eq:iv}
+\tau = \frac{\Cov(Z,Y)}{\Cov(Z,T)} .
+\end{equation}
+Randomized assignment in a trial with imperfect adherence is the standard instrument for the effect of treatment received: randomization makes assignment independent of the potential outcomes, and blinding makes it plausible, though it cannot guarantee, that assignment reaches the outcome only through uptake. Chapter~\ref{ch:iv} treats instruments in Bayesian terms.
+
+\paragraph{Haavelmo's probability approach.} Haavelmo\index{Haavelmo, Trygve|textbf} (1944) supplied the foundation: economic data realize a stochastic process, and a structural model describes potential responses to interventions, not the passive joint law of observed variables. His analysis of simultaneous equations\index{simultaneous equations|textbf} (Haavelmo 1943) fixed the lasting distinction between the structural form, autonomous behavioural equations with a causal reading, and the reduced form they solve into, estimable but causally mute. On this the Cowles Commission built the theory of identification.
+
+\paragraph{Heckman: selection and structure.} Heckman\index{Heckman, James J.|textbf} (1979) treated sample selection bias as a specification error: when selection is on unobservables related to the outcome, least squares is biased, and his two step correction models the selection equation explicitly. His programmatic contribution (Heckman and Vytlacil 2007) demands structural parameters with economic meaning and policy invariance, organized by the Roy model\index{Roy model|textbf} of selection on gains. Agents take treatment partly because their own return is high, so the treated are not exchangeable with the untreated even given covariates, and the marginal treatment effect\index{marginal treatment effect|textbf}\index{MTE|see{marginal treatment effect}} becomes the primitive from which average, treated and policy relevant effects are built.
+
+The selection correction itself comes from a bivariate normal model for the treatment decision and the outcome. Let $T^\ast=X^\top\kappa+Z^\top\eta+V$ be a latent propensity to take treatment, $T=\one\{T^\ast>0\}$, and $Y=X^\top\beta+\tau T+U$, with
+\[
+(U,V)\mid(X,Z)\sim N_2\!\left(0,\begin{pmatrix}\sigma^2 & \rho\sigma\\ \rho\sigma & 1\end{pmatrix}\right),\qquad \sigma>0,\quad |\rho|<1.
+\]
+The correlation $\rho$ measures how far the unobserved determinants of treatment also drive the outcome, and ignorability corresponds to $\rho=0$. With $c=X^\top\kappa+Z^\top\eta$, $\E(V\mid V>-c)=\lambda(c)$ and $\E(V\mid V\le -c)=-\lambda(-c)$, so
+\begin{equation}\label{ss:eq:mills}
+\E(Y\mid X,Z,T)=X^\top\beta+\tau T+\rho\sigma\{T\lambda(c)-(1-T)\lambda(-c)\},\qquad \lambda(c)=\frac{\varphi(c)}{\Phi(c)},
+\end{equation}
+where $\varphi$ and $\Phi$ are the standard normal density and distribution function and $\lambda$ is the inverse Mills ratio\index{inverse Mills ratio|textbf}. The two step estimator fits a probit for $T$ and adds $T\lambda(\hat c)-(1-T)\lambda(-\hat c)$, at the fitted index $\hat c$, as a control function in the regression of $Y$ on $X$ and $T$; its coefficient estimates $\rho\sigma$. Identification rests on the normal tails or, more credibly, on an excluded instrument in $Z$ absent from $X$. In Heckman's (1979) sample selection problem, $Y$ is observed only for the selected, and the correction is $\lambda$ alone, fitted on that sample.
+
+The marginal treatment effect earns its keep when gains vary across people, which the constant $\tau$ above rules out; under a constant effect it equals $\tau$ at every $u$. Write treatment as a threshold rule $T=\one\{U_D\le p(Z,X)\}$, where $p(Z,X)=\Prob(T=1\mid Z,X)$ is the propensity, $U_D$ is uniform given $X$ and read as resistance to treatment, and $(Y(0),Y(1),U_D)$ is independent of the instrument $Z$ given $X$. The marginal treatment effect $\mathrm{MTE}(x,u)=\E[Y(1)-Y(0)\mid X=x,U_D=u]$ is the effect for a person just indifferent at propensity $u$. Then $\E[Y(1)-Y(0)\mid X=x]=\int_0^1\mathrm{MTE}(x,u)\,du$, and the LATE between propensity values $p_0<p_1$ is $\int_{p_0}^{p_1}\mathrm{MTE}(x,u)\,du/(p_1-p_0)$. Where the propensity's support contains an interval and $\mathrm{MTE}(x,u)$ is continuous in $u$, Heckman and Vytlacil (2005) identify $\mathrm{MTE}(x,p)$ as the derivative in $p$ of $\E[Y\mid X=x,p(Z,X)=p]$ at interior points of that interval. A binary instrument yields two propensity values and identifies only the average of the MTE between them, the LATE above, and beyond the range the propensity spans the average effect needs extrapolation.
+
+\paragraph{LATE and the rapprochement.} The bridge to the statistical tradition is Imbens and Angrist (1994) and Angrist, Imbens and Rubin (1996). With a binary instrument and heterogeneous effects, the instrumental variable ratio identifies the local average treatment effect\index{local average treatment effect}, the effect among compliers, under relevance, exclusion, independence and monotonicity:
+\[
+\LATE = \frac{\E[Y\mid Z=1]-\E[Y\mid Z=0]}{\E[T\mid Z=1]-\E[T\mid Z=0]} .
+\]
+Angrist, Imbens and Rubin express the result through compliers, always takers, never takers and defiers, the principal strata of Frangakis and Rubin (2002). The dispute is whether an effect defined by the instrument is what the data can credibly deliver (Imbens and Angrist 1994) or has limited use because the policy question does not define it (Heckman and Vytlacil 2005).
+
+\section{Cox and Wermuth and the accounting view: model first positions}\label{fw:sec:cox}\label{fw:sec:accounting}
+
+David Cox\index{Cox, David R.|textbf}, sceptical of grand causal calculi, held that careful modelling and good design do most of the work\index{Cox, David R.!model first position|textbf}. Cox (1958) grounds inference in randomization, blocking and replication, with causal credibility largely settled before data are seen. Cox (1992) discusses causal interpretation, and Cox and Wermuth\index{Wermuth, Nanny|textbf} (1996) develop graphical chain models: conditional independences in substantively ordered blocks, modelled recursively from background through intermediate to response variables. A causal regression coefficient is interpretable only relative to the variables held fixed, so the analyst must say what is intervened upon and what held constant (Cox and Wermuth 2004). Subject matter knowledge and design come before algorithm.
+
+Chapter~\ref{ch:mccullagh} treats an average effect as an accounting identity\index{accounting view|textbf}: a weighted average of fitted contrasts over a chosen population, computed after fitting. This model first view challenges the estimand itself. For binary outcomes, a logistic model's conditional log odds effect and the marginal log odds contrast from averaged fitted probabilities differ even when $X$ is independent of $T$ (Greenland, Robins and Pearl 1999). The marginal quantity belongs as much to the covariate distribution as to the treatment; it does not transport across populations with different covariate spreads, and no individual experiences it. Section~\ref{gr:sec:many} gives a case in which one conditional odds ratio produces average effects that differ by a factor of three across case mixes.
+
+The prescription is to model individual or conditional effects and report estimands as functionals of the model. This aligns the accounting view with Heckman's marginal treatment effect\index{marginal treatment effect} and with hierarchical Bayesian partial pooling (Gelman and Hill 2007). The dispute with the design based traditions is whether the average effect is a destination or a by product: for them it is the primary, robustly identified target; for the model first view it is one summary among many, chosen by the user, not the estimator.
+
+\section{Bayesian foundations: exchangeability and randomization}\label{fw:sec:bayes}\index{Bayesian foundations of causal inference|textbf}
+
+\paragraph{Lindley and Novick: exchangeability as the engine.} Lindley\index{Lindley, Dennis V.!exchangeability|textbf} and Novick (1981) argue that the question ``which table should I analyse?'', dramatized by Simpson's paradox\index{Simpson paradox@Simpson's paradox|textbf}, cannot be answered by data or formal manipulation of probabilities alone, only by a judgement of which units are exchangeable with the unit whose outcome is to be predicted. De Finetti's theorem turns that judgement into a model, and only then does a determinate answer follow.
+
+Table~\ref{fw:tab:simpson} shows the paradox\index{Simpson paradox@Simpson's paradox} in the kidney stone data\index{kidney stone data|textbf} of Charig and coauthors (1986), popularized by Julious and Mullee (1994). The arithmetic is not in dispute; which number answers the causal question is. If a new patient is exchangeable with patients of the same stone size, the stratified numbers govern; were the stratifying variable a consequence of treatment, the pooled number could be relevant. Pearl reaches the same verdict through the back door criterion; Lindley locates the resolution in an exchangeability judgement the analyst must own. Section~\ref{gr:sec:kidney} returns to these counts and fits a stable effect on each of three scales.
+
+\begin{table}[htbp]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+ & Small stones & Large stones & Pooled \\
+\midrule
+Open surgery & $81/87$, 93\% & $192/263$, 73\% & $273/350$, 78\% \\
+Percutaneous & $234/270$, 87\% & $55/80$, 69\% & $289/350$, 83\% \\
+\midrule
+Better arm & open & open & percutaneous \\
+\bottomrule
+\end{tabular}
+\caption{Simpson's paradox in the kidney stone data. Open surgery wins in both strata but loses in the pool, because it was concentrated among patients with large stones. The data alone cannot say which comparison is causal; an exchangeability judgement, equivalently a judgement about confounding, must be supplied.}
+\label{fw:tab:simpson}
+\end{table}
+
+\paragraph{Kadane and Seidenfeld: do we need to randomize?} Kadane and Seidenfeld (1990) press the consequence that makes strict Bayesians uneasy. If, given the recorded covariates, a Bayesian's potential outcomes are already independent of assignment, physical randomization\index{randomization!in Bayesian terms} adds nothing to her inference, and the best deliberately chosen design is at least as good by her own lights. Randomization still secures agreement among observers with different priors, including sceptical regulators, protects against the experimenter's selection on unrecorded variables, and supports the randomization test as a common ground analysis. It buys an assurance about the data generating process that no later modelling can manufacture.
+
+\section{Beyond the average}\label{fw:sec:beyond}
+
+\paragraph{Mediation.} The natural direct and indirect effects of Section~\ref{fw:sec:robins} (see VanderWeele 2015) rest on the nested counterfactual $Y(t,M(t'))$ for a mediator\index{mediator|textbf}\index{mediation|textbf} $M$, the cross world quantity Dawid warns against, and on the untestable condition $Y(t,m)\indep M(t')\mid X$, $t\neq t'$. This condition fails in particular when treatment affects a confounder of mediator and outcome. Interventional direct and indirect effects (Vansteelandt and Daniel 2017) instead draw the mediator from its law under the other arm given $X$, rather than using the unit's own $M(t')$. With no confounder of mediator and outcome affected by treatment, the same mediation formula identifies them under single world assumptions. They describe an intervention on a population distribution rather than a mechanism within a unit. For a Bayesian each is a functional of a joint model whose unidentified part carries a prior.
+
+\paragraph{Effect heterogeneity.} The conditional average treatment effect $\tau(x)=\E[Y(1)-Y(0)\mid X=x]$ is the natural target when effects vary, and the object toward which Heckman's marginal treatment effect\index{marginal treatment effect} and the model first view both point; a naive flexible regression of $Y$ on $(T,X)$ inherits regularization bias\index{regularization bias} (Section~\ref{fw:sec:ml}).
+
+\paragraph{Principal stratification.} When a variable measured after treatment (compliance, survival, a surrogate) cannot be conditioned on without collider bias, Frangakis and Rubin (2002) define effects within principal strata\index{principal stratification|textbf}, latent classes given by the joint potential values of the variable, which treatment does not affect and which may be conditioned on. The complier stratum of the local effect is the leading example. Principal stratification cleanly expresses questions, such as the effect among those who would survive under either arm, that graphical and decision theoretic languages find awkward, at the cost of conditioning on latent and generally unidentified membership.
+
+\section{The shared estimation toolkit}\label{fw:sec:methods}
+
+Once identification\index{identification|textbf} is granted, by design or assumption, the frameworks share an estimation toolkit (Table~\ref{fw:tab:toolkit}).
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabular}{@{}L{1.45in}L{1.65in}L{0.9in}@{}}
+\toprule
+Method & Identifying assumption & Chapter \\
+\midrule
+Regression adjustment, g formula & ignorability, overlap & \ref{ch:predictive}, \ref{ch:horseshoe} \\
+Inverse weighting, H\'ajek & ignorability, overlap & \ref{ch:ipw} \\
+Augmented weighting, DML & ignorability, overlap & \ref{ch:dml}, \ref{ch:baipw} \\
+Trees and causal forests & ignorability, overlap & \ref{ch:bart} \\
+Instruments & independence, exclusion, relevance; monotonicity for LATE & \ref{ch:iv} \\
+Difference in differences & parallel trends & \ref{ch:did} \\
+Regression discontinuity & continuity at the cutoff & \ref{ch:bart} \\
+Synthetic control & donor pool spans the untreated path & \ref{ch:did} \\
+Bounds & as few as possible & \ref{ch:tianpearl} \\
+Sensitivity analysis & a bound on confounding & \ref{ch:sensitivity} \\
+Structural equilibrium & modularity, conduct & \ref{ch:blp} \\
+\bottomrule
+\end{tabular}
+\caption{The estimation toolkit and where the book treats each method.}
+\label{fw:tab:toolkit}
+\end{table}
+
+\paragraph{Regression discontinuity.} Under the threshold rule $T=\one\{R\ge c\}$, continuity of the potential outcome means in the running variable $R$ identifies only the effect at the cutoff\index{regression discontinuity} (Thistlethwaite and Campbell 1960; Imbens and Lemieux 2008): $\E[Y(1)-Y(0)\mid R=c]=\lim_{r\downarrow c}\E[Y\mid R=r]-\lim_{r\uparrow c}\E[Y\mid R=r]$. Treating assignment as random within a window around $c$ requires a stronger, local randomization assumption. A Bayesian places a flexible prior on the two regression functions and reports the posterior jump, with a smoothness prior taking the place of a bandwidth choice.
+
+\paragraph{Synthetic control.} Abadie and Gardeazabal (2003) and Abadie, Diamond and Hainmueller (2010) estimate a single treated unit's effect as its posttreatment gap from a weighted combination of controls\index{synthetic control} matched on pretreatment trajectory, assuming the donor pool spans its untreated dynamics. The horseshoe alternative in Chapter~\ref{ch:did} borrows across cohorts through shrinkage rather than choosing donor weights.
+
+\paragraph{Partial identification.} When the assumptions needed for a point are indefensible, one can assume less and report a set\index{partial identification} (Manski 1990, 2003). For $Y\in[0,1]$ the data fix $\E[Y(1)]$ only up to the mean of $Y(1)$ among the untreated, which can lie anywhere in $[0,1]$, and $\E[Y(0)]$ only up to the mean of $Y(0)$ among the treated, so the worst case bounds on the average effect have width $\Prob(T=0)+\Prob(T=1)=1$. Each further assumption, such as monotone treatment response or a valid instrument, narrows them, and Balke and Pearl (1997) derive the tight bounds that a binary instrument implies for a binary treatment and outcome.
+
+\section{Time varying treatments and the g methods}\label{fw:sec:gmethods}
+
+Repeated treatments\index{time varying treatment|textbf} involve intermediate variables affected by past treatment that confound future treatment. This feedback defeats point treatment adjustment and motivates Robins\index{Robins, James M.!g methods|textbf}'s g methods\index{g methods|textbf}.
+
+\paragraph{The feedback trap.} Consider two periods (Figure~\ref{fw:fig:gmethods}). Treatment $A_0$ affects an intermediate covariate $L_1$ (a CD4 count under an antiretroviral, say), which influences both the next treatment $A_1$ and the outcome $Y$ and shares an unobserved cause $U$ with $Y$. Holding $L_1$ fixed blocks part of the effect of $A_0$ and, because $L_1$ is a collider on the path $A_0\to L_1\leftarrow U\to Y$, opens a spurious path; omitting it leaves the effect of $A_1$ confounded. No single adjustment set\index{adjustment set|textbf} works.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[>={Stealth[length=2mm]},
+  every node/.style={circle,draw,minimum size=7mm,inner sep=1pt,font=\small},
+  unobs/.style={circle,draw,dashed}]
+  \node (A0) at (0,0) {$A_0$};
+  \node (L1) at (2,0) {$L_1$};
+  \node (A1) at (4,0) {$A_1$};
+  \node (Y)  at (6,0) {$Y$};
+  \node[unobs] (U) at (4,1.5) {$U$};
+  \draw[->] (A0) -- (L1); \draw[->] (L1) -- (A1); \draw[->] (A1) -- (Y);
+  \draw[->] (U) -- (L1); \draw[->] (U) -- (Y);
+  \draw[->] (L1) to[bend right=28] (Y);
+  \draw[->] (A0) to[bend left=32] (A1);
+\end{tikzpicture}
+\caption{Feedback between treatment and confounder. $L_1$ is affected by $A_0$ and shares an unmeasured cause $U$ with $Y$; it confounds the effect of $A_1$ and mediates the effect of $A_0$, so conditioning on it both removes signal and induces collider bias.}
+\label{fw:fig:gmethods}
+\end{figure}
+
+\paragraph{The g formula.} Robins (1986) gave the general identification result\index{g formula|textbf}. Under consistency, sequential ignorability\index{sequential ignorability|textbf} (at each time treatment is as good as random given the recorded past) and positivity (each treatment the strategy prescribes has positive probability given every recorded past that can occur under the strategy), the mean outcome under a treatment strategy\index{dynamic treatment regime|textbf} $\bar a=(a_0,a_1)$ is
+\[
+\E\bigl[Y(\bar a)\bigr] = \sum_{\ell_1} \E[Y\mid A_0{=}a_0, L_1{=}\ell_1, A_1{=}a_1]\;\Prob(L_1{=}\ell_1\mid A_0{=}a_0).
+\]
+The formula conditions on $L_1$ in the outcome term but averages over its law under $A_0=a_0$, without conditioning that law on $A_1$, adjusting for it as a confounder without amputating the effect of $A_0$ that runs through it. For a Bayesian the g formula is posterior predictive simulation: draw $L_1$ under $A_0=a_0$, then $Y$ under $(a_0, L_1, a_1)$, and average, the generative reading of Chapter~\ref{ch:gente} applied to sequences.
+
+\paragraph{Marginal structural models.} A computationally attractive alternative posits a model for the counterfactual mean\index{marginal structural model|textbf}, for example $\E[Y(\bar a)] = \beta_0 + \beta_1\sum_t a_t$, and fits it by inverse probability of treatment weighting (Robins, Hern\'an and Brumback 2000): weighting each subject by the inverse probability of the observed treatment history given the past creates a pseudo population without the feedback. The weights generalize the propensity score longitudinally and inherit every difficulty of Chapter~\ref{ch:ipw}, compounded over time.
+
+\paragraph{Structural nested models.} A third route, g estimation of structural nested mean models\index{structural nested model|textbf} (Robins 1994), models the effect of a final blip of treatment at each time given the past and exploits the conditional independence implications of sequential ignorability. The three g methods identify the same effects under the same assumptions and differ in modelling and robustness tradeoffs. All require sequential ignorability and positivity, with every time varying confounder measured at every time, a demand only a prospectively designed study can hope to meet.
+
+\section{Learners for heterogeneous effects}\label{fw:sec:ml}
+
+Estimating $\tau(\cdot)$ flexibly\index{heterogeneous treatment effects} is where causal inference meets machine learning\index{heterogeneous treatment effects!learners for|textbf} (Athey and Imbens 2019). The T learner fits separate outcome models and differences them, the S learner fits a single model in $(X,T)$ and contrasts $T=1$ with $T=0$, and the X learner (K\"unzel and coauthors 2019) imputes unit level effects and regresses them on $X$, which helps when the arms are very unequal. All three inherit the regularization bias of their base learners, which need not cancel and can swamp a small effect.
+
+The R learner\index{R learner} (Nie and Wager 2021), DR learner (Kennedy 2023) and causal forests\index{causal forest|textbf} (Athey, Tibshirani and Wager 2019, following Wager and Athey 2018) use orthogonal scores to remove first order nuisance bias (Chapters~\ref{ch:dml} to~\ref{ch:critique}). The Bayesian counterparts, which instead organize the prior around the causal target, are the Bayesian causal forest of Chapter~\ref{ch:bart} and the coupled horseshoe priors of Chapter~\ref{ch:horseshoe}. Neither kind of learner supplies the unconfoundedness and overlap on which identification of $\tau(\cdot)$ rests.
+
+\section{Causal discovery}\label{fw:sec:discovery}
+
+Every framework so far assumes the causal structure. Causal discovery\index{causal discovery|textbf} asks how much of it data can recover, a programme descending from Wright and turned into algorithms by Spirtes, Glymour and Scheines (2000).
+
+\paragraph{Constraint and score based methods.} The PC algorithm reads the graph off the conditional independencies in the data, under the causal Markov condition (the graph implies the independencies), faithfulness\index{faithfulness|textbf} (the data show no independencies beyond those the graph implies) and causal sufficiency (no unmeasured common cause of two measured variables). The FCI algorithm drops sufficiency and returns a coarser graph whose edge marks allow for latent confounders and selection. Several graphs, a Markov equivalence class, can encode the same independencies, so the output is partially directed: independence alone cannot tell cause from effect. Greedy equivalence search (Chickering 2002) searches over equivalence classes to optimize a score that is consistent, decomposable and score equivalent, such as BIC; in large samples it recovers the equivalence class when the distribution is faithful to an acyclic graph over the measured variables, trading the brittleness of local tests for a global objective.
+
+\paragraph{Breaking the symmetry.} Functional assumptions can orient what independence cannot. LiNGAM (Shimizu and coauthors 2006) shows that linear acyclic equations with mutually independent non Gaussian noises and no unmeasured common causes fully identify the graph, because non Gaussianity breaks the symmetry between $V_1\to V_2$ and $V_2\to V_1$ that Gaussianity preserves. NOTEARS (Zheng and coauthors 2018) recasts the combinatorial search as continuous optimization, encoding acyclicity of the weighted adjacency matrix $W$ of the $d$ variables as the smooth constraint $\mathrm{tr}\,e^{W\circ W}=d$, with $\circ$ the elementwise product.
+
+\paragraph{Caveats.} Discovery is only as sound as its assumptions. Faithfulness fails when effects cancel along paths, latent confounders blur orientation, finite samples corrupt the tests, and equivalence classes cap what is identifiable. It is best read in Dawid's spirit, as a generator of candidate structures to confront with subject matter knowledge and, where possible, experiment. For a Bayesian, a posterior over graphs is the natural output.
+
+\section{Transportability and external validity}\label{fw:sec:transport}
+
+Identification answers what the effect is here; policy needs what it will be there. Pearl and Bareinboim (2014) study transportability\index{transportability|textbf} with selection diagrams, whose added nodes mark mechanisms that differ between source and target populations. Write $\Prob$ and $\Prob^{\ast}$ for their laws. Reweighting source interventional laws over the target's pretreatment covariates $X$ requires $\Prob^{\ast}(Y\mid\doint(T{=}t),X{=}x)=\Prob(Y\mid\doint(T{=}t),X{=}x)$ and every target stratum to occur in the source. The equality holds when $X$ separates the selection nodes from $Y$, given $T$, in the graph with arrows into $T$ removed. Then
+\[
+\Prob^{\ast}\bigl(Y\mid \doint(T{=}t)\bigr) = \sum_{x} \Prob\bigl(Y\mid \doint(T{=}t), X{=}x\bigr)\,\Prob^{\ast}(X{=}x).
+\]
+This is the accounting identity of Chapter~\ref{ch:mccullagh}, with the averaging population $Q$ of that chapter taken to be the target. Proposition~\ref{gr:prop:dv} bounds how far the case mix average of the stratum effects on a given scale moves when the case mix changes, by the range of the stratum effects on that scale times the distance between the two mixes; the bound is zero on a scale on which the effect is stable. The difference of means computed from the display is such an average on the additive scale, so it is the same in every target only if the effect is stable on that scale (Section~\ref{gr:sec:many}). Internal validity, secured by design, and external validity\index{external validity|textbf}, secured only by assumptions about what transports, are distinct: a flawless trial in one population licenses nothing about another without a stated transport assumption.
+
+\section{Causation from observational evidence}\label{fw:sec:obs}
+
+The frameworks supply formal conditions under which an observational effect is identified. They are silent on the prior and harder question of whether to believe a causal claim when no condition can be verified\index{observational evidence|textbf}.
+
+\paragraph{Hill's viewpoints.} Bradford Hill (1965), confronting Fisher's smoking challenge, offered nine considerations\index{Bradford Hill considerations@Bradford Hill's considerations} (strength, consistency, specificity, temporality, biological gradient, plausibility, coherence, experiment and analogy) as aids to judgement, emphatically not a checklist: where design cannot mechanically exclude alternative explanations, triangulation across many imperfect lines of evidence can make a noncausal one implausible. Hill required none of the nine as a sine qua non, although temporality is necessary in logic: a cause comes before its effect.
+
+\paragraph{Target trial emulation.} Its contemporary descendant, target trial emulation\index{target trial emulation|textbf} (Hern\'an and Robins 2016), asks the analyst to specify, before touching the data, the protocol of the hypothetical randomized trial being emulated: eligibility, treatment strategies, assignment, time zero, outcome and analysis. This is meant to eliminate a catalogue of avoidable biases, including immortal time bias, bias from prevalent users and an ill defined time zero.
+
+\paragraph{The burden of design.} Harrell (2026) objects that target trial emulation does not address confounding, especially confounding by indication, when prognostic factors such as severity drive treatment. He credits its attention to cohort and time zero but calls emulation a misnomer, preferring best practice in observational comparisons. He distinguishes four designs: randomized experiments without interruption in data flow; randomized experiments with questions about postrandomization variables; prospective observational studies with protocolized, high quality data; and undesigned observational studies. Of the observational designs, only the prospective one has a chance of supporting causal inference: elicit decision factors before seeing the data and collect them with care. The undesigned study, he writes, ``usually remains hopeless no matter how elegant the causal calculus that is used.'' A designed study reports sensitivity analysis (Section~\ref{sec:sensitivity}) for assumptions it cannot test.
+
+\section{What each framework takes a cause to be}\label{fw:sec:philosophy}\label{fw:sec:compare}
+
+Each framework tacitly adopts a classical account of causation\index{causation, accounts of|textbf}, and naming the accounts shows why the frameworks talk past one another.
+
+\paragraph{Regularity and probability.} Hume reduced causation to constant conjunction. The probabilistic refinement (Suppes 1970) says a cause raises the probability of its effect, with confounding understood through Reichenbach's common cause principle and screening off. This is the metaphysics implicit in $d$ separation and in the chain graphs of Cox and Wermuth, where the graph bookkeeps screening off relations. Its limit is Simpson's paradox: raising probability is relative to a population, which is why Lindley returns the question to exchangeability.
+
+\paragraph{Counterfactuals.} Lewis (1973) analysed ``$A$ caused $Y$'' as the counterfactual\index{counterfactual} ``had $A$ not occurred, $Y$ would not have'', judged in the closest possible worlds\index{counterfactual!account of causation|textbf}\index{causation, accounts of!counterfactual|textbf}. This is the metaphysics of the potential outcome model and of Pearl's top rung. It gives individual meaning to an effect; its liability, Dawid's point, is that the comparison invokes cross world quantities no experiment can reach.
+
+\paragraph{Manipulability and invariance.} Woodward's interventionist account\index{causation, accounts of!interventionist|textbf} (Woodward 2003) holds that $A$ causes $Y$ if an idealized intervention on $A$ would change $Y$, and that a relation is causal to the extent that it is invariant under such interventions. Pearl's do operator, Haavelmo's autonomy and Holland's slogan share this metaphysics, the common root of the do calculus and the econometric structural tradition.
+
+\paragraph{Agency and decision.} Dawid's framework expresses an agency account: causal claims are claims about how an external choice between regimes would change the distribution of outcomes. It keeps the manipulationist content while declining the counterfactual ontology, and is the account closest to causal decision theory.
+
+Table~\ref{fw:tab:compare} compares the frameworks. The formal ones are most valuable in observational studies and in questions within experiments, such as nonadherence, mediation and surrogate endpoints, that randomization alone does not answer.
+
+\begin{table}[htbp]
+\centering\footnotesize
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}L{0.7in}L{0.85in}L{1.0in}L{0.8in}L{1.15in}@{}}
+\toprule
+Framework & What is a cause? & Identifying assumption & Inference & What a Bayesian takes from it \\
+\midrule
+Fisher & a manipulated treatment & physical randomization (design) & exact test of the sharp null & randomization as a known assignment kernel; model the response \\
+Neyman and Rubin & $Y(1)-Y(0)$ for a unit & ignorability and overlap (assumption; known under randomization) & Neymanian or Bayesian imputation & impute missing potential outcomes; an ignorable assignment drops out of the posterior \\
+Pearl & the effect of $\doint(T{=}t)$ in a mechanism & a correct graph; back door or front door & identify, then estimate the functional & push the posterior through the identifying functional \\
+Robins & a single world counterfactual & sequential ignorability (assumption; known under sequential randomization) & influence functions, g methods & priors that depend on the propensity score; reparameterize instead of cross fit \\
+Dawid & a contrast between regimes & extended conditional independence & decision theoretic & posterior predictive law under each regime; decision analysis \\
+Econometric & a parameter of an autonomous equation & exogeneity, a valid instrument & instruments, selection and structural models & joint latent variable model; prior on the selection correlation $\rho$ \\
+McCullagh & a group element acting on each unit's baseline, the same for all units & model consistency under change of design; an assignment kernel uninformative about the response model (known under randomization) & likelihood conditional on the assignment (Chapters~\ref{ch:mccullagh} and~\ref{ch:groups}) & model first; the average effect is a derived accounting quantity \\
+\bottomrule
+\end{tabular}
+\caption{The frameworks compared, with what a Bayesian takes from each. Identification comes from design in the first row and from an assumption about nature in the others; randomization makes the part that concerns assignment a property of the study, while exclusion restrictions, autonomy and cross world assumptions stay assumptions.}
+\label{fw:tab:compare}
+\end{table}
+
+
+
+Despite these differences the frameworks often compute the same numbers; what they dispute is the interpretation, provenance and scope of the assumptions. Imbens (2020) argues that potential outcomes have been the more useful language for empirical economics, connecting directly to design, heterogeneity and the questions economists ask, while graphs suit complex structures with many variables.
+
+\section{Reading this book alongside Pearl}\label{fw:sec:pearlbook}
+
+Pearl\index{Pearl, Judea}'s \emph{Causality} (Pearl 2009) is the book this one most often converses with\index{Pearl, Judea!reading this book alongside|textbf}, and Table~\ref{fw:tab:pearl} maps where we follow it, extend it and part company. The remarks also apply to \emph{The Book of Why} (Pearl and Mackenzie 2018), which tells the same story for a general reader.
+
+\begin{table}[htbp]
+\centering\footnotesize
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}L{1.7in}L{0.85in}L{1.6in}@{}}
+\toprule
+\emph{Causality}, chapter & This book & Relation \\
+\midrule
+3, causal diagrams and identification; the smoking and tar example & \ref{ch:smoking}, App.~\ref{app:graphs} & front door identification on a simulated population \\
+5, structural models in the social sciences & \ref{ch:iv}, \ref{ch:cdt}, \ref{ch:blp} & priors on structural parameters; conduct as a parameter \\
+6, Simpson's paradox, confounding and collapsibility & \ref{ch:mccullagh}, \ref{ch:groups}, Section~\ref{fw:sec:bayes} & noncollapsibility read as accounting; the reversal on three scales \\
+7, structural counterfactuals & \ref{ch:ot} & priors on the unidentified coupling \\
+8, imperfect experiments and bounds & \ref{ch:iv}, \ref{ch:tianpearl} & posteriors over response types \\
+9, probability of causation & \ref{ch:tianpearl}, \ref{ch:smoking} & posteriors for the bounds and for the probability of necessity \\
+11, reflections and discussions with readers & \ref{ch:ipw}, \ref{ch:dml}, \ref{ch:horseshoe} & propensity scores and adjustment; estimation left open \\
+\bottomrule
+\end{tabular}
+\caption{Chapters of Pearl's \emph{Causality} and the chapters of this book that take up the same questions.}
+\label{fw:tab:pearl}
+\end{table}
+
+\paragraph{Where we follow Pearl.} Identification comes before estimation, and no data or prior can supply a causal assumption the design does not. The do operator is the right definition of an intervention, and every causal estimand in the book is a functional of a model under a stated intervention. The average treatment effect is not the only question worth asking, and Pearl's counterfactual queries, above all the probabilities of necessity and sufficiency of his Chapter 9 and of Tian and Pearl (2000), are among the others. His smoking example, in which tar deposits mediate the whole effect of smoking on cancer and a hidden genotype confounds both, is the canonical front door identification.
+
+\paragraph{Bounds and Bayes.} Chapter 8 of \emph{Causality} derives the tight bounds of Balke and Pearl (1997) on the average effect in a trial with noncompliance, by linear programming over the distribution of latent response types, then turns to finite sample inference by Gibbs sampling, following Chickering and Pearl (1996): a prior on the response type distribution yields a posterior for the effect though it is only partially identified. That analysis is the template for the partially identified posteriors of Chapter~\ref{ch:tianpearl}: the data move the posterior up to the identified set, and inside it the prior decides.
+
+\paragraph{A half Bayesian.} Pearl (2001) described himself as only half a Bayesian: he accepts updating for parameters but holds that causal assumptions cannot be learned by conditioning or replaced by a prior over parameters. We agree with the second half and draw a different consequence from the first. Causal assumptions enter this book through the design and the model's structure, never through a prior on an unidentified quantity presented as if the data had informed it. But once the structure is fixed, estimating its parameters well, with many covariates, rough regression functions and weak overlap, is no technicality to delegate: it is where the prior matters most (Chapter~\ref{ch:horseshoe}). \emph{Causality} says little about estimation once a functional is identified. Part~II shows that the leading frequentist answer, double machine learning, does not end that problem, and Part~III gives a Bayesian one.
+
+\section{What the comparison teaches}\label{fw:sec:discussion}
+
+Our position: identification\index{identification} first, from design where possible, stated assumptions otherwise\index{design versus assumption|textbf}. Neither calculus nor prior substitutes for knowing how the data arose. Then one exchangeable Bayesian model, priors built for the dimension of the problem, and every causal estimand a functional of its posterior. Where the data leave a quantity unidentified (the joint law of potential outcomes, the form of competition in a market), the posterior says so, through bounds or a prior the data do not overwhelm. Chapters~\ref{ch:mccullagh} and~\ref{ch:groups} complete these foundations; Part~II examines the leading alternative.
+
+\paragraph{Further reading.} Imbens and Rubin (2015) give the potential outcome view at book length, Pearl (2009) the structural one (Section~\ref{fw:sec:pearlbook}), Hern\'an and Robins (2020) the epidemiological one with the g methods, and Dawid (2021) the decision theoretic one. Imbens (2020) compares graphs and potential outcomes for economists. Holland (1986) remains the best short statement of the fundamental problem.
+
+\section{In practice}
+
+\paragraph{The target.} Given posterior draws of the parameters of one model, the estimands of this chapter are functions of those draws, and what differs is the assumption that licenses each function. Chapter~\ref{ch:computation} shows how the draws are produced, including by generative Bayesian computation when the model is a simulator whose likelihood is unavailable.
+
+\paragraph{What the analyst does differently.} For each causal claim the analyst says whether identification comes from design or from assumption. Without randomization she names the assumption (ignorability given a covariate set, a graph, a valid instrument, parallel trends, continuity at a cutoff), says where it comes from, and reports the posterior of each target the decision needs together with how the answer moves when the assumption fails.
+
+\paragraph{Against DML.} DML is the efficiency branch of Robins's framework (Section~\ref{fw:sec:robins}): given an identified functional, usually the average effect under ignorability, it asks for the smallest variance and an estimator that attains it. DML takes the identifying assumption as given. 
+
+\section*{Notes}
+
+Neyman's (1923) paper stayed in Polish until its translation in 1990. The instrument of Wright (1928) is in Appendix B of \emph{The Tariff on Animal and Vegetable Oils}. Angrist and Pischke (2010) survey the design based turn in applied economics, and Cunningham (2021) is a textbook on its methods.
+
+\begin{exercises}
+\item\label{ex:ch01:5} Write Dawid's regime indicator formulation of ignorability and show that, when consistency and overlap hold, it is equivalent to $Y(t) \indep T \mid X$ for each $t$, which is implied by, but weaker than, the joint condition in the definition of ignorability in Chapter~\ref{ch:predictive}.
+\item\label{ex:chframeworks:1} Verify the decomposition \eqref{fw:eq:decomp}. Construct a population in which the naive contrast is zero while the effect on the treated is positive.
+\item\label{ex:chframeworks:2} In Table~\ref{fw:tab:simpson}, compute the success rate of each procedure standardized to the pooled distribution of stone size. Which population does this number describe, and why is it an accounting identity in the sense of Chapter~\ref{ch:mccullagh}?
+\item\label{ex:chframeworks:3} Draw the single world intervention graph for the confounding graph of Figure~\ref{fig:dagconf} under $\doint(T=t)$ and read off the independence that corresponds to ignorability.
+\item\label{ex:chframeworks:4} Show that for the graph of Figure~\ref{fw:fig:gmethods} the g formula and inverse probability of treatment weighting give the same mean under the strategy $\bar a=(1,1)$ when the models are correct.
+\item\label{ex:chframeworks:5} A treatment helps half of a population by one unit and harms the other half by one unit. Which of Fisher's and Neyman's nulls is true? What can a randomized experiment say about the proportion harmed?
+\item\label{ex:chframeworks:6} In Figure~\ref{fw:fig:dags}(b), let $T$ and $Y$ be independent fair coins and let $C=1$ unless both coins show zero. List the four equally likely cells of $(T,Y)$ and check that $T$ and $Y$ are independent. Restrict to the cells with $C=1$ and compute $\Prob(Y=1\mid T=1, C=1)$ and $\Prob(Y=1\mid T=0, C=1)$. What do the two numbers say about adjusting for a collider, and how would selecting units on $C$ produce the same dependence in a sample?
+\item\label{ex:chframeworks:7} In a source population the effect of $T$ on $Y$ in the stratum $X=x$ is $\tau(x)$, and the target population has the same stratum effects but a different law $\Prob^{\ast}(X)$. Show that the average effect in the target is $\sum_x \tau(x)\Prob^{\ast}(X=x)$, that this is the accounting identity of Chapter~\ref{ch:mccullagh} with the target as the averaging population $Q$, and say when the source and target average effects coincide.
+\item\label{ex:chframeworks:8} Two Bayesians must agree on how $2m$ patients are allocated to two arms. The first believes that, given a recorded covariate $X$, the potential outcomes are independent of assignment. The second suspects that an experimenter who allocates by hand favours patients with a good prognosis that $X$ does not record. Show that for the first the deterministic allocation with the smallest expected posterior loss loses nothing against a random one, because the expected loss of a random allocation averages those of the deterministic allocations it mixes, and that for the second the posterior of the average effect depends on how the experimenter chose a balanced allocation but not on how a random allocation was drawn. Which part of Kadane and Seidenfeld's answer to ``why randomize?'' does this illustrate?
+\end{exercises}

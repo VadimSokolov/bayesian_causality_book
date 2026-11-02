@@ -1,0 +1,10 @@
+data sets 200
+{"both": 9.42, "both99": 54.755, "cov_all": 0.015, "cov_hill": 0.15, "cov_hill99": 0.65, "cov_oracle": 0.885, "cov_trim": 0.025, "ctrl_P": 0.58, "cut_99": 0.491, "cut_hill": 0.734, "est_all": 1.201, "est_hill": 1.163, "est_hill99": 1.104, "est_ipw_all": 2.123, "est_ipw_trim": 1.823, "est_oracle": 1.054, "est_trim": 1.156, "jacc_hill_trim": 0.083, "kept_flat_all": 1.0, "kept_flat_hill": 0.999, "kept_flat_hill99": 0.647, "kept_flat_oracle": 0.0, "kept_flat_trim": 0.524, "kept_pocket_all": 1.0, "kept_pocket_hill": 0.779, "kept_pocket_hill99": 0.21, "kept_pocket_oracle": 0.0, "kept_pocket_trim": 0.763, "kept_rest_all": 1.0, "kept_rest_hill": 1.0, "kept_rest_hill99": 0.979, "kept_rest_oracle": 1.0, "kept_rest_trim": 0.995, "minctrl_F": 4.2, "n_all": 571.34, "n_hill": 546.205, "n_hill99": 426.47, "n_oracle": 320.775, "n_trim": 477.365, "nc": 428.66, "nf": 136.245, "np": 114.32, "nt": 571.34, "only_hill": 15.715, "only_hill99": 90.115, "only_trim": 84.555, "only_trim99": 39.22, "ps_f": 0.884, "ps_p": 0.727, "s0_f": 0.472, "s0_p": 0.618, "s0_r": 0.351, "true_all": 1.859, "true_all_T": 1.859, "true_hill": 1.603, "true_hill99": 1.243, "true_oracle": 1.0, "true_trim": 1.65, "width_all": 0.493, "width_hill": 0.462, "width_hill99": 0.384, "width_oracle": 0.329, "width_trim": 0.412}
+set    n_kept  truth   est    bias   rmse  mcse_bias cov  width  bias_vs_allATT
+all      571.3  1.859  1.201 -0.658  0.678  0.011 0.015  0.493 -0.658
+hill     546.2  1.603  1.163 -0.440  0.478  0.013 0.150  0.462 -0.696
+hill99   426.5  1.243  1.104 -0.139  0.185  0.009 0.650  0.384 -0.755
+trim     477.4  1.650  1.156 -0.494  0.512  0.009 0.025  0.412 -0.703
+oracle   320.8  1.000  1.054  0.054  0.101  0.006 0.885  0.329 -0.805
+ipw trim: bias 0.17293742468989742 rmse 0.19888536455151187
+ipw all: bias 0.2640718040977806 rmse 0.29322401693095723

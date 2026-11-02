@@ -1,0 +1,38 @@
+\begin{table}[ht]
+\centering
+\caption{Root mean squared error of five estimators of the average effect on the treated over 500 panels per row, and coverage of the 95 percent interval of the three that have one. TWFE is two way fixed effects, Cohort the cohort by time estimator, Imput.\ the imputation estimator, Trend the imputation estimator with unit trends and HS the horseshoe. $N$ is the number of units, Dep the share of units whose trend departs from the common path, and the effect design is (a) the common path, (b) the path with one sparse cohort deviation, (c) the path with dense cohort deviations.}
+\label{tab:didsimgrid}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}rclcccccccc@{}}
+\toprule
+& & & \multicolumn{5}{c}{Root mean squared error} & \multicolumn{3}{c}{Coverage} \\
+\cmidrule(lr){4-8}\cmidrule(lr){9-11}
+$N$ & Dep & Design & TWFE & Cohort & Imput. & Trend & HS & HS & Imput. & Trend \\
+\midrule
+40 & 0.0 & (a) & 0.41 & 0.16 & 0.08 & 0.36 & 0.09 & 0.96 & 0.94 & 0.91 \\
+40 & 0.0 & (b) & 0.37 & 0.15 & 0.08 & 0.37 & 0.09 & 0.96 & 0.94 & 0.90 \\
+40 & 0.0 & (c) & 0.44 & 0.16 & 0.08 & 0.36 & 0.09 & 0.97 & 0.94 & 0.94 \\
+\addlinespace
+40 & 0.1 & (a) & 0.42 & 0.18 & 0.14 & 0.34 & 0.09 & 0.98 & 0.90 & 0.94 \\
+40 & 0.1 & (b) & 0.39 & 0.18 & 0.13 & 0.35 & 0.09 & 0.98 & 0.93 & 0.93 \\
+40 & 0.1 & (c) & 0.45 & 0.17 & 0.14 & 0.36 & 0.09 & 0.98 & 0.91 & 0.92 \\
+\addlinespace
+40 & 0.3 & (a) & 0.43 & 0.20 & 0.18 & 0.36 & 0.14 & 0.95 & 0.93 & 0.92 \\
+40 & 0.3 & (b) & 0.39 & 0.21 & 0.19 & 0.35 & 0.15 & 0.94 & 0.90 & 0.93 \\
+40 & 0.3 & (c) & 0.46 & 0.21 & 0.18 & 0.37 & 0.15 & 0.95 & 0.93 & 0.92 \\
+\addlinespace
+200 & 0.0 & (a) & 0.41 & 0.07 & 0.04 & 0.15 & 0.04 & 0.96 & 0.95 & 0.95 \\
+200 & 0.0 & (b) & 0.37 & 0.07 & 0.04 & 0.17 & 0.04 & 0.96 & 0.93 & 0.93 \\
+200 & 0.0 & (c) & 0.44 & 0.06 & 0.03 & 0.15 & 0.04 & 0.97 & 0.96 & 0.96 \\
+\addlinespace
+200 & 0.1 & (a) & 0.40 & 0.08 & 0.06 & 0.17 & 0.04 & 0.97 & 0.94 & 0.93 \\
+200 & 0.1 & (b) & 0.37 & 0.08 & 0.06 & 0.15 & 0.04 & 0.96 & 0.94 & 0.96 \\
+200 & 0.1 & (c) & 0.44 & 0.07 & 0.06 & 0.16 & 0.04 & 0.97 & 0.95 & 0.96 \\
+\addlinespace
+200 & 0.3 & (a) & 0.40 & 0.09 & 0.08 & 0.16 & 0.05 & 0.97 & 0.94 & 0.94 \\
+200 & 0.3 & (b) & 0.37 & 0.09 & 0.08 & 0.16 & 0.05 & 0.97 & 0.94 & 0.95 \\
+200 & 0.3 & (c) & 0.44 & 0.09 & 0.08 & 0.15 & 0.06 & 0.96 & 0.95 & 0.96 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,94 @@
+\chapter{A Workflow for Applied Bayesian Causal Inference}\label{ch:workflow}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+The workflow has seven steps: state the question and the population, draw the assignment mechanism, check overlap, fit two flexible outcome models, check the model against the data, report accountings, and quantify sensitivity to unmeasured confounding. Steps~1 and~2 ask for the same statement and the same graph under any method; in Steps~3 to~7 the Bayesian analysis uses its posterior for more than an average. For one average effect, under the conditions set out at the end of the chapter, DML is enough.
+\end{tcolorbox}
+
+The 401(k), LaLonde, NHEFS and Thornton analyses of Chapters~\ref{ch:k401} and~\ref{ch:nhefs} share a sequence of seven steps\index{workflow!seven steps|textbf}. We set it out as a workflow\index{workflow|textbf} for the applied analyst, saying at each step what a DML analyst would do.
+
+\section{Step 1: state the causal question and the population}
+
+Before fitting any model, write down whom the decision concerns and what would be done differently\index{workflow!stating the causal question and the population|textbf}. In the 401(k) application the policy question was whether to extend eligibility to workers lacking it, making the effect on the untreated the relevant accounting. In LaLonde the benchmark concerned programme participants, so the effect on the treated\index{effect on the treated}. In the Thornton experiment the question was how large an incentive to offer, so the dose response was the target. For an observational study the statement is the protocol of the target trial it emulates (Section~\ref{fw:sec:obs}): eligibility, the treatment strategies and a start of follow up at which eligibility is met and treatment assigned, so that nothing measured after that start enters the adjustment set.
+
+The population fixes the accounting: in the 401(k) data the effect on the untreated, 6.86 thousand dollars, was about 40\% below the 11.65 on the treated. For DML it also fixes the estimator: the effect on the treated needs a different orthogonal score from the average effect, and Chapter~\ref{ch:dml}'s partially linear score targets an overlap weighted average that need not equal the population average effect when effects vary. For the Bayesian analyst it fixes only the weights on the posterior draws, which can be changed without refitting.
+
+\section{Step 2: draw the assignment mechanism}
+
+Say how treatment was assigned, and draw the graph\index{assignment mechanism!drawing the|textbf}\index{workflow!drawing the assignment mechanism|textbf}: randomized, as in Thornton, though at offer rates that differ by village; determined by employers given observed worker characteristics, as argued for 401(k); or chosen by the person, as with quitting smoking. The LaLonde comparison sets National Supported Work (NSW) trainees recruited for disadvantage beside CPS survey controls; within the NSW itself assignment was random. Each mechanism suggests which covariates are confounders, which might be instruments, and where unmeasured confounding is most plausible. Section~\ref{sec:milk} showed the cost of skipping this step: the Lanarkshire\index{Lanarkshire milk experiment} teachers were a mechanism nobody modelled.
+
+Mark every variable in the data as a pretreatment confounder, a mediator, a consequence of the outcome or an instrument, and write down unconfoundedness with the covariate set named. In the 401(k) data, record the Poterba, Venti and Wise argument: income and the other eight covariates are the confounders, and a taste for saving is the unmeasured variable most likely to break the assumption. In LaLonde, mark earnings history as the confounder separating the disadvantaged trainees from the CPS respondents who replace the randomized controls.
+
+A DML analyst needs the same graph, and in practice receives a covariate list and treats it as the adjustment set. Orthogonalization protects her against nuisance estimation error, not against a wrong set: a mediator in the set biases DML as it biases any other method. For the Bayesian analyst the graph also determines the prior: whether to couple the outcome prior to the propensity depends on whether the covariates are confounders or instruments, and Step~7's sensitivity analysis is parametrized by the unmeasured variable the graph identified.
+
+\section{Step 3: check overlap before modelling}
+
+Fit a propensity model\index{propensity score}, not to weight by it but to see where the data are thin: plot both groups' estimated propensities on a log density scale (Figure~\ref{fig:lalonde_ps}), tabulate their quantiles, and record the region of covariate space where one group is absent\index{overlap!checking before modelling|textbf}\index{workflow!checking overlap|textbf}. Decide whether to restrict the target population to the region of overlap and say so in Step~1's statement. In LaLonde most CPS controls had propensities below one in a thousand and were irrelevant, and the odds $e/(1 - e)$ of DML's random forest propensity reached 8 for the most treated like controls. In the 401(k) data the thin region was low income (Section~\ref{sec:k401overlap}); in NHEFS overlap\index{overlap} was good. After fitting the outcome model, Hill's common support check gives a second, model based view, unit by unit.
+
+DML estimates the propensity inside cross fitting. With an augmented score, thin overlap produces a few large weights that widen intervals or undermine the normal approximation. The usual remedy, trimming at a threshold such as 0.05, changes the target and must be reported.
+
+The Bayesian outcome model pools across nearby covariate values instead of reweighting, so thin overlap becomes extrapolation. Posterior intervals may widen there, as in the bottom income quintile of Section~\ref{sec:k401overlap}, but a tree ensemble need not widen (Chapter~\ref{ch:bart}), so width alone is no guarantee. The common support check adds what no weight can: a unit by unit statement of which treated participants have counterfactuals with unusually large predictive uncertainty.
+
+\section{Step 4: fit at least two flexible outcome models}
+
+Fit two outcome model classes\index{workflow!fitting two flexible outcome models|textbf}, for example a coupled horseshoe\index{horseshoe prior} on a basis and a Bayesian causal forest\index{Bayesian causal forest}\index{Bayesian causal forest!in the workflow|textbf}. Unless Step~2 marked instruments among the covariates, include the estimated propensity as a covariate in both, fitted once on the whole sample without cross fitting (Section~\ref{sec:ricsim}), against regularization induced confounding\index{regularization induced confounding}. Where they agree, the conclusion does not depend on the choice between them, though both can share an extrapolation or a shrinkage bias that agreement cannot reveal. They agreed closely on the NHEFS average effect; in the 401(k) analysis the forest's chains did not converge, so there the check remains to be done (Chapter~\ref{ch:k401}).
+
+A DML analyst at this step chooses a learner for each of two nuisance functions, the outcome regression and the propensity, and a number of folds. She too should fit at least two learners, since the forest and lasso versions in Table~\ref{tab:k401} differed by about one thousand dollars, and she should report the spread over partitions. The Bayesian posterior covers the whole response surface, so agreement between classes can be checked on the effect's shape as well as its average.
+
+Before any accounting is read from the fits, the computation needs its own check: for a sampler, split $\hat R$, effective sample sizes and Monte Carlo errors for the published effects; for a trained network, the held out loss and the rank checks of simulation based calibration (Section~\ref{comp:sec:checks}). 
+
+\section{Step 5: check the model against the data}
+
+Posterior predictive checks\index{model checking|textbf}\index{workflow!checking the model against the data|textbf}\index{posterior predictive check} compare data replicated from the fitted model with observed data on features that matter. In Figure~\ref{fig:ppc401k} (Chapter~\ref{ch:k401}), neither 401(k) error model passes: Gaussian replicates are too symmetric; Student $t$ replicates are closer in the centre but too light in the upper tail and too low in their mean.
+
+The check does not overturn the average effect, which DML, with no error model at all, also estimates, but it changes what else the model may report. Refitting with Student $t$ errors moves the common effect (the constant effect horseshoe of Table~\ref{tab:k401}) from 9.8 to 4.2 thousand dollars, because with errors this skewed a heavy tailed model estimates a shift of the bulk of the distribution rather than of its mean (Section~\ref{sec:k401overlap}). The analyst keeps the Gaussian working model for the mean and checks its mean intervals against a heteroskedasticity robust standard error, but reports no tail intervals or individual predictions from it. She reports the $t$ fit, which also fails, only as a shift of the conditional centre, beside the quantile regressions of Section~\ref{sec:k401overlap}, which assume no error law.
+
+DML has no generative model to check. A DML analyst should inspect her nuisance residuals, but a cross fitted forest's residual plot cannot check an outcome distribution the method never specifies.
+
+\section{Step 6: report accountings, not just one number}
+
+Compute and report together the posterior accountings\index{accountings|textbf}\index{workflow!reporting accountings|textbf} the decision needs: the average effect over the relevant population, the effects on the treated and untreated, subgroup effects and, where risk matters, distributional effects. They are coherent by construction. Distributional effects need the conditional outcome distributions and not only their means: a population quantile comes from averaging the conditional distribution functions over the target population and then inverting, and a probability that an individual gains needs a coupling of the two potential outcomes (Chapter~\ref{ch:gente}, Section~\ref{sec:ot}).
+
+Keep the posterior draws of the conditional effects $\tau(x_i)$, or of quintile effects as in the 401(k) horseshoe, in a matrix with one row per draw, and apply to each row weights that sum to one: equal for all households; proportional to the treatment indicators for the treated, to the control indicators for the untreated, and to a subgroup's indicators for that subgroup. With quintile effects, use each quintile's share of the chosen population (Section~\ref{sec:k401acc}). Each weighting gives a vector of draws and hence a posterior mean, an interval and any probability the decision needs, such as the probability that the effect on the untreated exceeds a threshold that justifies the cost of extending eligibility.
+
+In the 401(k) data the Gaussian working model produced 8.64, 11.65 and 6.86 thousand dollars from one matrix (the Student $t$ refit gives 4.83, 6.09 and 4.08 for the shift of the bulk), and Table~\ref{tab:k401q} from the same matrix.
+
+DML needs three orthogonal scores for the same three numbers, though one cross fit of the two outcome regressions and the propensity serves all three. Each score gives its own interval. An interval for a difference, such as the treated effect minus the untreated effect, needs the score difference or the scores' joint covariance from that cross fit; neither gives a probability that the difference is positive. For the Bayesian accountings, subtracting corresponding draws gives the difference's posterior.
+
+\section{Step 7: quantify sensitivity to unmeasured confounding}
+
+Finally, ask how the conclusion depends on what is unmeasured\index{workflow!quantifying sensitivity|textbf}. The LaLonde analysis of Section~\ref{sec:lalonde} applies the Bayesian sensitivity analysis\index{sensitivity analysis!in the workflow|textbf} of Section~\ref{sec:sensitivity} to the BART posterior for the effect on the treated, and Figure~\ref{fig:lalonde_sens} there shows the result: even a prior allowing confounding comparable to the full effect leaves the probability of a positive effect at 0.84.
+
+Report a curve like Figure~\ref{fig:lalonde_sens}, not a single adjusted number, and name the unmeasured variable from Step~2 that the confounding parameters stand for. Readers can then choose a plausible prior scale for that variable and read off the probability; a prior centred away from zero, or one that ties the confounder's group imbalance $a$ to its effect $b_U$ on the outcome, needs its own integration over the same posterior draws. Frequentist sensitivity bounds, which a DML analyst can compute apart from the estimate, give a worst case over a set rather than a probability: they show that confounding of a given strength could flip the sign, not how likely that is. The Bayesian computation starts from a posterior already in the report: for LaLonde a normal approximation to the BART posterior, with mean 1.54, and not the causal forest figure of Table~\ref{tab:apps}.
+
+\section{In practice: the workflow against DML}
+
+Table~\ref{tab:apps} lists the four applications with the Bayesian estimate, the DML estimate where we computed one\index{workflow!against double machine learning|textbf}, and the accounting that mattered in each.
+
+\begin{table}[ht]
+\centering
+\caption{Posterior mean effects from the coupled horseshoe with income quintile effects (401(k)), Bayesian causal forest (LaLonde, NHEFS) and Bayesian logistic model (Thornton), with DML where computed. For 401(k), Bayes averages over all households; partially linear DML weights by $e(x)\{1 - e(x)\}$ and reports the lowest of five random partitions (median 9.00).}
+\label{tab:apps}
+\small
+\begin{tabular}{p{1.15in}p{0.5in}p{0.5in}p{1.55in}}
+\toprule
+Application & Bayes & DML & Accounting that mattered \\
+\midrule
+401(k), assets, \$000 & 8.64 & 8.59 & effect on the untreated; rises with income \\
+LaLonde, earnings, \$000 & 1.68 & 1.51 & treated only; experimental benchmark 1.79 \\
+NHEFS, weight, kg & 3.41 & 3.71 & little heterogeneity \\
+Thornton, learning status & 0.447 & & dose response; odds ratios differ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+
+DML was adequate on the single average in the three applications where we computed it, and it has no sampler to monitor. When the question is one average effect, overlap is good, the error distribution is not of interest, the sample is large and the nuisance rate conditions of Chapter~\ref{ch:dml} are credible, DML answers it and the Bayesian machinery adds little beyond a check. The Bayesian analysis is not automatically efficient or doubly robust; its answers are only as good as the outcome model, and Step~5 is where that model is checked. Applied questions rarely stop at one average; when they go further, the posterior is already there.
+
+\section*{Notes}
+
+For Step 1, see the ICH (2019) addendum on a clinical trial's estimand and Hern\'an and Robins (2016) on an observational study's target trial. For Step 2, see Imbens and Rubin (2015) on assignment mechanisms; the causal diagram is Pearl's (1995), and Imbens (2020) compares the two languages for empirical work in economics. The overlap tools of Step 3 are trimming from Crump and coauthors (2009), overlap weights from Li, Morgan and Zaslavsky (2018) and the common support rule of Hill and Su (2013). In Step 4 the Bayesian causal forest is Hahn, Murray and Carvalho's (2020), and carrying the estimated propensity in both model classes is a remedy for the regularization induced confounding that Hahn, Carvalho, Puelz and He (2018) described.
+
+For the posterior predictive checks of Step 5, see Rubin (1984), and Gelman, Meng and Stern (1996) for discrepancies that depend on the parameters. Gelman and coauthors (2020) place such checks inside a general Bayesian workflow. Step 6 applies the accounting view of Chapter~\ref{ch:mccullagh}. The sensitivity analysis of Step 7 integrates over the bias parameters as McCandless, Gustafson and Levy (2007) do, with Gustafson (2015) on the partially identified limit. The thresholds a DML analyst would compute instead are those of Cornfield and coauthors (1959), Rosenbaum (2002) and Cinelli and Hazlett (2020), all in Chapter~\ref{ch:tianpearl}, and Chernozhukov, Cinelli, Newey, Sharma and Syrgkanis (2022a) extend omitted variable bias bounds to machine learning estimators.
+
+For how flexible methods compare when the effect is known, see Dorie and coauthors (2019), who analyse a 2016 competition of some thirty methods on simulated data sets. The workflow covers studies that adjust for measured covariates. Instruments and difference in differences replace Step 2's unconfoundedness assumption (Chapters~\ref{ch:iv} and~\ref{ch:did}); Chapter~\ref{ch:cdt} treats decisions. Time varying treatments, which it does not cover, are in Hern\'an and Robins (2020) and Section~\ref{fw:sec:gmethods}.

@@ -1,0 +1,308 @@
+\chapter{Mathematical Background}\label{app:background}
+
+
+
+\section{Conventions}\label{sec:bg:conv}
+
+
+
+A random variable is a measurable function on a probability space, and its law is the distribution it induces on $\R$ (on $\R^d$ for a random vector, which is a column). $\Prob$ and $\E$ are probability and expectation, $\mathrm{Var}$ and $\mathrm{Cov}$ variance and covariance, $A \indep B \mid C$ conditional independence, and $N(\mu, \sigma^2)$ the normal law with mean $\mu$ and variance $\sigma^2$, with density $\phi$ and distribution function $\Phi$ when $\mu = 0$ and $\sigma = 1$. The treatment is $T$, the covariates are $X$, the potential outcome under treatment $t$ is $Y(t)$ and the observed outcome is $Y(T)$. The treatment effect is $\tau$ throughout, a generic parameter is $\theta$ with prior $\pi(\theta)$, and the horseshoe global scale has its own symbol, $\gscale$. We write $W$ for one observation, for example $W = (Y, T, X)$. Appendix~\ref{app:notation} lists the rest.
+
+The distribution function of a scalar $Y$ is $F(y) = \Prob(Y \le y)$, and its quantile function is the generalized inverse
+\[
+F^{-1}(u) = \inf\{y : F(y) \ge u\}, \qquad 0 < u < 1,
+\]
+which is defined even when $F$ jumps or is flat. The book writes $F_t$ and $q_t$ for the distribution and quantile functions of $Y(t)$, so $q_t = F_t^{-1}$. By construction $F^{-1}(u) \le y$ exactly when $u \le F(y)$, and two facts follow. If $U$ is uniform on $(0, 1)$, then $\Prob\{F^{-1}(U) \le y\} = \Prob\{U \le F(y)\} = F(y)$, so $F^{-1}(U)$ has distribution function $F$, which is how any scalar law is simulated. If $F$ is continuous, then $F(Y)$ is uniform on $(0, 1)$. This is the probability integral transform\index{probability integral transform|textbf}, and a copula (Section~\ref{app:toolkit}) uses it to separate a joint law from its margins. For a scalar posterior with quantile function $Q(\cdot \mid y)$, $Q(U \mid y)$ is a draw: the noise outsourcing of Section~\ref{comp:sec:noise}.
+
+Let $Z_n$ and $Z$ be random variables. $Z_n \xrightarrow{p} Z$, convergence in probability\index{convergence in probability|textbf}, means $\Prob(|Z_n - Z| > \epsilon) \to 0$ for every $\epsilon > 0$. $Z_n \xrightarrow{d} Z$, convergence in distribution\index{convergence in distribution|textbf}, means $\E f(Z_n) \to \E f(Z)$ for every bounded continuous $f$, equivalently $F_n(z) \to F(z)$ at every continuity point of $F$, where $F_n$ and $F$ are the distribution functions of $Z_n$ and $Z$. $Z_n \to Z$ almost surely means $\Prob(Z_n \to Z) = 1$. Almost sure convergence implies convergence in probability, convergence in probability implies convergence in distribution, and convergence in distribution to a constant implies convergence in probability. For $a_n > 0$ write $Z_n = o_p(a_n)$ if $Z_n/a_n \xrightarrow{p} 0$, and $Z_n = O_p(a_n)$ if for every $\epsilon > 0$ there is an $M$ with $\sup_n \Prob(|Z_n| > Ma_n) < \epsilon$\index{order in probability|textbf}; a sequence that converges in distribution is $O_p(1)$. Thus $\hat\theta - \theta = O_p(n^{-1/2})$ says that the error is at most of order $n^{-1/2}$, and $o_p(n^{-1/2})$ that it is of smaller order.
+
+A sequence $W_1, \dots, W_n$ is i.i.d. if its terms are independent with a common law. It is exchangeable if reordering its terms in any way leaves their joint law unchanged. Every i.i.d. sequence is exchangeable, and so are draws without replacement from an urn, which are not independent (Section~\ref{sec:bg:bayes} has the numbers). Billingsley (1995) gives the measure theoretic details of all of this.
+
+\section{Conditioning and independence}\label{sec:bg:cond}
+
+
+
+Let $Y$ have a finite second moment and let $X$ be a random vector. The conditional expectation\index{conditional expectation|textbf} $\E(Y \mid X)$ is the function of $X$ that minimizes the mean squared error $\E\{Y - g(X)\}^2$ over all square integrable $g$. It is characterized by orthogonality: the residual satisfies
+\[
+\E\bigl[\{Y - \E(Y \mid X)\}\,h(X)\bigr] = 0 \quad \text{for every square integrable } h.
+\]
+So $\E(Y \mid X)$ is the orthogonal projection of $Y$ onto the space of functions of $X$ in $L^2$. For any other $g$ the cross term vanishes, and $\E(Y - g)^2 = \E\{Y - \E(Y \mid X)\}^2 + \E\{\E(Y \mid X) - g\}^2$, which is Pythagoras' theorem in $L^2$. Taking $h \equiv 1$ gives the law of total expectation, and writing $Y - \E Y$ as the sum of the orthogonal pieces $Y - \E(Y \mid X)$ and $\E(Y \mid X) - \E Y$ gives the law of total variance:
+\[
+\E Y = \E\{\E(Y \mid X)\}, \quad \mathrm{Var}(Y) = \E\{\mathrm{Var}(Y \mid X)\} + \mathrm{Var}\{\E(Y \mid X)\}.
+\]
+The first turns an average effect into an average of conditional effects, $\E\{Y(1) - Y(0)\} = \E\{\tau(X)\}$ with $\tau(x) = \E\{Y(1) - Y(0) \mid X = x\}$. The second splits the variance of an outcome into what the covariates explain and what they leave. With only $\E|Y| < \infty$, conditional expectation is the function $g(X)$ with $\E\{Yh(X)\} = \E\{g(X)h(X)\}$ for every bounded measurable $h$. The law of total expectation still holds; the projection picture and the law of total variance need a second moment (Billingsley 1995), which Student $t$ errors with $1 < \nu \le 2$ degrees of freedom lack.
+
+Random vectors $A$ and $B$ are conditionally independent\index{conditional independence|textbf} given $C$, written $A \indep B \mid C$, if $p(a, b \mid c) = p(a \mid c)\,p(b \mid c)$, equivalently $p(a \mid b, c) = p(a \mid c)$: once $C$ is known, $B$ carries no further information about $A$. Four properties\index{conditional independence!four rules|textbf} let one move between such statements without returning to densities (Pearl 2009):
+\begin{itemize}
+\item Symmetry: $A \indep B \mid C$ implies $B \indep A \mid C$.
+\item Decomposition: $A \indep (B, D) \mid C$ implies $A \indep B \mid C$.
+\item Weak union: $A \indep (B, D) \mid C$ implies $A \indep B \mid (C, D)$.
+\item Contraction: $A \indep B \mid C$ and $A \indep D \mid (B, C)$ together imply $A \indep (B, D) \mid C$.
+\end{itemize}
+
+These rules let one move between adjustment sets\index{adjustment set}. The back door criterion\index{back door criterion} of Section~\ref{app:graphs} implies conditional ignorability, $Y(t) \indep T \mid X$, when $X$ is the adjustment set. If $Y(t) \indep (T, X') \mid X$, decomposition and weak union give ignorability given $X$ and $(X, X')$. Conversely, ignorability given $(X, X')$ and $Y(t) \indep X' \mid X$ give $Y(t) \indep (T, X') \mid X$ by contraction, and hence ignorability given $X$ by decomposition. No rule adds a variable to a valid set without a further premise: in the graph $T \leftarrow U_1 \to X' \leftarrow U_2 \to Y$, with $U_1$ and $U_2$ unmeasured and no arrow from $T$ to $Y$, the empty set is a valid adjustment set because $T$ and $Y$ are independent, but $\{X'\}$ is not, since conditioning on the collider $X'$ makes them dependent.
+
+Gaussian conditioning\index{Gaussian conditioning|textbf} underlies every conjugate update in the book. If $(U, V)$ is jointly normal with means $m_U, m_V$ and covariance blocks $\Sigma_{UU}, \Sigma_{UV}, \Sigma_{VV}$, with $\Sigma_{VV}$ invertible, then
+\[
+U \mid V = v \sim N\bigl(m_U + \Sigma_{UV}\Sigma_{VV}^{-1}(v - m_V),\; \Sigma_{UU} - \Sigma_{UV}\Sigma_{VV}^{-1}\Sigma_{VU}\bigr).
+\]
+To see it, write $U = m_U + \Sigma_{UV}\Sigma_{VV}^{-1}(V - m_V) + E$: the residual $E$ is jointly normal with $V$, as a linear function of $(U, V)$, and uncorrelated with it, hence independent of it, with mean zero and covariance $\Sigma_{UU} - \Sigma_{UV}\Sigma_{VV}^{-1}\Sigma_{VU}$. For regression, stack the data as $Y = Z\beta + \varepsilon$ with $Y \in \R^n$, an $n \times p$ design matrix $Z$ and $\varepsilon \sim N(0, \sigma^2 I_n)$, and give the coefficients the prior $\beta \mid \sigma^2 \sim N(0, \sigma^2\Lambda)$ with $\Lambda$ positive definite. Completing the square in $\|Y - Z\beta\|^2 + \beta^\top\Lambda^{-1}\beta$, or applying the formula above to $(\beta, Y)$ and the Woodbury identity\index{Woodbury identity|textbf}, gives
+\[
+\beta \mid Y, \sigma^2 \sim N\bigl(K^{-1}Z^\top Y,\; \sigma^2 K^{-1}\bigr), \qquad K = Z^\top Z + \Lambda^{-1}.
+\]
+With $\Lambda = \mathrm{diag}(\lambda_j^2\gscale^2)$ this is the first step of the horseshoe Gibbs sampler of Chapter~\ref{ch:horseshoe}. In the limit, a zero entry of $\Lambda^{-1}$ is an infinite prior variance and leaves that coefficient unpenalized, which is how the sampler treats the treatment effect.
+
+Four inequalities recur. Markov's inequality\index{Markov inequality|textbf} says $\Prob(R \ge a) \le \E R/a$ for $R \ge 0$ and $a > 0$, and Chebyshev's inequality\index{Chebyshev inequality|textbf} applies it to $(R - \E R)^2$: $\Prob(|R - \E R| \ge a) \le \mathrm{Var}(R)/a^2$. A variance bound therefore becomes a rate in probability, and applied to a sample mean it is the weak law of large numbers\index{law of large numbers}. Jensen's inequality\index{Jensen inequality|textbf} says $g(\E R) \le \E g(R)$ for convex $g$ and reverses for concave $g$; with $g(r) = r^2$ it is $\mathrm{Var}(R) \ge 0$. The Cauchy and Schwarz inequality\index{Cauchy Schwarz inequality} says $|\E(UV)| \le \{\E U^2\,\E V^2\}^{1/2}$, so a correlation lies in $[-1, 1]$, and it bounds an expected product of two errors by the product of their root mean squares. For Jensen, take expectations of a supporting line $g(r) \ge g(\E R) + k(r - \E R)$. For Cauchy and Schwarz, use $\E(U - cV)^2 \ge 0$ with $c = \E(UV)/\E V^2$ when $\E V^2 > 0$; otherwise $V = 0$ almost surely and both sides vanish.
+
+\section{Bayesian inference}\label{sec:bg:bayes}
+
+
+
+Bayesian inference starts from a model $p(y \mid \theta)$ for the data and a prior\index{prior distribution|textbf} $\pi(\theta)$. Bayes' rule\index{Bayes rule@Bayes' rule|textbf} gives the posterior\index{posterior distribution|textbf}
+\[
+\pi(\theta \mid y) = \frac{p(y \mid \theta)\,\pi(\theta)}{m(y)}, \qquad m(y) = \int p(y \mid \theta)\,\pi(\theta)\,d\theta,
+\]
+where $m(y)$ is the marginal density of the data, the prior predictive. For a new observation $\tilde y$ that is independent of $y$ given $\theta$, the posterior predictive\index{posterior predictive distribution|textbf} density is $p(\tilde y \mid y) = \int p(\tilde y \mid \theta)\,\pi(\theta \mid y)\,d\theta$, a prediction averaged over what the data say about $\theta$ instead of computed at one value of it. A prior is conjugate\index{conjugate prior|textbf} when the posterior belongs to the same family, so that the update is algebra. Gelman, Carlin, Stern, Dunson, Vehtari and Rubin (2013) cover this material at length.
+
+\paragraph{Beta binomial.} Let $k \mid \theta \sim \mathrm{Bin}(n, \theta)$ and $\theta \sim \mathrm{Beta}(a, b)$. The likelihood\index{likelihood|textbf} is proportional to $\theta^k(1 - \theta)^{n-k}$ and the prior to $\theta^{a-1}(1 - \theta)^{b-1}$, so the posterior is $\mathrm{Beta}(a + k, b + n - k)$, with mean
+\[
+\E(\theta \mid k) = \frac{a + k}{a + b + n} = \frac{a + b}{a + b + n}\cdot\frac{a}{a + b} + \frac{n}{a + b + n}\cdot\frac{k}{n}.
+\]
+The mean is a weighted average of the prior mean and the sample proportion, in which the prior counts as $a + b$ observations. Take $a = b = 2$ and $k = 7$ responders among $n = 20$ patients. The posterior is $\mathrm{Beta}(9, 15)$ with mean $9/24 = 0.375$, the weights $1/6$ and $5/6$ falling on the prior mean $0.5$ and the sample proportion $0.35$. The posterior predictive probability that the next patient responds is $0.375$, and that the next two both respond is $9 \cdot 10/(24 \cdot 25) = 0.15$, above $0.375^2 = 0.141$, because the two future responses are exchangeable given the data and not independent.
+
+\paragraph{Normal normal.} Let $\bar y \mid \theta \sim N(\theta, v)$, where $v = \sigma^2/n$ is the known variance of a mean of $n$ observations with standard deviation $\sigma$, and let $\theta \sim N(m_0, s^2)$. Completing the square in $\theta$ gives a normal posterior, whose precision is the sum of the two precisions and whose mean is their precision weighted average:
+\begin{align*}
+\frac{1}{s_n^2} &= \frac{1}{v} + \frac{1}{s^2}, \qquad \kappa = \frac{v}{v + s^2}, \\
+\E(\theta \mid \bar y) &= s_n^2\Bigl(\frac{\bar y}{v} + \frac{m_0}{s^2}\Bigr) = (1 - \kappa)\,\bar y + \kappa\,m_0.
+\end{align*}
+The shrinkage coefficient $\kappa$ is the weight the posterior mean gives the prior mean. With $v = 1$, $m_0 = 0$ and $s^2 = \lambda_j^2\gscale^2$ it is the coefficient $\kappa_j = 1/(1 + \lambda_j^2\gscale^2)$ of the horseshoe prior. Take $n = 16$ observations with $\sigma = 4$ and $\bar y = 3.2$, so that $v = 1$, and the prior $N(0, 4)$. Then $\kappa = 1/5$, the posterior mean is $0.8 \times 3.2 = 2.56$ and the posterior variance is $0.8$. 
+
+\paragraph{Credible and confidence intervals.} A 95\% credible interval\index{credible interval|textbf} is an interval $[l, u]$ with $\Prob(l \le \theta \le u \mid y) = 0.95$ for the data observed. A 95\% confidence interval is a rule that covers the true $\theta$ in at least 95\% of repeated samples, whatever $\theta$ is. In the normal example the credible interval is $2.56 \pm 1.96\sqrt{0.8} = (0.81, 4.31)$ and the confidence interval is $3.2 \pm 1.96 = (1.24, 5.16)$. The credible interval is narrower and carries the prior with it: its coverage in repeated samples is 97\% at $\theta = 0$, 88\% at $\theta = 4$ and 76\% at $\theta = 6$, and it averages to exactly 95\% over draws of $\theta$ from the prior.
+
+\paragraph{De Finetti's theorem.} An infinite sequence $W_1, W_2, \dots$ is exchangeable\index{exchangeability} if every finite stretch of it is. De Finetti's theorem\index{de Finetti theorem@de Finetti's theorem}\index{theorem|seealso{Bernstein von Mises theorem; Brenier's theorem; de Finetti's theorem; Frisch Waugh Lovell theorem; Ghosal Ghosh van der Vaart theorem; Sklar's theorem}} (de Finetti 1937) says that an infinite exchangeable sequence of binary variables is a mixture of i.i.d. Bernoulli sequences: there is a unique probability law $G$ on $[0, 1]$ with
+\[
+\Prob(W_1 = w_1, \dots, W_n = w_n) = \int_0^1 \theta^{\sum_i w_i}(1 - \theta)^{n - \sum_i w_i}\,G(d\theta).
+\]
+The same holds for variables in a Polish space, with $\theta$ replaced by a random law (Hewitt and Savage 1955). Exchangeability, the judgment that the labels on the observations carry no information, therefore commits a Bayesian to a model and a prior on the mixing law. The theorem needs an infinite sequence. Draw two balls without replacement from an urn with three red and two black balls. The draws are exchangeable and $\Prob(\text{both red}) = (3/5)(2/4) = 0.3$, but any mixture of i.i.d. sequences has $\E\theta = 3/5$ and $\Prob(\text{both red}) = \E\theta^2 \ge (\E\theta)^2 = 0.36$ by Jensen's inequality, so no mixture matches. Diaconis and Freedman (1980) bound how far a finite exchangeable sequence can be from a mixture. Section~\ref{gr:sec:urn} gives the urn form of the theorem, due to Heath and Sudderth (1976), and the exact distance for an urn half full.
+
+\paragraph{Consistency and the Bernstein von Mises theorem.} Let $W_1, \dots, W_n$ be i.i.d. from $p_{\theta_0}$ in a model $\{p_\theta : \theta \in \Theta\}$ with $\Theta \subset \R^d$, and write $\Pi(\cdot \mid W_{1:n})$ for the posterior. The posterior is consistent\index{posterior consistency|textbf} at $\theta_0$ if $\Pi(\|\theta - \theta_0\| > \epsilon \mid W_{1:n}) \xrightarrow{p} 0$ for every $\epsilon > 0$. By Schwartz's theorem this holds when the prior charges every Kullback and Leibler neighborhood of $\theta_0$ and there are uniformly consistent tests of $\theta_0$ against $\|\theta - \theta_0\| > \epsilon$ for every $\epsilon$ (Ghosal and van der Vaart 2017). The Bernstein von Mises theorem\index{Bernstein von Mises theorem|textbf} adds a limit law: if, besides these conditions, the model is differentiable in quadratic mean at an interior point $\theta_0$ with nonsingular Fisher information\index{Fisher information|textbf} $I_{\theta_0}$, and the prior has a density that is positive and continuous at $\theta_0$, then
+\[
+\bigl\|\Pi(\cdot \mid W_{1:n}) - N\bigl(\hat\theta_n, (nI_{\theta_0})^{-1}\bigr)\bigr\|_{\mathrm{TV}} \xrightarrow{p} 0,
+\]
+where $\hat\theta_n$ is an efficient estimator such as the maximum likelihood estimator (van der Vaart 1998, Chapter 10). The prior washes out, and a 95\% credible interval is asymptotically a 95\% confidence interval. Without the conditions the conclusion can fail. Under misspecification, given local asymptotic normality and concentration conditions (Theorem~\ref{pg:thm:misspec}), the posterior is still asymptotically normal around the Kullback and Leibler projection of the truth. Its variance is the inverse of the expected negative Hessian of the log likelihood for one observation divided by $n$; its center has the sandwich sampling variance of Section~\ref{sec:bg:large}, also divided by $n$. Credible intervals miscover unless these agree (Kleijn and van der Vaart 2012; Corollary~\ref{pg:cor:sandwich} gives the coverage). At a boundary, such as a variance component whose true value is zero, the limit is not normal, and when the dimension grows with $n$ the prior can matter at first order.
+
+\paragraph{Gibbs sampling.} A Gibbs sampler\index{Gibbs sampler} samples a posterior $\pi(\theta_1, \dots, \theta_k \mid y)$ that is hard to draw from directly by cycling through each coordinate's full conditional given the newest values of the others. Each update leaves the posterior invariant, so it is a stationary law of the resulting Markov chain, and under mild irreducibility conditions averages along the chain converge to posterior expectations. Discard an initial stretch and compare several chains started far apart, since the chain starts away from the posterior and its draws are dependent. The method pays when every full conditional is a standard law, which conjugacy and the scale mixtures of Section~\ref{app:toolkit} arrange, as in the horseshoe sampler of Chapter~\ref{ch:horseshoe}.
+
+\section{Large sample tools}\label{sec:bg:large}
+
+
+
+The central limit theorem\index{central limit theorem|textbf} says that if $W_1, \dots, W_n$ are i.i.d. with mean $\mu$ and finite variance $\sigma^2$, then $\sqrt{n}(\bar W - \mu) \xrightarrow{d} N(0, \sigma^2)$; the multivariate version replaces $\sigma^2$ by a covariance matrix\index{asymptotic variance|textbf}. Slutsky's lemma\index{Slutsky lemma@Slutsky's lemma|textbf}\index{lemma|see{Slutsky's lemma}} says that if $A_n \xrightarrow{d} A$ and $B_n \xrightarrow{p} b$ for a constant $b$, then $A_n + B_n \xrightarrow{d} A + b$, $B_nA_n \xrightarrow{d} bA$ and, for $b \ne 0$, $A_n/B_n \xrightarrow{d} A/b$ (van der Vaart 1998, Chapter 2). Together they justify the studentized interval: the sample variance $s^2$ converges in probability to $\sigma^2 > 0$, so $\sqrt{n}(\bar W - \mu)/s \xrightarrow{d} N(0, 1)$ and $\bar W \pm 1.96\,s/\sqrt{n}$ covers $\mu$ with probability tending to $0.95$.
+
+The delta method\index{delta method|textbf} carries a limit law through a smooth map. If $\sqrt{n}(\hat\theta - \theta) \xrightarrow{d} N(0, \Sigma)$ and $g$ is differentiable at $\theta$ with gradient $\nabla g(\theta) \ne 0$, then
+\[
+\sqrt{n}\{g(\hat\theta) - g(\theta)\} \xrightarrow{d} N\bigl(0,\; \nabla g(\theta)^\top\Sigma\,\nabla g(\theta)\bigr).
+\]
+The proof expands $g(\hat\theta) - g(\theta) = \nabla g(\theta)^\top(\hat\theta - \theta) + o_p(n^{-1/2})$ and applies Slutsky's lemma.
+
+Sample quantiles have their own version of the delta method. Fix $0 < u < 1$ and suppose $F$ is differentiable at $q(u) = F^{-1}(u)$ with derivative $f\{q(u)\} > 0$. The sample quantile $\hat q(u)$ of $n$ i.i.d. draws with empirical distribution function $F_n$ satisfies
+\[
+\hat q(u) - q(u) = \frac{u - F_n\{q(u)\}}{f\{q(u)\}} + o_p(n^{-1/2}),
+\]
+and since $nF_n\{q(u)\}$ is binomial with success probability $u$, the central limit theorem gives $\sqrt{n}\{\hat q(u) - q(u)\} \xrightarrow{d} N\bigl(0,\; u(1 - u)/f\{q(u)\}^2\bigr)$ (van der Vaart 1998, Chapter 21). Where the density is thin, usually in the tails, a quantile, and with it a quantile treatment effect, is estimated least precisely.
+
+An M-estimator\index{M-estimator|textbf} $\hat\theta$ solves $n^{-1}\sum_i \psi(W_i; \hat\theta) = 0$; least squares and maximum likelihood are examples. Suppose the $W_i$ are i.i.d., $\theta_0$ is a well separated zero of $\E\psi(W; \theta)$, and the sample average of $\psi$ converges uniformly in probability to its expectation. Then $\hat\theta \xrightarrow{p} \theta_0$.
+
+For asymptotic normality, assume also that $\theta_0$ is interior and $\psi(w; \theta)$ is continuously differentiable in $\theta$ on a ball $U$ around $\theta_0$, with $\E\sup_{\theta \in U}\|\partial_\theta\psi(W; \theta)\|^2 < \infty$. This bound permits differentiation under the expectation. Define
+\[
+J_0 = -\E\,\partial_\theta\psi(W; \theta_0), \qquad S_0 = \E\{\psi(W; \theta_0)\psi(W; \theta_0)^\top\}.
+\]
+If $J_0$ is nonsingular and $S_0$ is finite, then
+\[
+\sqrt{n}(\hat\theta - \theta_0) \xrightarrow{d} N\bigl(0,\; J_0^{-1}S_0J_0^{-\top}\bigr).
+\]
+This is the sandwich variance\index{sandwich variance|textbf}, with bread $J_0^{-1}$ and meat $S_0$. It is estimated by replacing both expectations by sample averages at $\hat\theta$. When $\psi$ is the likelihood score of a correct model, $S_0 = J_0$ and the sandwich collapses to the inverse information. For least squares $\psi = (Y - X^\top\beta)X$, and the sandwich is the heteroskedasticity robust variance (van der Vaart 1998, Chapter 5).
+
+An estimator is asymptotically linear with influence function\index{influence function|textbf} $\varphi$ if $\hat\theta - \theta_0 = n^{-1}\sum_i\varphi(W_i) + o_p(n^{-1/2})$ with $\E\varphi(W) = 0$ and $\E\|\varphi(W)\|^2 < \infty$. The central limit theorem then gives $\sqrt{n}(\hat\theta - \theta_0) \xrightarrow{d} N(0, \E\varphi\varphi^\top)$, and the influence function of the M-estimator above is $J_0^{-1}\psi(W; \theta_0)$. It measures the effect of one observation on the estimate. For a regular estimator of a smooth functional $\theta = \theta(P)$ of an unrestricted data law $P$ it is $\varphi(w) = \frac{d}{d\epsilon}\theta\{(1 - \epsilon)P + \epsilon\delta_w\}\big|_{\epsilon = 0}$, with $\delta_w$ the point mass at $w$. Asymptotic linearity at one law is not enough for this: for normal data with mean zero, the estimator $\bar W\,\mathbf{1}\{|\bar W| > n^{-1/4}\}$ of the mean has $\varphi = 0$, while the derivative of the mean is $w$.
+
+In a model with a nuisance parameter, one of the influence functions of regular estimators has the smallest variance. It is the efficient influence function\index{efficient influence function|textbf} $\varphi^*$, and $\E\varphi^*\varphi^{*\top}$ is the semiparametric efficiency bound\index{efficiency bound} (Bickel, Klaassen, Ritov and Wellner 1993). It equals the efficient score, the likelihood score for $\theta$ minus its projection on the tangent space of the nuisance parameter, multiplied by the inverse of the variance of that score.
+
+Chapter~\ref{ch:dml} uses the word score more widely: a score there is any function $\psi$ of the data, the target $\tau$ and the nuisance parameters whose mean is zero at the truth, whether or not it is a derivative of a log likelihood. With the nuisance parameters known, such a score is an influence function up to the scale $J_0^{-1}$, and exactly one when $\partial_\tau\psi = -1$, as for the augmented inverse probability weighted score. With estimated nuisance parameters, a Neyman orthogonal score gives the same influence function when nuisance fitting changes the sample estimating equation by $o_p(n^{-1/2})$. Orthogonality removes its first order bias; cross fitting and product rate conditions control the remainder (Theorem~\ref{dml:thm:main}). The nuisance estimates themselves may converge more slowly than $n^{-1/2}$. When $\psi$ is proportional to the efficient score, $J_0^{-1}\psi$ is the efficient influence function and the sandwich variance equals the efficiency bound. A third use of the word, in Section~\ref{app:toolkit}, is the derivative $\frac{d}{dy}\log m(y)$ of a log marginal density with respect to the data.
+
+Cross validation\index{cross validation|textbf} estimates out of sample prediction error: split the sample into $K$ folds, fit on $K - 1$ of them, score the predictions on the fold left out, and average the $K$ scores. The tuning constant with the smallest average, a lasso penalty for example, is the one chosen, and the cross fitting of Chapter~\ref{ch:dml} uses the same fold structure to estimate nuisance functions instead of tuning constants.
+
+\paragraph{Example.} Suppose $n = 400$ observations of a pair $(A_i, B_i)$ give sample means $\bar A = 10.2$ and $\bar B = 2.5$, sample variances $s_A^2 = 36$ and $s_B^2 = 1$, and sample covariance $s_{AB} = 1.5$. By the central limit theorem and Slutsky's lemma the standard error of $\bar A$ is $s_A/\sqrt{n} = 6/20 = 0.3$ and its 95\% interval is $10.2 \pm 0.59$. If the $A_i$ are normal, $\sqrt{n}(s_A^2 - \sigma^2)$ has limit variance $2\sigma^4$, and the delta method with $g(x) = \sqrt{x}$ gives the standard error of the sample standard deviation, $s_A/\sqrt{2n} = 0.21$. For the ratio $\hat r = \bar A/\bar B = 4.08$ the gradient of $g(a, b) = a/b$ at the sample means is $(1/\bar B, -\bar A/\bar B^2) = (0.4, -1.632)$, and the delta method gives
+\begin{align*}
+\widehat{\mathrm{Var}}(\hat r) &= \frac{1}{n}\Bigl(\frac{s_A^2}{\bar B^2} - \frac{2\bar A s_{AB}}{\bar B^3} + \frac{\bar A^2 s_B^2}{\bar B^4}\Bigr) \\
+&= \frac{5.760 - 1.958 + 2.663}{400} = 0.0162.
+\end{align*}
+The standard error is $0.127$ and the 95\% interval is $4.08 \pm 0.25$. Dropping the covariance term would give $0.145$, 14\% too large. The Wald ratio of Chapter~\ref{ch:iv} and the H\'ajek ratio of Chapter~\ref{ch:ipw} are ratios of this kind.
+
+\section{Linear regression and partialling out}\label{sec:bg:ols}
+
+
+
+Stack $n$ observations as $Y \in \R^n$ and a design matrix $Z \in \R^{n \times p}$ of full column rank. Least squares\index{linear regression|textbf} minimizes $\|Y - Z\beta\|^2$ and gives $\hat\beta = (Z^\top Z)^{-1}Z^\top Y$, which is characterized by the normal equations $Z^\top(Y - Z\hat\beta) = 0$: the residual is orthogonal to every column of $Z$. The fitted vector $Z\hat\beta = P_ZY$ is the orthogonal projection of $Y$ on the column space of $Z$, with $P_Z = Z(Z^\top Z)^{-1}Z^\top$, and the residual is $M_ZY$ with $M_Z = I - P_Z$. Both matrices are symmetric and idempotent, and $M_ZZ = 0$. This is the sample version of the $L^2$ projection of Section~\ref{sec:bg:cond}.
+
+\begin{theorem}[Frisch, Waugh and Lovell]\label{thm:bg:fwl}\index{Frisch Waugh Lovell theorem|textbf}
+Let $T \in \R^n$ and $X \in \R^{n \times p}$ be such that $(T, X)$ has full column rank, and let $\tilde T = M_XT$ and $\tilde Y = M_XY$. In the least squares fit $Y = \hat\tau T + X\hat\beta + \hat e$ the coefficient of $T$ is
+\[
+\hat\tau = \frac{\tilde T^\top\tilde Y}{\tilde T^\top\tilde T} = \frac{\tilde T^\top Y}{\tilde T^\top\tilde T},
+\]
+and $\hat e$ is the residual of the regression of $\tilde Y$ on $\tilde T$.
+\end{theorem}
+
+\begin{proof}
+The normal equations give $T^\top\hat e = 0$ and $X^\top\hat e = 0$. Apply $M_X$ to the fit. Since $M_XX = 0$ and $M_X\hat e = \hat e$, we get $\tilde Y = \hat\tau\tilde T + \hat e$. Also $\tilde T^\top\hat e = T^\top\hat e = 0$, so this is the least squares fit of $\tilde Y$ on $\tilde T$, with residual $\hat e$. Its coefficient has the first form because $\tilde T^\top\tilde T > 0$ by full column rank. Symmetry and idempotence of $M_X$ give $\tilde T^\top\tilde Y = \tilde T^\top Y$, the second form.
+\end{proof}
+
+The theorem is the algebra behind the partialling out\index{linear regression!partialling out|textbf} of Chapter~\ref{ch:dml}, where flexible fits replace the least squares fits on $X$. 
+
+\paragraph{Omitted variable bias.} Suppose $Y = \tau T + X^\top\beta + \varepsilon$ with $\E(\varepsilon \mid T, X) = 0$, and the regression of $Y$ on $T$ alone is run, with all variables centered. It converges to
+\[
+\tau + \frac{\beta^\top\mathrm{Cov}(X, T)}{\mathrm{Var}(T)},
+\]
+so the omitted variable bias\index{omitted variable bias|textbf} is the covariance of $T$ with the omitted part of the outcome, $X^\top\beta$, divided by $\mathrm{Var}(T)$. With a single omitted $X$ the bias has the sign of $\beta\,\mathrm{Cov}(X, T)$: positive when $X$ moves outcome and treatment in the same direction, negative when in opposite directions.
+
+\paragraph{Ridge and lasso.} Ridge regression\index{ridge regression|textbf} (Hoerl and Kennard 1970) minimizes $\|Y - Z\beta\|^2 + \eta\|\beta\|^2$, with solution $(Z^\top Z + \eta I)^{-1}Z^\top Y$, and the lasso\index{lasso|textbf} (Tibshirani 1996) minimizes $\|Y - Z\beta\|^2 + \eta\|\beta\|_1$. Each is a posterior mode. With $Y \mid \beta \sim N(Z\beta, \sigma^2I_n)$ the negative log posterior is $\{\|Y - Z\beta\|^2 + \text{penalty}\}/(2\sigma^2)$ up to a constant, where the penalty is $\eta\|\beta\|^2$ under the prior $\beta \sim N(0, \sigma^2\eta^{-1}I)$ and $\eta\|\beta\|_1$ under independent Laplace priors with density proportional to $\exp\{-\eta|\beta_j|/(2\sigma^2)\}$. For the Gaussian prior the mode is also the mean, with posterior covariance $\sigma^2(Z^\top Z + \eta I)^{-1}$ (Section~\ref{sec:bg:cond}). The lasso is a mode and not a mean: the posterior mean under the Laplace prior is almost never exactly zero. The Laplace law is the scale mixture of normals with exponential variance of Section~\ref{app:toolkit}, and the horseshoe uses a half Cauchy mixing law for the scale instead.
+
+\paragraph{Shrinkage and a correlated coefficient.} A penalty on one coefficient\index{partialling out!and shrinkage|textbf} moves another that is correlated with it and left unpenalized. Let $T$ be the unpenalized treatment and $X$ a covariate, both with mean zero, unit variance and correlation $r = 0.6$, and let $Y = \tau T + \beta X + \varepsilon$ with $\tau = 1$, $\beta = 2$ and $\E(\varepsilon \mid T, X) = 0$. Penalize only the coefficient $b$ of $X$, with weight $n\eta$ in the notation above, that is $\eta$ per observation; this is a Gaussian prior on $b$ and a flat prior\index{prior distribution!flat} on the coefficient $a$ of $T$, in the sense of Section~\ref{sec:bg:cond}. In large samples the normal equations are $a + rb = \tau + r\beta$ and $ra + (1 + \eta)b = r\tau + \beta$. Subtracting $r$ times the first from the second gives $(1 + \eta - r^2)b = (1 - r^2)\beta$, and the first gives $a = \tau + r(\beta - b)$, so
+\[
+b = \beta\,\frac{1 - r^2}{1 + \eta - r^2}, \qquad a = \tau + r\beta\,\frac{\eta}{1 + \eta - r^2}.
+\]
+At $\eta = 0$ the coefficients are the true $(a, b) = (1, 2)$. At $\eta = 1$ the penalty cuts $b$ from $2$ to $0.78$ and lifts $a$ from $1$ to $1.73$, and as $\eta \to \infty$ the coefficient $b$ goes to zero and $a$ to $\tau + r\beta = 2.2$. Because the total penalty is $n\eta b^2$, the matching prior $b \sim N(0, \sigma^2/(n\eta))$ tightens as $n$ grows. A fixed prior $N(0, s_b^2)$ corresponds to $\eta = \sigma^2/(ns_b^2)$, and the shift in $a$ then falls like $1/n$; it persists only when the penalty stays comparable to the information in the data, as it can with many covariates.
+
+The treatment coefficient absorbs what the shrunken coefficient no longer explains. Its bias is the omitted variable bias $r\beta = 1.2$ times a fraction $\eta/(1 + \eta - r^2)$ that rises from $0$ to $1$ with the penalty, and the bias vanishes when $r = 0$. A penalty on the covariate's coefficient therefore damages the estimate of $\tau$ when the penalized covariate is correlated with treatment and matters for the outcome. This is the seed of what Chapter~\ref{ch:critique} calls regularization induced confounding\index{regularization induced confounding} and of the failure of the plug in estimator in Chapter~\ref{ch:dml}.
+
+\section{Distributional tools for shrinkage priors}\label{app:toolkit}
+
+
+
+\subsection{Scale mixtures of normals}
+
+A random variable $\beta$ is a scale mixture of normals\index{scale mixture of normals|textbf} if $\beta \mid \lambda \sim N(0, \lambda^2)$ for some random $\lambda > 0$. The marginal density is
+\[
+\pi(\beta) = \int_0^\infty \frac{1}{\sqrt{2\pi}\lambda}e^{-\beta^2/(2\lambda^2)}\,p(\lambda)\,d\lambda.
+\]
+The Laplace distribution arises when $\lambda^2$ is exponential, the Student $t$ when $\lambda^{-2}$ is gamma, and the horseshoe\index{horseshoe prior} when $\lambda$ is half Cauchy. For the Laplace case the characteristic function of the mixture is $\E\exp(-s^2\lambda^2/2)$, which for exponential $\lambda^2$ with mean $2b^2$ is $1/(1 + b^2s^2)$, the characteristic function of the Laplace law with scale $b$. For the Student case, integrating the normal density against a $\mathrm{Gamma}(\nu/2, \nu/2)$ density, with shape and rate, for the precision $\lambda^{-2}$ gives the Student $t$ density with $\nu$ degrees of freedom.
+
+\begin{proposition}
+If $\lambda \sim C^+(0,1)$, then $\kappa = 1/(1 + \lambda^2) \sim \mathrm{Beta}(1/2, 1/2)$.
+\end{proposition}
+
+\begin{proof}
+The half Cauchy density is $2/\{\pi(1 + \lambda^2)\}$. With $\kappa = 1/(1 + \lambda^2)$, $\lambda = \sqrt{(1-\kappa)/\kappa}$ and $|d\lambda/d\kappa| = \frac{1}{2}\kappa^{-3/2}(1-\kappa)^{-1/2}$. Substituting gives density $\pi^{-1}\kappa^{-1/2}(1-\kappa)^{-1/2}$, the $\mathrm{Beta}(1/2, 1/2)$ density.
+\end{proof}
+
+\subsection{The half Cauchy as an inverse gamma mixture}
+
+\begin{proposition}
+If $\nu \sim \mathrm{IG}(1/2, 1)$ and $\lambda^2 \mid \nu \sim \mathrm{IG}(1/2, 1/\nu)$, then $\lambda \sim C^+(0, 1)$.
+\end{proposition}
+
+\begin{proof}
+Write $x = \lambda^2$. The joint density of $(x, \nu)$ is $\pi^{-1}x^{-3/2}\nu^{-2}e^{-(1 + 1/x)/\nu}$. Integrating over $\nu$ with $w = 1/\nu$ gives
+\[
+p(x) = \frac{x^{-3/2}}{\pi}\int_0^\infty e^{-w(1 + 1/x)}\,dw = \frac{x^{-1/2}}{\pi(1 + x)}.
+\]
+With $dx = 2\lambda\,d\lambda$ the density of $\lambda$ is $2/\{\pi(1 + \lambda^2)\}$, the half Cauchy\index{half Cauchy distribution|textbf}.
+\end{proof}
+
+
+
+\subsection{Regular variation}
+
+A measurable $f > 0$ is regularly varying\index{regular variation} with index $\alpha$ if $f(cx)/f(x) \to c^{\alpha}$ as $x \to \infty$ for all $c > 0$. Equivalently, $f(x) = x^{\alpha}L(x)$ with $L$ slowly varying, meaning $L(cx)/L(x) \to 1$ as $x \to \infty$. The book uses two facts: Karamata's theorem on integrals of regularly varying functions, and the monotone density theorem (Bingham, Goldie and Teugels 1987).
+
+\begin{itemize}
+\item If $f$ is regularly varying with index $\alpha < -1$, then $\int_x^\infty f(t)\,dt \sim x f(x)/(-\alpha - 1)$.
+\item If $f$ is regularly varying with index $\alpha$ and differentiable with eventually monotone derivative, then $x f'(x)/f(x) \to \alpha$.
+\end{itemize}
+The second gives the form of the score behind the tail robustness\index{tail robustness} theorem: for a prior density $\pi$ regularly varying with index $-\alpha$ and with eventually monotone derivative, $\frac{d}{dy}\log \pi(y) = \pi'(y)/\pi(y) \sim -\alpha/y$. The proof of the theorem in Appendix~\ref{app:theory} takes this as its hypothesis and shows that the marginal $m$ inherits it.
+
+\subsection{Tweedie's formula}
+
+\begin{proposition}
+If $y \mid \beta \sim N(\beta, 1)$ and $\beta \sim \pi$, then $\E(\beta \mid y) = y + \frac{d}{dy}\log m(y)$ with $m(y) = \int \phi(y - \beta)\pi(d\beta)$\index{Tweedie formula@Tweedie's formula}.
+\end{proposition}
+
+\begin{proof}
+Differentiate $m(y) = \int\phi(y - \beta)\pi(d\beta)$ under the integral, using $\phi'(z) = -z\phi(z)$: $m'(y) = \int(\beta - y)\phi(y - \beta)\pi(d\beta) = m(y)\{\E(\beta \mid y) - y\}$.
+\end{proof}
+
+\subsection{Polya Gamma variables}
+
+A random variable $\omega$ has the Polya Gamma\index{Polya Gamma@P\'olya Gamma|textbf} law $\mathrm{PG}(b, c)$ if
+\[
+\omega \overset{d}{=} \frac{1}{2\pi^2}\sum_{k=1}^\infty \frac{g_k}{(k - 1/2)^2 + c^2/(4\pi^2)},
+\]
+with $g_k \sim \mathrm{Gamma}(b, 1)$ independently.
+Its Laplace transform (Polson, Scott and Windle 2013) is $\E e^{-\omega t} = \cosh^b(c/2)/\cosh^b\{\sqrt{(c^2/2 + t)/2}\}$. The augmentation identity of Chapter~\ref{ch:computation} follows by setting $c = 0$ and $t = \zeta^2/2$, together with $\cosh(\zeta/2) = e^{\zeta/2}(1 + e^{-\zeta})/2$.
+
+\subsection{The Dirichlet process and the Bayesian bootstrap}
+
+The Dirichlet process\index{Dirichlet process|textbf} with concentration $a$ and base law $G_0$ is the random law $F$ such that for every partition $A_1, \ldots, A_k$, $(F(A_1), \ldots, F(A_k)) \sim \mathrm{Dirichlet}(aG_0(A_1), \ldots, aG_0(A_k))$. Given observations $z_1, \ldots, z_n$, the posterior is a Dirichlet process with concentration $a + n$ and base law proportional to $aG_0 + \sum_i\delta_{z_i}$ (Ferguson 1973). As $a \to 0$ the posterior puts all its mass on the observed points, with weights $\mathrm{Dirichlet}(1, \ldots, 1)$: the Bayesian bootstrap\index{Bayesian bootstrap|textbf} of Rubin\index{Rubin, Donald B.!Bayesian bootstrap|textbf} (1981).
+
+\subsection{Copulas}
+
+By Sklar's theorem\index{Sklar theorem@Sklar's theorem|textbf} (Nelsen 2006), every joint distribution $H$ with continuous marginals $F_0, F_1$ can be written uniquely as $H(y_0, y_1) = C(F_0(y_0), F_1(y_1))$, where $C$ is a distribution on $[0,1]^2$ with uniform marginals. The Fr\'echet and Hoeffding bounds\index{Frechet Hoeffding bounds@Fr\'echet Hoeffding bounds|textbf} of Section~\ref{sec:ot} are the pointwise extremes of $C$.  The Gaussian copula\index{copula} with correlation $\rho$ interpolates between the lower bound at $\rho = -1$ and the upper bound at $\rho = 1$.
+
+\section{Graphs, the do calculus and linear programs}\label{app:graphs}
+
+Here we use Pearl's letters: $X$ is the treatment, $Z$ an adjustment set and $W$ a set of further conditioning nodes.
+
+\subsection{Causal graphs}
+
+A causal directed acyclic graph\index{causal graph|textbf}\index{directed acyclic graph} has a node for each variable and an arrow from $A$ to $B$ when $A$ is a direct cause of $B$. Each variable is a function of its parents and an independent noise term. The intervention $do(X = x)$ replaces the equation for $X$ by the constant $x$ and leaves the others unchanged. The interventional distribution $\Prob(y \mid do(x))$ is the law of $Y$ in the modified system. The identification formulas below also need positivity, which the graph cannot supply: conditioning events must have positive probability, for example $\Prob(x \mid z) > 0$ whenever $\Prob(z) > 0$ in the adjustment formula. If $X = Z$ always, adjusting for $Z$ asks for $\Prob(y \mid x, z)$ in cells the data never show, and two models with the same observed law can give different $\Prob(y \mid do(x))$.
+
+A path is a sequence of distinct nodes joined by arrows of either direction. A node on a path is a collider\index{collider} if both arrows on the path point into it, as $B$ is in $A \to B \leftarrow C$. A path is blocked by $W$ if it contains a noncollider in $W$ or a collider with neither itself nor any descendant in $W$. Two sets of nodes $S_1$ and $S_2$ are d-separated\index{d separation|textbf} by $W$ if $W$ blocks every path between them, and we then write $S_1 \indep S_2 \mid W$ in the graph; d-separation in a causal graph implies conditional independence in every distribution compatible with it (Pearl 2009, Section 1.2.3).
+
+A back door path from $X$ to $Y$ begins with an arrow into $X$. A set $Z$ satisfies the back door criterion\index{back door criterion} if no element of $Z$ is a descendant of $X$ and $Z$ blocks every back door path. Then
+\[
+\Prob(y \mid do(x)) = \sum_z \Prob(y \mid x, z)\Prob(z),
+\]
+the adjustment formula (Pearl 2009, Theorem 3.3.2). In potential outcome terms, the back door criterion implies conditional ignorability\index{ignorability} given $Z$.
+
+\subsection{The three rules}
+
+Write $G_{\overline{X}}$ for the graph with arrows into $X$ removed and $G_{\underline{X}}$ for the graph with arrows out of $X$ removed. Pearl's rules\index{do calculus!three rules|textbf} (Pearl 1995; Pearl 2009, Theorem 3.4.1) are:
+\begin{enumerate}
+\item Insertion or deletion of observations: $\Prob(y \mid do(x), z, w) = \Prob(y \mid do(x), w)$ if $Y \indep Z \mid X, W$ in $G_{\overline{X}}$.
+\item Exchange of action and observation: $\Prob(y \mid do(x), do(z), w) = \Prob(y \mid do(x), z, w)$ if $Y \indep Z \mid X, W$ in $G_{\overline{X}\underline{Z}}$.
+\item Insertion or deletion of actions: $\Prob(y \mid do(x), do(z), w) = \Prob(y \mid do(x), w)$ if $Y \indep Z \mid X, W$ in $G_{\overline{X}\,\overline{Z(W)}}$, where $Z(W)$ is the set of $Z$ nodes that are not ancestors of any $W$ node in $G_{\overline{X}}$.
+\end{enumerate}
+Shpitser and Pearl (2006) and Huang and Valtorta (2006) proved the rules complete: any identifiable interventional distribution can be derived with them.
+
+\subsection{Deriving the front door formula}
+
+Take the graph $S \to M \to C$ with a hidden $U$ pointing into $S$ and $C$\index{front door criterion}. Then:
+\begin{enumerate}
+\item $\Prob(m \mid do(s)) = \Prob(m \mid s)$, by rule 2, since the only back door path from $S$ to $M$ passes through $U$ and $C$, and $C$ is a collider on it.
+\item $\Prob(c \mid do(m)) = \sum_{s'}\Prob(c \mid m, s')\Prob(s')$, by the back door criterion with adjustment set $\{S\}$, which blocks $M \leftarrow S \leftarrow U \to C$.
+\item First condition on the mediator:
+\[
+\Prob(c \mid do(s)) = \sum_m \Prob(m \mid do(s))\Prob(c \mid m, do(s)).
+\]
+Rule 2 gives $\Prob(c \mid m, do(s)) = \Prob(c \mid do(m), do(s))$, since $C \indep M \mid S$ in $G_{\overline{S}\underline{M}}$. Rule 3 then gives $\Prob(c \mid do(m), do(s)) = \Prob(c \mid do(m))$, since $C \indep S \mid M$ in $G_{\overline{M}\,\overline{S}}$. Substitution yields $\Prob(c \mid do(s)) = \sum_m \Prob(m \mid do(s))\Prob(c \mid do(m))$.
+\end{enumerate}
+Substituting steps 1 and 2 into step 3 gives the front door formula \eqref{eq:frontdoor}:
+\[
+\Prob(c \mid do(s)) = \sum_m \Prob(m \mid s)\sum_{s'}\Prob(c \mid m, s')\Prob(s').
+\]
+
+\subsection{Bounds as linear programs}
+
+For binary $X$ and $Y$, the joint law of $(X, Y(0), Y(1))$ has eight cells, with probabilities $q_{x,a,b} = \Prob(X = x, Y(1) = a, Y(0) = b)$. The data, experimental and observational on one population, fix linear functions of $q$:
+\begin{align*}
+\Prob\{Y(1) = 1\} &= \textstyle\sum_{j, b} q_{j, 1, b}, & \Prob\{Y(0) = 1\} &= \textstyle\sum_{j, a} q_{j, a, 1}, \\
+\Prob(X = 1, Y = a) &= \textstyle\sum_b q_{1, a, b}, & \Prob(X = 0, Y = b) &= \textstyle\sum_a q_{0, a, b},
+\end{align*}
+with every index in $\{0, 1\}$. Together with $q \geq 0$ and $\sum_{j,a,b} q_{j,a,b} = 1$ these equations define the feasible polytope. The probability of necessity and sufficiency is $\sum_j q_{j,1,0}$, a linear function of $q$. Its bounds are the minimum and maximum of this function over the polytope. Balke and Pearl (1997) solved such programs symbolically by enumerating vertices of the dual, for the bounds on the average effect under imperfect compliance, and Tian and Pearl (2000) obtained the closed forms of Chapter~\ref{ch:tianpearl} by linear programming\index{linear programming|textbf} of this kind. 
+
+The probability of necessity\index{probability of necessity} $\PN = \Prob\{Y(0) = 0 \mid X = 1, Y = 1\} = q_{1,1,0}/\Prob(X = 1, Y = 1)$ has a denominator fixed by the data, so the same program bounds it.
+
+\subsection{A Bayesian version of the program}
+
+ Let $\phi$ collect the identified probabilities, let $\PNS_{\mathrm{lo}}(\phi)$ and $\PNS_{\mathrm{hi}}(\phi)$ be the solutions of the two linear programs, and write $\PNS = \PNS_{\mathrm{lo}}(\phi) + u\{\PNS_{\mathrm{hi}}(\phi) - \PNS_{\mathrm{lo}}(\phi)\}$ with $0 \le u \le 1$, the position of Chapter~\ref{ch:tianpearl}. The likelihood depends on the parameters only through $\phi$, so the posterior of $u$ given $\phi$ is its prior given $\phi$. To draw from the posterior of $\PNS$, draw $\phi$ from its posterior, solve the two programs for the bounds, draw $u$ from its prior given $\phi$ and apply the formula. Chapter~\ref{ch:tianpearl} takes $u$ a priori independent of $\phi$, so the same prior serves at every draw; Appendix~\ref{app:theory} allows dependence.
+
+

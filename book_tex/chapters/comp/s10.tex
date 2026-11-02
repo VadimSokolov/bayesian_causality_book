@@ -1,0 +1,35 @@
+% comp s10 (W6, phase 2); log misc/work-orders/comp-phase2-W6.applied.md
+\section{Choosing the engine}\label{comp:sec:engine}
+
+Table~\ref{tab:cost} compares engines and cost orders for $n$ units and $p$ covariates\index{engine choice|textbf}; constants depend on the machine.
+
+\begin{table}[ht]
+\centering
+\caption{Engines by situation. $N_{\mathrm{it}}$ is the number of iterations and $J$ the number of simulated pairs.}
+\label{tab:cost}
+\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.8in}L{0.62in}L{0.82in}L{1.0in}L{0.86in}}
+\toprule
+Situation & Engine & What it needs & How it fails & Cost order \\
+\midrule
+Gaussian outcome & Horseshoe Gibbs & Closed form full conditionals & Scales mix slowly & $np^2 + N_{\mathrm{it}}p^3$; $N_{\mathrm{it}}n^2p$ if $p > n$ \\
+Binary or count outcome & Polya Gamma Gibbs & Logistic or count likelihood & As above & $N_{\mathrm{it}}(p^3 + np^2)$ \\
+No closed form conditionals & HMC & Log posterior and its gradient & Funnels (divergences); heavy tails & $N_{\mathrm{it}}\times$ leapfrog steps $\times\, np$ \\
+Near normal posterior & Laplace & Likelihood, gradients & Skewed or bounded posteriors, tails & One optimization and one Hessian \\
+Speed, very large $n$ & Variational & Likelihood, a tractable family & Tails; error not reported & One optimization \\
+Factorized family & Mean field & Independent blocks & Intervals too short & As variational \\
+Likelihood unavailable or costly & Trained network & A simulator; no likelihood or gradients & Extrapolation, under-dispersion, lost dependence & $J$ simulations and a fit, then a forward pass per draw \\
+One effect, no posterior & DML, $K$ folds & Cross fitted regressions & Interval only; needs overlap, nuisance rates & $2K$ cross validated lasso fits \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For Gaussian or Polya Gamma conditionals the Gibbs sampler is the default, and for the horseshoe Section~\ref{comp:sec:horseshoe} reports that trained networks lost to it. A network earns its training where the likelihood cannot be evaluated or is expensive, as in the merger studies of Chapter~\ref{ch:blp}, and over many data sets from one design\index{generative Bayesian computation!cost} (Section~\ref{comp:sec:algorithm} gives the break-even).
+
+\section{In practice}
+
+\paragraph{The target.} Every target in this book is a function of the draws $\theta^{(s)}$: an average effect is $\tau_Q(\theta^{(s)})$ for each draw, a merger threshold or a probability of causation another function of the same draws. The engine decides how fast the draws arrive and how closely they follow the posterior; the model, the prior and the summary decide which posterior that is.
+
+\paragraph{What the analyst does differently.} For the horseshoe model she uses the fast sampler when $p$ exceeds $n$, and includes an unpenalized intercept or centres the outcome and every column. She runs 1,500 to 3,000 iterations, drops the first third, and reports split $\hat R$, the effective sample size for the effect and a posterior predictive check. For a network she reports the summary, the held out loss, the ranks of the effect, the local ranks and a reference where one exists.
+
+\paragraph{Against DML.} DML is cheaper in principle, but in the two Gaussian outcome designs, with 51 and 56 columns and 200 and 9,915 units, we timed the horseshoe sampler at half the time of a cross fitted lasso and a twentieth of the time of a cross fitted forest (Section~\ref{comp:sec:cost}). As $p$ grows the factorization dominates and the comparison turns. In the replications of Section~\ref{sec:ricsim}, with $n = 200$, one coupled horseshoe fit, its lasso fit of the treatment included, took 1.6 seconds on average at $p = 150$ and 5.7 seconds at $p = 300$, while everything in a replication except its three horseshoe fits and the six lasso fits of the treatment that feed two of them, DML's ten lasso fits included, took 3.2 and 2.3 seconds, an upper bound on the cost of DML in that design. The reduced form sampler of Section~\ref{sec:crit:bayes} took 9.8 seconds for one chain of 2,000 sweeps at $n = 300$ and $p = 400$, and about 200 seconds for the four chains run to convergence that Table~\ref{tab:crit:head} uses, against 1.0 for a cross fitted lasso. We did not time the Polya Gamma sampler for a binary outcome, whose cost per iteration grows with $n$. DML with a lasso nuisance keeps a cost advantage at large $p$, and may keep one for a binary outcome and in a very large analysis with a nonlinear nuisance that a Gaussian or Polya Gamma model does not fit. In every design the posterior comes with checks for which DML has no counterpart. A trained network repays its training only over many data sets from one design.

@@ -1,0 +1,549 @@
+\chapter{Groups, Urns and Information}\label{ch:groups}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+A treatment effect that is stable across populations is a group element, and an average describes the case mix: one odds ratio of $e$ supports average effects from 0.076 to 0.232 over six case mixes. A randomized experiment is an urn from which about half the units are drawn, so the finite and infinite views of exchangeability disagree. When the units are sampled from a population, the experiment identifies only the two arm laws: the average effect is a function of them, while the fraction helped lies in a Fr\'echet interval that more data do not narrow. An information gap in nats measures the distance of the data from stability on a scale, and the posterior odds of one scale against another move at the exponential rate given by the difference of their gaps. In the kidney stone data the risk ratio is the most stable scale and the odds ratio the least, by a factor of 64 in gap. A right Haar prior gives exact coverage in a transformation model with known baselines; estimating the baseline under BART or a horseshoe loses that guarantee.
+\end{tcolorbox}
+
+Chapter~\ref{ch:mccullagh} left two questions open: which scale makes an effect stable, and how much an experiment can reveal about the association between a unit's potential outcomes.
+
+
+
+\section{The treatment effect as a group action}\label{gr:sec:group}
+
+For McCullagh a statistical model is a stochastic process: a probability distribution on the outcome space, indexed by the covariate and design information held fixed, from which sampling distributions, expectations and the properties of summaries follow. We call this the process view. The von Mises programme\index{Mises, Richard von@von Mises, Richard!frequency definition of probability|textbf} runs the other way, defining probability as a limiting relative frequency, and in McCullagh's reading potential outcomes inference inherits that definition and adds random sampling from a population. The frequency view suits concrete populations, finite and open to simple random sampling, as in surveys and auditing. In science the population is abstract, infinite and only partly accessible, and there is no sampling frame. 
+
+McCullagh formalizes treatment assignment as a Markov kernel from covariates and an auxiliary randomization device to the treatment vector, the mechanism $p(T\mid X,Y(0),Y(1),\phi)$ of Chapter~\ref{ch:mccullagh}. In a randomized design the kernel depends only on covariates and a device with known law. It contains no outcome model parameter, so treatment is ancillary\index{ancillarity|textbf} for those parameters and Rubin's factorization follows. In a flawed experiment or observational study the kernel can depend on quantities outside the model. Dawid (2000) reaches the same place by decision theory (Section~\ref{fw:sec:dawid}). With $F_{x,t}$ the response law at covariate $x$ under treatment $t$, a group element and a posterior functional (Chapter~\ref{ch:predictive}) index the same intervention laws $(F_{x,0},F_{x,1})$.
+
+McCullagh defines the effect of a treatment as a group element. Let $\{P_\gamma:\gamma\in\mathcal C\}$ be the laws of the response under control, with $\gamma_i=\gamma(x_i)$ the baseline of unit $i$, and let a group $G$ act on the baseline space $\mathcal C$.
+
+\begin{definition}[Model based treatment effect]\label{gr:def:effect}\index{group action!treatment effect as|textbf}
+Assume that $G$ acts freely on $\mathcal C$ and that $\gamma\mapsto P_\gamma$ is one to one. Level $t$ of the treatment corresponds to an element $g_t\in G$ with $g_0=1_G$, and a unit with baseline $\gamma_i$ given level $t$ has law $P_{g_t\gamma_i}$. The effect of level $t$ is $g_t$, common to all units. Only the baseline varies.
+\end{definition}
+
+
+
+\begin{table}[ht]
+\centering
+\caption{Four groups acting on a baseline. In each row $\psi$ is the effect on the scale in which the group acts by translation.}
+\label{gr:tab:groups}
+\begin{tabular}{@{}lll@{}}
+\toprule
+baseline space $\mathcal C$ & action & model \\
+\midrule
+$\R$ (mean) & $\gamma\mapsto\gamma+\psi$ & linear, additive effect \\
+$(0,\infty)$ (rate) & $\gamma\mapsto e^{\psi}\gamma$ & log linear, rate ratio $e^{\psi}$ \\
+$\R$ (log odds) & $\gamma\mapsto\gamma+\psi$ & logistic, odds ratio $e^{\psi}$ \\
+$(0,\infty)$ (hazard) & $\gamma\mapsto e^{\psi}\gamma$ & proportional hazards, hazard ratio $e^{\psi}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The point is stability: $g_t$ means the same thing for every covariate configuration and every subset of units. For the additive group of the line, write $\psi$ for the effect and keep $\tau$ for averages. In the logit row of Table~\ref{gr:tab:groups}, translation of the log odds by $\psi$ gives the risk map $g(p)=e^{\psi}p/\{1+(e^{\psi}-1)p\}$ of Chapter~\ref{ch:mccullagh}. Here $\psi$ is the conditional log odds ratio, the $\beta$ of equation~\eqref{eq:logistic}; the baseline log odds $\gamma$ is not that equation's coefficient vector $\gamma$.
+
+The potential outcomes tradition defines the effect differently, as the Neyman and Rubin average $\tau_{\mathrm{fp}}=n^{-1}\sum_i\{Y_i(1)-Y_i(0)\}$ of Chapter~\ref{ch:predictive}, or its population analogue. With both potential outcomes observed, Battey and Edgar (2026) state that the two agree for every sample exactly when (C1) the treatment acts through the baseline parameter, (C2) the same action can be written on the observations, and (C3) no further nuisance parameter enters. They note that C1 and C2 make the model a transformation family\index{transformation model|textbf}. The linear and exponential models satisfy the conditions, the Weibull only in part, and the additive rate and logistic models fail, so that for them $\tau_{\mathrm{fp}}$ depends on the sample on every scale. The agreement is on the scale in which the group acts by translation. In the exponential model with rate ratio $e^{\psi}$, the comonotone coupling gives $Y_i(1)=e^{-\psi}Y_i(0)$, so the raw difference is $(e^{-\psi}-1)$ times the mean control outcome, which changes with the sample, while the difference of log outcomes is the constant $-\psi$.
+
+
+
+\begin{lemma}[Translation chart]\label{gr:lem:chart}
+Let $G$ be a connected one dimensional Lie group acting continuously, freely and transitively on an open interval $I\subset\R$. Then $G$ is isomorphic to $(\R,+)$, and there are an increasing homeomorphism $h:I\to\R$, the chart, and an isomorphism $\psi:G\to\R$ with
+\[
+h(gy)=h(y)+\psi(g)\qquad\text{for all } g\in G,\ y\in I.
+\]
+\end{lemma}
+
+The proof is in Appendix~\ref{app:groupsproofs}. The logit group on the interval $(0,1)$ of risks has $h=\logit$ and $\psi(g)$ the log odds ratio.
+
+\section{One stable effect, many averages}\label{gr:sec:many}
+
+Take $\logit\Prob(Y_i=1)=\gamma_i+\psi t_i$, with $t_i\in\{0,1\}$ and $\psi=1$, a conditional odds ratio of $e\approx2.72$ for every unit. The baseline log odds have law $Q=N(\mu,s^2)$, the image of the covariate law under $x\mapsto\gamma(x)$; later sections use $Q$ for the covariate law itself. The average effect for this case mix\index{case mix|textbf} is the accounting identity of Chapter~\ref{ch:mccullagh}
+\begin{equation}
+\tau_Q(\psi)=\E_Q\{\expit(\gamma+\psi)-\expit(\gamma)\}.
+\label{gr:eq:tauQ}
+\end{equation}
+Table~\ref{gr:tab:tau} and Figure~\ref{gr:fig:tau} give its values by Monte Carlo, with 400,000 draws of $\gamma$ for each row and each point.
+
+\begin{table}[ht]
+\centering
+\caption{One conditional odds ratio, $e$ in every row, and six case mixes: the baseline log odds is $N(\mu,s^2)$ and $\psi=1$. The control risk $\E_Q\expit(\gamma)$ and the average effect $\tau_Q$ are Monte Carlo averages over 400,000 draws of the baseline (seed 1), with standard errors below 0.001, and the marginal odds ratio is computed from the two marginal risks.}
+\label{gr:tab:tau}
+\begin{tabular}{@{}cccccc@{}}
+\toprule
+$\mu$ & $s$ & control risk & $\tau_Q$ & conditional odds ratio & marginal odds ratio \\
+\midrule
+$-3.0$ & 0.5 & 0.053 & 0.076 & 2.72 & 2.66 \\
+$-2.0$ & 0.5 & 0.129 & 0.150 & 2.72 & 2.62 \\
+$-0.5$ & 0.5 & 0.384 & 0.232 & 2.72 & 2.57 \\
+$-0.5$ & 2.0 & 0.424 & 0.151 & 2.72 & 1.84 \\
+$-0.5$ & 3.0 & 0.442 & 0.115 & 2.72 & 1.59 \\
+$\phantom{-}2.0$ & 0.5 & 0.871 & 0.076 & 2.72 & 2.66 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{tau_case_mix.pdf}
+\caption{The average effect $\tau_Q$ against the mean baseline log odds $\mu$, for baseline spreads $s=0.5$ (solid line), $1.5$ (dashed line) and $3.0$ (dash and dot line), with $\psi=1$ so that the conditional odds ratio is $e$ throughout. Each curve is a Monte Carlo average over the same 400,000 draws of a standard normal, at 71 values of $\mu$ from $-4$ to $3$. The dotted horizontal line is the bound $\tanh(\psi/4)=0.245$ of Proposition~\ref{gr:prop:range}.}
+\label{gr:fig:tau}
+\end{figure}
+
+The conditional odds ratio is $e$ in every row, yet the average effect ranges over a factor of three, from $0.076$ to $0.232$. Spread alone, with $\mu=-0.5$ fixed, takes it from $0.232$ to $0.115$. The marginal odds ratio is below $e$ in every row and falls to $1.59$ at $s=3$, the noncollapsibility of Chapter~\ref{ch:mccullagh}. Each curve in Figure~\ref{gr:fig:tau} peaks at $\mu=-\psi/2$, where the control and treated risks lie symmetrically about one half, and the peak falls as the spread grows. 
+
+\begin{proposition}\label{gr:prop:range}
+Fix $\psi>0$ and let $Q$ range over all probability laws for the baseline log odds $\gamma$ in \eqref{gr:eq:tauQ}. Then
+\[
+\{\tau_Q(\psi):Q\}=\bigl(0,\ \tanh(\psi/4)\bigr],
+\]
+with the supremum attained only by the point mass at $\gamma=-\psi/2$. Equivalently, an average effect $\tau\in(0,1)$ is generated by the odds ratio $e^{\psi}$ under some case mix if and only if $\psi\ge4\operatorname{artanh}(\tau)$.
+\end{proposition}
+
+Since $\expit'$ is even and decreases away from zero, $d(\gamma)=\expit(\gamma+\psi)-\expit(\gamma)$ increases up to $\gamma=-\psi/2$ and decreases thereafter, so $\tau_Q(\psi)\le d(-\psi/2)=\tanh(\psi/4)$ (full proof in Appendix~\ref{app:groupsproofs}). At $\psi=1$ this is $0.245$, the dotted line in Figure~\ref{gr:fig:tau}. Without the baseline distribution, then, $\tau_Q$ bounds $\psi$ only from below and $\psi$ bounds $\tau_Q$ only from above. An average effect of $0.232$ needs $\psi\ge0.945$, an odds ratio of at least $2.57$, while $0.076$ needs only $\psi\ge0.305$, an odds ratio of at least $1.36$. Two populations that differ only in case mix report $0.076$ and $0.232$ for the same treatment. This is McCullagh's critique in numbers: $\tau_Q$ describes the case mix, $\psi$ describes the treatment.
+
+\section{A randomized experiment is an urn}\label{gr:sec:urn}
+
+The urn form of de Finetti's theorem, due to Heath and Sudderth (1976), shows where the gap between the finite population and superpopulation posteriors of Chapter~\ref{ch:mccullagh} comes from.
+
+\begin{theorem}[Heath and Sudderth]\label{gr:thm:hs}
+Let $Z_1,\dots,Z_n$ be exchangeable with values in $\{0,1\}$ and let $S=\sum_iZ_i$. Given $S=r$, the sequence is distributed as $n$ draws without replacement from an urn\index{Heath and Sudderth urn|textbf}\index{urn|see{Heath and Sudderth urn}} with $r$ ones and $n-r$ zeros. Hence for $k\le n$ and $s=\sum_{i\le k}z_i$,
+\[
+\Prob(Z_1=z_1,\dots,Z_k=z_k)=\sum_{r=0}^n \Prob(S=r)\,\frac{(r)_{s}\,(n-r)_{k-s}}{(n)_k},
+\]
+with $(a)_j=a(a-1)\cdots(a-j+1)$. If the sequence extends to an infinite exchangeable sequence, $S/n$ converges in law to a limit with law $\Pi$ as $n\to\infty$, and the display becomes de Finetti's theorem, $\Prob(Z_{1:k}=z_{1:k})=\int\theta^{s}(1-\theta)^{k-s}\,\Pi(d\theta)$.
+\end{theorem}
+
+\begin{proof}
+Given $S=r$ every arrangement of $r$ ones among $n$ places is equally likely, which is the urn, and the display is the probability that the first $k$ draws show $z_{1:k}$. As $n\to\infty$, $(r)_s(n-r)_{k-s}/(n)_k-(r/n)^s(1-r/n)^{k-s}\to0$ uniformly in $r$, and the laws of $S/n$ converge, because $\E\{(S)_j/(n)_j\}=\Prob(Z_1=\dots=Z_j=1)$ for every $n\ge j$ and $(S)_j/(n)_j-(S/n)^j\to0$ uniformly, so the moments of $S/n$ converge and determine the limit on $[0,1]$.
+\end{proof}
+
+The rate is explicit. Diaconis and Freedman (1980) show that the first $k$ of $n$ exchangeable variables taking $c$ values are within $ck/n$ in total variation of a mixture of independent and identically distributed laws\index{de Finetti theorem@de Finetti's theorem!finite version}, and within $k(k-1)/(2n)$ whatever the number of values. (Their norm is twice this distance, so Appendix~\ref{app:theory} states $2ck/n$.) Figure~\ref{gr:fig:hs} shows the exact distance for an urn half full: about $k/(4n)$ for small $k$ and 0.16 to 0.17 at $k=n/2$, whatever $n$. For this urn the finite and infinite views agree only when $k/n$ is small, and at $k=n/2$ the bound says nothing.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{heath_sudderth_tv.pdf}
+\caption{Total variation distance between $k$ draws without replacement from an urn of $n$ units, half of them ones, and $k$ independent draws with probability one half, against $k$ on logarithmic scales, for $n=100$ (thick light line), $1{,}000$ (medium dark line) and $10{,}000$ (thin black line). Exact hypergeometric and binomial calculations at up to 40 log spaced values of $k$ from 2 to $n/2$. Thin dashed lines: the bound $ck/n=2k/n$ of Diaconis and Freedman, capped at 1; the distance is less than one sixth of it.}
+\label{gr:fig:hs}
+\end{figure}
+
+Fix $n$ units with potential outcomes $(Y_i(1),Y_i(0))$. Complete randomization\index{randomization!as an urn|textbf} draws $n_1$ units uniformly without replacement: treated responses are draws from $\{Y_i(1)\}$ and controls are complementary draws from $\{Y_i(0)\}$. Neyman's randomization inference fixes the unknown urn composition, a degenerate mixing measure, and puts probability only on assignment.
+
+\begin{proposition}\label{gr:prop:fpc}
+Let $p_1$ be the proportion of ones in a binary urn $\{Y_i(1)\}$ and $\bar Y_1$ the mean of the $n_1$ treated responses. Under complete randomization
+\[
+\mathrm{Var}(\bar Y_1)=\frac{p_1(1-p_1)}{n_1}\cdot\frac{n-n_1}{n-1},
+\]
+so the urn differs from the de Finetti limit by the finite population correction\index{finite population correction|textbf} $(n-n_1)/(n-1)$. For outcomes of any kind and the difference in means $\hat\tau=\bar Y_1-\bar Y_0$, Neyman's variance is
+\[
+\mathrm{Var}(\hat\tau)=\frac{S_1^2}{n_1}+\frac{S_0^2}{n_0}-\frac{S_\tau^2}{n},
+\]
+where $S_1^2$, $S_0^2$ and $S_\tau^2$ are the finite population variances, with divisor $n-1$, of $Y(1)$, $Y(0)$ and the unit effects $\tau_i$. If the additive group of Section~\ref{gr:sec:group} also acts on the observations unit by unit, $Y_i(1)=Y_i(0)+\psi$ for all $i$ (condition C2 of Battey and Edgar, 2026, with its deterministic coupling, which by Lemma~\ref{gr:lem:binary} binary outcomes satisfy only trivially), then $S_\tau^2=0$ and Neyman's conservative variance estimator is unbiased. Stability of the laws alone leaves $S_\tau^2$ free.
+\end{proposition}
+
+Appendix~\ref{app:groupsproofs} proves it. The term $-S_\tau^2/n$, the unit effect variance over $n$ of Section~\ref{sec:imputation}, combines the finite population corrections of the arm means with minus twice their covariance. It is the gap between the urn and the process for the contrast, and it vanishes only when the effect is constant.
+
+Surveys and audits are urns with $k/n$ bounded away from zero, where the process view is off by the factor $(n-k)/(n-1)$ in the variance of a mean. A randomized experiment sits in between: its urn is the sample itself, $n_1/n$ is about one half, and Figure~\ref{gr:fig:hs} shows that the two views then disagree. Inference about the stable effect $\psi$, which concerns future units, belongs to the process; inference about $\tau_{\mathrm{fp}}$, which concerns these $n$ units, belongs to the urn.
+
+The Bayesian form of the urn is the finite population inference of Ericson (1969) and Smith (1976). Sugden and Smith (1984) give the condition under which the design may be ignored for inference about the urn, the assignment analogue of Rubin's ignorability (Section~\ref{sec:ignorability}). Given it, the posterior of $\tau_{\mathrm{fp}}$ imputes the unobserved coordinates, as in Section~\ref{sec:imputation}, and depends on the prior for the pairs, not only on the priors for the margins. Independent priors on the margins, with each missing coordinate imputed from its own margin, impose the independent coupling, $\rho=0$ in Chapter~\ref{ch:predictive}. For Dirichlet process margins whose total mass is small against $n$ (Beta margins for binary outcomes among them) and for normal margins with flat priors on the means, this gives, with $\mu_t$ the mean of margin $t$ and $\tau=\mu_1-\mu_0$,
+\[
+\mathrm{Var}(\tau_{\mathrm{fp}}\mid\text{data})\approx\frac{n_0}{n}\,\mathrm{Var}(\mu_1\mid\text{data})+\frac{n_1}{n}\,\mathrm{Var}(\mu_0\mid\text{data}),
+\]
+against $\mathrm{Var}(\mu_1\mid\text{data})+\mathrm{Var}(\mu_0\mid\text{data})$ for $\tau$: each margin is scaled by the share of its coordinates that are missing (proof in Appendix~\ref{app:groupsproofs}). Other independent priors can scale the margins differently. A joint prior on the pairs that keeps the prior on the margins changes nothing about $\tau$, changes $\tau_{\mathrm{fp}}$ through the unobserved coordinates of the observed units (the Bayesian form of the $S_\tau^2$ term in Proposition~\ref{gr:prop:fpc}), and changes everything about the helped fraction of Section~\ref{gr:sec:margins}.
+
+\section{What the margins identify}\label{gr:sec:margins}
+
+\paragraph{Binary outcomes: the coupling is invisible.} For binary outcomes the urn holds pairs of four types $(Y(1),Y(0))\in\{0,1\}^2$, with $p_{ab}$ the fraction of type $(a,b)$ as in Chapter~\ref{ch:tianpearl}. Type $10$ units are helped and type $01$ units are harmed; the margins are $p_1=p_{10}+p_{11}$ and $p_0=p_{01}+p_{11}$.
+
+\begin{lemma}\label{gr:lem:binary}
+The only increasing bijection of $\{0,1\}$ is the identity. Thus condition C2 of Battey and Edgar, with increasing group actions, fails for every binary model with a nonzero effect, leaving the coupling of a unit's potential outcomes free.\index{coupling!of potential outcomes}
+\end{lemma}
+
+\begin{proof}
+An increasing bijection of a two point ordered set fixes both points.
+\end{proof}
+
+\begin{proposition}[Fr\'echet bounds on the urn]\label{gr:prop:frechet}
+Let the urn have margins $p_1$ and $p_0$. The fraction helped, $p_{10}$, which is the probability of necessity and sufficiency\index{probability of necessity and sufficiency} $\PNS$ of Tian and Pearl (2000) for a unit drawn from the urn, satisfies the sharp bounds
+\[
+\max(0,\,p_1-p_0)\;\le\;p_{10}\;\le\;\min(p_1,\,1-p_0).
+\]
+When the units are drawn independently from a population, with $p_{ab}$ now the population probability of type $(a,b)$, a Dirichlet prior on these probabilities gives a posterior of $p_{10}$ that concentrates on this interval as $n$ grows and does not shrink further.
+\end{proposition}
+
+\begin{proof}
+Nonnegativity of the four cells gives the displayed Fr\'echet bounds\index{Frechet Hoeffding bounds@Fr\'echet Hoeffding bounds}, each attained (Exercise~\ref{ex:ch01:8}). Under independent population draws, the likelihood depends only on the margins, so it is constant along the segment. In a finite urn the randomization law also depends on the coupling through $S_\tau^2$ (Proposition~\ref{gr:prop:fpc}), hence the restriction to a population in the last statement.
+\end{proof}
+
+These are the Tian and Pearl bounds\index{Tian and Pearl bounds} on $\PNS$ from experimental data (Chapter~\ref{ch:tianpearl}); that chapter's other bounds are not Fr\'echet bounds. The stable parameter on any scale is a function of $(p_0,p_1)$ within each stratum, so it carries no information about $p_{10}$ beyond the Fr\'echet interval: counterfactuals are not needed for the process view because they are not parameters of it.
+
+\paragraph{Which estimands are identified.} Let $F$ be the empirical law of the $n$ pairs $(a,b)$, treated and control outcomes, with margins $F_1,F_0$. Then $\tau_{\mathrm{fp}}=\int y\,F_1(dy)-\int y\,F_0(dy)$; the difference in means is unbiased under complete randomization for every urn, with no model or prior (Exercise~\ref{ex:ch01:1}).
+
+\begin{theorem}[Separability]\label{gr:thm:sep}
+Let the outcome space $\mathcal Y$ be finite, let $f:\mathcal Y\times\mathcal Y\to\R$, and let $\mathcal F(F_1,F_0)$ be the Fr\'echet class of joint laws with margins $F_1$ and $F_0$. The following are equivalent.
+\begin{enumerate}
+\item[(i)] $f$ is separable\index{separable functional|textbf}: $f(a,b)=\alpha(a)+\beta(b)$ for some $\alpha,\beta:\mathcal Y\to\R$.
+\item[(ii)] $\int f\,dF$ is constant on $\mathcal F(F_1,F_0)$ for every pair of margins.
+\item[(iii)] $\int f\,dF$ is constant on $\mathcal F(F_1,F_0)$ for one pair of margins with full support.
+\end{enumerate}
+\end{theorem}
+
+A small transfer of probability from $(a,b')$ and $(a',b)$ to $(a,b)$ and $(a',b')$ preserves both margins, so invariance requires
+\[
+f(a,b)+f(a',b')=f(a,b')+f(a',b).
+\]
+Under (iii) the product law has full support, so every such transfer is available. Fixing $(a_0,b_0)$ gives $f(a,b)=f(a,b_0)+f(a_0,b)-f(a_0,b_0)$, the separable form (full proof in Appendix~\ref{app:groupsproofs}).
+
+\begin{corollary}[Identified estimands are functions of the margins]\label{gr:cor:complete}
+Let $\Psi$ be any functional of the urn composition, linear or not. If $\Psi$ is identified from every design that reveals the margins, that is, if $\Psi(F)=\Psi(F')$ whenever $F$ and $F'$ have the same margins, then $\Psi$ is a function of $(F_1,F_0)$.
+\end{corollary}
+
+\begin{proof}
+A function constant on the fibres of the map $F\mapsto(F_1,F_0)$ factors through that map.
+\end{proof}
+
+Every identified causal estimand is therefore a functional of the two arm laws; for the saturated process, which leaves the laws free, nothing identified lies outside the process view, and a restricted model restricts the margins and says nothing more about the pairs. The ATE has separable $f(a,b)=a-b$, so any design that reveals the margins identifies it. The helped fraction has $f=\one\{a=1,b=0\}$ and the second moment of the unit effects has $f=(a-b)^2$; neither is separable, neither is identified, and so neither is the variance of the unit effects. The median unit effect is not of integral form at all. The risk ratio, the odds ratio and the stable effect $\psi$ on any group are nonlinear functions of the margins, identified because they never touch the joint.
+
+Separable does not mean unique: $f(a,b)=a$ and $f(a,b)=a-2b$ qualify too. What singles out the ATE is that, for binary outcomes and for outcomes on an equally spaced grid, a mean of a function of the unit effect, $\int\kappa(a-b)\,dF$, is identified only when it is an affine function of the ATE, because separability forces $\kappa$ to have zero second differences (Appendix~\ref{app:groupsproofs}). This is the urn form of the accounting identity\index{accounting identity} of Chapter~\ref{ch:mccullagh}: $\tau_{\mathrm{fp}}$ is bookkeeping across two separate urns and needs no unit to be observed twice.
+
+\paragraph{Neyman's variance is rarely sharp.} For binary outcomes the unit effects lie in $\{-1,0,1\}$. Write $V_\tau=n^{-1}\sum_i(\tau_i-\tau_{\mathrm{fp}})^2$ for their variance with divisor $n$, so that $S_\tau^2=nV_\tau/(n-1)$.
+
+\begin{proposition}[Sharp Neyman variance for binary urns]\label{gr:prop:sharpvar}
+Over the Fr\'echet class with margins $p_1$ and $p_0$,
+\[
+|\tau_{\mathrm{fp}}|-\tau_{\mathrm{fp}}^2\;\le\;V_\tau\;\le\;2\min(p_1,1-p_0)-\tau_{\mathrm{fp}}-\tau_{\mathrm{fp}}^2,
+\]
+and both bounds are attained. In particular $V_\tau>0$ whenever $0<|\tau_{\mathrm{fp}}|<1$, so for such an urn Neyman's conservative variance\index{Neyman conservative variance estimator@Neyman's conservative variance estimator}, which drops the term $S_\tau^2/n$ of Proposition~\ref{gr:prop:fpc}, is never sharp.
+\end{proposition}
+
+The variance $V_\tau=p_{10}+p_{01}-\tau_{\mathrm{fp}}^2=2p_{10}-\tau_{\mathrm{fp}}-\tau_{\mathrm{fp}}^2$ is linear in $p_{10}$, so its sharp bounds are attained at the Fr\'echet endpoints (Appendix~\ref{app:groupsproofs}; Aronow, Green and Lee 2014). For an urn whose margins are the observed small stone rates of Table~\ref{fw:tab:simpson}, $p_1=0.931$ and $p_0=0.867$, so that $\tau_{\mathrm{fp}}=0.064$, the helped fraction runs from 0.064 to 0.133 and $0.060\le V_\tau\le0.198$, while the ATE does not move (Figure~\ref{gr:fig:ateurn}, top).
+
+\paragraph{Strata and the reversal.} A stratified experiment has one urn per stratum.
+
+\begin{proposition}[Stratified urns and the reversal]\label{gr:prop:strat}
+Let the units fall into strata $x$ of sizes $n_x$, and let the assignment draw $n_{x,1}$ units of stratum $x$ into treatment and the remaining $n_{x,0}$ into control, uniformly, with $n_t=\sum_xn_{x,t}$ and $\bar Y_{x,t}$ the mean response of arm $t$ in stratum $x$. Then $\tau_{\mathrm{fp}}=\sum_x(n_x/n)\,\tau_{\mathrm{fp},x}$, and the collapsed contrast
+\[
+\sum_x\frac{n_{x,1}}{n_1}\bar Y_{x,1}-\sum_x\frac{n_{x,0}}{n_0}\bar Y_{x,0}
+\]
+is unbiased for $\tau_{\mathrm{fp}}$ for every urn if and only if $n_{x,1}/n_1=n_{x,0}/n_0=n_x/n$ for all $x$, that is, if both arms are allocated in proportion to the stratum sizes.
+\end{proposition}
+
+Appendix~\ref{app:groupsproofs} gives the proof. In the kidney stone data\index{kidney stone data} of Table~\ref{fw:tab:simpson} the weights on small stones are $87/350=0.25$ for open surgery, $270/350=0.77$ for the percutaneous procedure (PCNL, percutaneous nephrolithotomy) and $357/700=0.51$ in the urn of all 700 patients, which is the weight of both arms under allocation in proportion to stone size. The collapsed contrast, $-0.046$, compares two different mixtures of the stone size urns: Simpson's paradox\index{Simpson paradox@Simpson's paradox} in the language of urns. The standardized ATE for this urn, $0.51\times0.064+0.49\times0.043=0.054$, is the accounting identity $\tau_Q$ of Chapter~\ref{ch:mccullagh} with $Q$ the empirical law of stone size, and it has the opposite sign.
+
+\paragraph{The ATE belongs to the case mix.}  Figure~\ref{gr:fig:ateurn} (bottom) varies the share of small stones in the urn, holding fixed the effect fitted on each scale under the restriction that it is the same in both strata (Table~\ref{gr:tab:gaps} and Section~\ref{gr:sec:kidney}). On the odds ratio scale the ATE is 0.034 in an urn of small stones and 0.075 in an urn of large stones; on the risk ratio scale it is 0.063 and 0.049, the other way round; under the stable risk difference it is 0.059 in every urn. The most and the least stable scales, the risk ratio and the odds ratio, disagree even on whether the effect grows or shrinks with stone size.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{kidney_ate_urn.pdf}
+\caption{Both panels are computed from the kidney stone counts of Table~\ref{fw:tab:simpson}, with no simulation. Top: urns with the small stone margins ($p_1=0.931$, $p_0=0.867$), indexed by the helped fraction $p_{10}$ along the Fr\'echet segment. The ATE is constant (thick solid line); the helped fraction (dashed), the harmed fraction $p_{01}$ (dash dot) and the variance of the unit effects $V_\tau$ (dotted) are not. Bottom: the ATE implied by the effect fitted on each scale against the share of small stones in the urn: risk ratio (solid), risk difference (dashed), odds ratio (dash dot). The dotted vertical line is the observed share, 0.51, and the open square the collapsed contrast, $-0.046$.}
+\label{gr:fig:ateurn}
+\end{figure}
+
+\section{Transformation models and Haar priors}\label{gr:sec:transform}
+
+Condition C2 of Section~\ref{gr:sec:group} asks the group to act on the observations as well as on the baseline. Let the outcome space be an open interval $I$, let $G$ and the chart $h$ be as in Lemma~\ref{gr:lem:chart}, and take $\mathcal C=I$.
+
+\begin{theorem}\label{gr:thm:recon}
+Assume C1 to C3 in the following form: $P_\gamma$ is the law of $h^{-1}(h(\gamma)+\varepsilon)$, where $\varepsilon$ has a fixed known law with density $f$ on $\R$. Then $Y\sim P_\gamma$ implies $gY\sim P_{g\gamma}$, which is C2. Let unit $i$ have control law $P_{\gamma_i}$ and treated law $P_{g\gamma_i}$.
+\begin{enumerate}
+\item[(a)] Under the comonotone coupling of the potential outcomes, $h(Y_i(1))-h(Y_i(0))=\psi(g)$ for every unit, so the Neyman and Rubin effect on the chart scale equals the group effect $\psi(g)$ for every sample and every configuration of baselines.
+\item[(b)] Suppose the baselines $\gamma_i$ are known and $n_1$ treated responses with independent errors are observed. They form a transformation model\index{transformation model} under the action of $G$ on the scale $z_i=h(Y_i)-h(\gamma_i)$. Under the right Haar prior on $g$, the posterior law of the pivot $\psi(g)-\psi(\hat g)$ equals its sampling law given the maximal invariant $a$, for any equivariant estimator $\hat g$. A credible set $\{g:\psi(g)-\psi(\hat g)\in A\}$ of posterior probability $1-\alpha$, with $A$ chosen given $a$ only, therefore has coverage exactly $1-\alpha$, conditionally and unconditionally.
+\item[(c)] If $\hat g$ is the maximum likelihood estimate, assumed unique, $f$ is twice differentiable and $j(\hat g)>0$ almost surely, the conditional density of $\hat g$ given $a$ is exactly the Barndorff Nielsen formula $p^{*}(\hat g\mid a;g)=c(a)\,|j(\hat g)|^{1/2}L(g)/L(\hat g)$, with $L$ the likelihood, $j$ the observed information and $c(a)$ a normalizing constant.
+\end{enumerate}
+\end{theorem}
+
+The proofs of (a) and (c) are in Appendix~\ref{app:groupsproofs} and that of (b) in Appendix~\ref{pg:sec:groups}. The comonotone coupling is rank preservation (Chapter~\ref{ch:gente}), an assumption about the joint law that no experiment can check. Part (b) is Fraser's (1961) structural inference: a Bayesian interval from the right Haar prior is also a confidence interval. With known baselines, $z_i=\psi(g)+\varepsilon_i$ is a location model. An equivariant estimator shifts $\psi(\hat g)$ by the same constant added to every $z_i$. The residuals $a=(z_i-\psi(\hat g))_{i\le n_1}$ form a maximal invariant: samples have the same residuals exactly when they differ by a common shift. The right Haar measure is flat in $\psi(g)$.
+
+So one condition does three jobs, under the assumptions of each part: it makes the Neyman and Rubin effect on the chart scale equal the group effect, the right Haar posterior exactly calibrated and the Barndorff Nielsen formula exact. When it fails, as in the logistic model, $\tau_{\mathrm{fp}}$ depends on the sample (Sections~\ref{gr:sec:group} and~\ref{gr:sec:many}) and, the data being discrete, no nonrandomized interval has exact coverage. For continuous one parameter models with a one dimensional sufficient statistic, exact matching forces a location structure (Lindley 1958), and in general the best available is first order probability matching (Welch and Peers 1963), Jeffreys' prior when $\psi$ is the only parameter.
+
+\begin{remark}\label{gr:rem:nuisance}
+With an unknown baseline map $\gamma(\cdot)$ under BART or a horseshoe, the guarantee of exactness in (b) is lost, since the prior on the nuisance is not the right Haar measure of a group containing it. What survives, and only under conditions on the prior for $\gamma$ that remove the bias from shrinkage of the baseline, is a semiparametric Bernstein von Mises approximation for the marginal posterior of $g$ (Castillo 2012; Ray and van der Vaart 2020). The conditions can fail: shrinkage of the baseline leaks into the effect, which is regularization induced confounding\index{regularization induced confounding} (Hahn, Carvalho, Puelz and He 2018; Chapter~\ref{ch:ipw}), and the horseshoe leaks less than the lasso but is not exempt. Ray and van der Vaart repair the bias with a prior adjusted by the propensity score, the idea of the coupled prior\index{coupled prior} of Chapter~\ref{ch:horseshoe}: tell the prior which direction carries the confounding.
+\end{remark}
+
+\paragraph{An invariant transport gives a group.} Theorem~\ref{gr:thm:recon} assumes a group, and partial exchangeability does not supply one: it leaves the cell laws $(F_{x,0},F_{x,1})$ unrestricted. For real outcomes, write $F_{x,t}$ also for the distribution function and let $M_x=F_{x,1}^{-1}\circ F_{x,0}$ be the monotone optimal transport map from control to treated in cell $x$ (Nareklishvili, Polson and Sokolov 2026b).
+
+\begin{proposition}\label{gr:prop:transport}
+Let $\Pi$ be a partially exchangeable prior under which, almost surely, every cell law has a continuous distribution function that is strictly increasing on all of $\R$. The following are equivalent, $\Pi$ almost surely.
+\begin{enumerate}
+\item[(i)] There is an increasing bijection $g$ of $\R$ with $F_{x,1}(y)=F_{x,0}(g^{-1}y)$ for all $x$ and $y$, a group action on the observations.
+\item[(ii)] The map does not depend on the cell: $M_x=M$ for all $x$.
+\end{enumerate}
+Then $g=M$, and the smallest group for which (i) holds is the cyclic group generated by $M$. A one dimensional group suffices, since $M$ embeds in a continuous flow $(g^{s})_{s\in\R}$ of increasing homeomorphisms with $g^{1}=M$, but when $M$ is not the identity the flow is not unique.
+\end{proposition}
+
+The proof is in Appendix~\ref{app:groupsproofs}, and the embedding is due to Fort (1955). McCullagh's stability axiom therefore has a clean Bayesian form: it restricts the de Finetti measure to arrays whose treatment map is the same in every cell, a restriction of the support of $\Pi$ and not a further exchangeability. For binary and count outcomes the only increasing bijection of the observations is the identity (Lemma~\ref{gr:lem:binary}, whose argument applies to any well ordered set of values), so the group must act on $\mathcal C$, and which chart makes the effect constant is the question of Section~\ref{gr:sec:gap}.
+
+\paragraph{Nonabelian groups and the choice of Haar prior.} Exact calibration requires the right Haar prior\index{Haar measure|textbf} in higher dimensions too (Fraser 1961; Hora and Buehler 1966). Left and right differ only for nonunimodular groups, which excludes abelian and compact groups.
+
+\begin{proposition}\label{gr:prop:affine}
+For the affine group\index{affine group|textbf}, with elements $g(y)=\sigma y+\mu$ and $\sigma>0$, the right Haar measure is $d\sigma\,d\mu/\sigma$ and the left Haar measure is $d\sigma\,d\mu/\sigma^{2}$. Treatment 2 after treatment 1 is $g_2g_1(y)=\sigma_2\sigma_1y+(\sigma_2\mu_1+\mu_2)$, whose scale part is order free while the location parts of $g_2g_1$ and $g_1g_2$ differ in general.
+\end{proposition}
+
+The proof is in Appendix~\ref{app:groupsproofs}. The additive effect of treatment 2 is therefore defined only relative to an order. When two elements are estimated from independent samples and composed, credible sets for the scale part of the composite stay exact, since its pivot is the product of two independent pivots, but the natural pivot of the location part has a law that depends on the elements, so that calibration does not reach it: the Behrens Fisher phenomenon\index{Behrens Fisher problem}. For normal samples the right Haar prior gives the classical $t$ interval, and the left Haar prior a shorter one that fails already for one sample: its nominal 95 percent interval covers 0.917 at $n=5$ (Exercises~\ref{ex:gr:9} and~\ref{ex:gr:10}).
+
+\paragraph{Lanarkshire.} In the milk experiment of Chapter~\ref{ch:mccullagh}, the gain model is additive, so part (a) makes $\psi$ the group and average effect alike, and the whole difficulty lies in the assignment kernel. Let $U$ be the unrecorded nourishment score, $c<0$ its coefficient in gain, and $x$ the recorded variables. Regression identifies only $\psi^{\dagger}(x)=\psi+c\,\Delta(x)$, where $\Delta(x)<0$ is the milk minus control mean of $U$ at $x$ (teachers favoured the poorly nourished), so $\psi^{\dagger}>\psi$ and the naive comparison overstates the benefit of milk. The likelihood depends on $(\psi,c\Delta)$ only through $\psi^{\dagger}$, so the data can inform how the selection term $c\Delta(x)$ varies with $x$ but not its level. With $c\Delta$ constant in $x$ and a flat prior on $\psi$ independent of it, the posterior of $c\Delta$ is its prior, and a posterior draw of $\psi$ is a posterior draw of $\psi^{\dagger}$ minus an independent prior draw of $c\Delta$. Chapter~\ref{ch:tianpearl}, \emph{Lanarkshire in numbers}, is this analysis. Student's remedy removes the term instead of modelling it: a coin toss inside matched pairs makes the kernel ancillary within pairs, whatever the teachers saw, so the within pair difference has mean $\psi$ and $\psi$ is identified without a prior on the selection term.
+
+\section{Choosing the scale: the information gap}\label{gr:sec:gap}
+
+McCullagh's axiom (Section~\ref{gr:sec:group}) holds on a scale when the effect is the same in every stratum. Data never satisfy it exactly, and the distance from satisfying it is a Kullback and Leibler divergence\index{Kullback Leibler divergence}.
+
+\paragraph{The two theorems.}
+Let $X_1,X_2,\dots$ be independent draws, generic observations and not the covariate, from a law $P$ with full support on a finite set, with empirical measure $L_n$.
+
+\begin{theorem}[Sanov 1957]\label{gr:thm:sanov}\index{Sanov theorem@Sanov's theorem|textbf}
+For every set $A$ of laws whose closure is the closure of its interior in the simplex,
+\[
+\lim_{n\to\infty}\frac1n\log\Prob(L_n\in A)=-\inf_{F\in A}\KL(F\,\|\,P).
+\]
+\end{theorem}
+
+\begin{theorem}[The inverse of Sanov's theorem; Ganesh and O'Connell 1999]\label{gr:thm:isanov}\index{Sanov theorem@Sanov's theorem!inverse of|textbf}
+Let the random law $F$ have a Dirichlet prior with positive parameters, and suppose $L_n\to F^{\circ}$. For $A$ as above,
+\[
+\lim_{n\to\infty}\frac1n\log\Pi(F\in A\mid X_{1:n})=-\inf_{F\in A}\KL(F^{\circ}\,\|\,F).
+\]
+\end{theorem}
+
+In Sanov's theorem the sampling law $P$ is fixed and the empirical law $F$ varies, giving $\KL(F\,\|\,P)$. In the inverse theorem the limiting empirical law $F^\circ$ is fixed and the candidate population law $F$ varies, giving $\KL(F^\circ\,\|\,F)$. For a Dirichlet prior the reason is visible in the posterior density at $F$, which by Stirling's formula is $\exp\{-n\,\KL(L_n\,\|\,F)+O(\log n)\}$, uniformly on compact subsets of the open simplex. The reverse projection $\arg\min_F\KL(F^{\circ}\,\|\,F)$ is the maximum likelihood projection, where the posterior concentrates under misspecification (Kleijn and van der Vaart 2012; Theorem~\ref{pg:thm:misspec}). Figure~\ref{gr:fig:sanov} compares the two rates for one proportion.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{sanov_vs_inverse.pdf}
+\caption{Exact rates for success probability $0.30$ and the set $\{p\ge0.45\}$, $n=20,40,\dots,1600$. Solid line: Sanov, from the binomial tail. Dashed line: the inverse, from the Beta posterior under a flat prior with $\hat p=0.30$. Horizontal lines: the limits $\KL(0.45\,\|\,0.30)=0.0498$ (dotted) and $\KL(0.30\,\|\,0.45)=0.0472$ (dashes and dots).}
+\label{gr:fig:sanov}
+\end{figure}
+
+\paragraph{Stability classes and information gaps.}
+Take strata $x=1,\dots,J$, treatment $t\in\{0,1\}$, design fractions $w_{x,t}>0$, the share of the sample in each cell, and true cell laws $F^{\circ}=(F^{\circ}_{x,t})$. For tables of cell laws write $\KL_w(F\,\|\,F')=\sum_{x,t}w_{x,t}\KL(F_{x,t}\,\|\,F'_{x,t})$ and $\KL_w(F\,\|\,\mathcal S)=\inf_{F'\in\mathcal S}\KL_w(F\,\|\,F')$.
+
+\begin{definition}[Stability class and information gap]\label{gr:def:stable}\index{stability class|textbf}\index{information gap|textbf}
+For a group $G$ acting on the baseline parameter space $\mathcal C$, the McCullagh stability class is
+\[
+\mathcal S_G=\bigl\{F:\ F_{x,0}=P_{\gamma_x},\ F_{x,1}=P_{g\gamma_x}\ \text{for some } \gamma_1,\dots,\gamma_J\in\mathcal C,\ g\in G\bigr\},
+\]
+where $P_\gamma$ is the outcome law with baseline $\gamma$ and the effect of a member is $\psi(g)$ (for the risk ratio and the risk difference $G$ acts only partially, as Section~\ref{gr:sec:kidney} explains). The information gap of $G$ at $F^{\circ}$ is $D_G=\KL_w(F^{\circ}\,\|\,\mathcal S_G)$.
+\end{definition}
+
+The gap is zero exactly when McCullagh's axiom holds on the scale of $G$. At the empirical law $D_G=\mathrm{dev}_G/(2n)$, the deviance of the stable model over twice the sample size, in nats per patient on any scale, so gaps are comparable where effects are not.
+
+\begin{theorem}[The posterior selects the group]\label{gr:thm:select}
+Let $\mathcal G$ be a finite collection of groups together with the saturated (heterogeneous) model, each with positive prior probability, a smooth positive prior density on its $d_G$ parameters and a unique interior projection, at which the divergence from $F^{\circ}$ has a nonsingular Hessian in those parameters. Let cell $(x,t)$ receive $nw_{x,t}$ independent draws from $F^{\circ}_{x,t}$. Then almost surely
+\[
+\frac1n\log\frac{\Pi(\mathcal S_G\mid\text{data})}{\Pi(\mathcal S_H\mid\text{data})}\;\longrightarrow\;D_H-D_G .
+\]
+More precisely, the log posterior odds equal $n(D_H-D_G)-\tfrac12(d_G-d_H)\log n+O_p(\sqrt n)$, and the fluctuation is $O_p(1)$ when both models contain $F^{\circ}$.
+\end{theorem}
+
+\begin{corollary}\label{gr:cor:select}
+Suppose also that $d_G<d_{\mathrm{sat}}$ for every group $G$, as for the stable models of this chapter when $J\ge2$, where $d_G=J+1$ and $d_{\mathrm{sat}}=2J$. Under these conditions:
+\begin{enumerate}
+\item[(i)] if exactly one group $G$ has $D_G=0$, its posterior probability tends to one, the other groups vanish at the exponential rate $D_H$, and the saturated model, which always has $D=0$, at the polynomial rate $n^{-(d_{\mathrm{sat}}-d_G)/2}$;
+\item[(ii)] a true stable model beats the saturated model only polynomially, with posterior odds of order $n^{(d_{\mathrm{sat}}-d_G)/2}$, which is $n^{(J-1)/2}$ when the saturated model has an effect in each stratum;
+\item[(iii)] if no group is exactly stable, the posterior probability of the saturated model tends to one, and with $D_{\min}=\min_HD_H$ over the groups, attained at $G$, the leading order weights $e^{-nD-\frac12d\log n}$ of the two models cross where $nD_{\min}=\tfrac12(d_{\mathrm{sat}}-d_G)\log n$; this locates the crossing of the weights only, since the fluctuation in the theorem is of larger order.
+\end{enumerate}
+\end{corollary}
+
+Appendix~\ref{pg:sec:groups} proves the results by a Laplace approximation\index{Laplace approximation} to each marginal likelihood. Inverse Sanov explains the reverse divergence but does not prove these results: $\mathcal S_G$ has empty simplex interior and Dirichlet probability zero. The exponent $D_G$ is prior independent. The stated polynomial factor is for a smooth positive prior; a horseshoe prior on departures from a common effect changes this factor, leaving the exponent alone.
+
+\paragraph{A horseshoe test of stability.} Let the effect in stratum $j$ be $\psi_j=\psi+\eta_j$ for $j=1,\dots,J$, estimated independently by $\hat\psi_j\sim N(\psi_j,\sigma^2J/n)$ with $\sigma$ known and $n/J$ units in each stratum, with a flat prior on $\psi$ and a horseshoe on the departures, $\eta_j\mid\lambda_j,\gscale\sim N(0,\lambda_j^2\gscale^2)$ with $\lambda_j$ half Cauchy. Stability is $\eta_j-\bar\eta=0$ for every $j$, with $\bar\eta$ the average of the $\eta_j$, and it is the boundary point $\gscale=0$ of the alternative. Prior A is a half Cauchy law on $\gscale$ in the units of the data, with density $2/\{\pi(1+\gscale^2)\}$. Prior B puts the global scale in noise units, $\gscale/(\sigma\sqrt{J/n})$, on a half Cauchy law truncated to $[1/J,1]$, the prior for which van der Pas, Szab\'o and van der Vaart (2017a) prove contraction.
+
+\begin{proposition}\label{gr:prop:hstest}
+Fix $J\ge2$, let $n\to\infty$ with $n/J$ units in each stratum, and let $\mathrm{BF}_{01}$ be the Bayes factor of stability, $\gscale=0$, against the horseshoe alternative. Write $a_n\asymp_pb_n$ when $a_n/b_n$ and $b_n/a_n$ are both $O_p(1)$.
+\begin{enumerate}
+\item[(i)] Under stability and prior A, $\mathrm{BF}_{01}\asymp_p\sqrt n/\sigma$ when $J\ge3$, and $\mathrm{BF}_{01}\asymp_p\sqrt n/(\sigma\log n)$ when $J=2$.
+\item[(ii)] Under a fixed departure with $\sum_j(\eta_j-\bar\eta)^2>0$ and prior A, $\log\mathrm{BF}_{10}=\{1+o_p(1)\}\,\dfrac{n}{2J\sigma^2}\sum_j(\eta_j-\bar\eta)^2$.
+\item[(iii)] Let $\psi$ be known, use prior B, let $J\to\infty$ and let $s=o(J)$ of the $\eta_j$ be nonzero, with $s\ge C\log J$ for a large enough constant $C$. The posterior for $\eta$ contracts in squared error at the near minimax rate $(\sigma^2J/n)\,s\log J$.
+\item[(iv)] Under stability and prior B the law of $\mathrm{BF}_{01}$ is the same for every $n$.
+\end{enumerate}
+\end{proposition}
+
+Appendix~\ref{pg:sec:groups} proves it. Part (i) is the Jeffreys and Lindley asymmetry for a point null\index{Jeffreys Lindley asymmetry}: prior A confirms stability only at rate $\sqrt n$ for $J\ge3$, compared with $n^{(J-1)/2}$ for a smooth positive prior on the $J-1$ contrasts (Corollary~\ref{gr:cor:select}), while part (ii) refutes it exponentially. Stability can therefore be refuted quickly by data and only confirmed slowly. Under prior B it is not confirmed at all: the global scale is tied to the noise, so the alternative shrinks towards the null as $n$ grows, and by part (iv) the Bayes factor has the same law for every $n$. A prior built for estimating the departures, as in part (iii), is a poor one for testing stability.
+
+\paragraph{The kidney stones on three scales.}
+Table~\ref{fw:tab:simpson} gives the kidney stone data\index{kidney stone data} and Table~\ref{gr:tab:gaps} the gaps. Figure~\ref{gr:fig:isanov} applies Theorem~\ref{gr:thm:select} with the cell frequencies held at their observed values and $n$ growing. Its curves are leading order weights $e^{-nD_G-\frac12d_G\log n}$ with equal prior model probabilities, $d_G=3$ and $d_{\mathrm{sat}}=4$. They drop the $O(1)$ Laplace terms, the prior density at the projection and the information determinants, so they are not exact posterior probabilities.
+
+At $n=700$ they are $0.38$ on the risk ratio, $0.37$ on the risk difference, $0.23$ on the odds ratio and $0.01$ on heterogeneity, and the split between the risk ratio and the risk difference rests on $0.043$ nats in $nD_G$, less than the terms dropped, so the trial cannot separate these two scales. The odds ratio trails the risk ratio by $0.50$ nats, leading order odds of about $1.6$ to $1$, and the prior density at the projection, one of the dropped terms, moves by about as much when the prior scale of one common effect changes by a factor of $1.6$, so at $n=700$ even that ranking leans on the priors.
+
+The leading order odds of the risk ratio over the odds ratio reach $19$ to $1$ only at about $n=4{,}150$, six times the trial, and heterogeneity overtakes the risk ratio near $n=593{,}000$. The odds ratio, the default of logistic regression and the scale on which McCullagh's group acts most naturally, is the least stable description of these data, by a factor of $64$ in information. 
+
+\begin{table}[ht]
+\centering
+\caption{Stable estimate, deviance and gap for the kidney stone data ($n=700$, $J=2$, $D_G=\mathrm{dev}_G/1400$). Each stable model has a baseline per stratum and a common effect.}
+\label{gr:tab:gaps}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+scale & stable estimate $\hat\psi$ & deviance & $D_G$ (nats per patient) \\
+\midrule
+log risk ratio & $0.070$ & $0.016$ & $1.1\times10^{-5}$ \\
+risk difference & $0.059$ & $0.102$ & $7.3\times10^{-5}$ \\
+log odds ratio & $0.357$ & $1.008$ & $7.2\times10^{-4}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{kidney_inverse_sanov.pdf}
+\caption{Kidney stone data. Left: gaps $D_G$ in units of $10^{-4}$ (bars, left to right and darkest to lightest: log risk ratio, risk difference, log odds ratio). Right: leading order weights with equal prior model probabilities and the cell frequencies held fixed, $n$ from 300 to $10^7$. Solid line: log risk ratio. Dashed line: risk difference. Dashes and dots: log odds ratio. Dotted line: heterogeneous model. Vertical dashed line: $n=700$.}
+\label{gr:fig:isanov}
+\end{figure}
+
+\section{Kidney stones revisited}\label{gr:sec:kidney}
+
+\paragraph{The reversal on three scales.}
+On every scale of Figure~\ref{gr:fig:forest} the stratum effects and the stable estimate favour open surgery, while the collapsed contrast favours PCNL with an interval that includes zero\index{Simpson paradox@Simpson's paradox} (Charig and coauthors 1986; Julious and Mullee 1994). The collapsed contrast averages the arms over different case mixes (small stone weights $0.25$ and $0.77$, Section~\ref{gr:sec:margins}), so it changes with the design fractions $w_{x,t}$ and is not covariate equivariant in McCullagh's sense. An exactly stable effect would not depend on the design fractions. Here $D_G>0$ and it does, but it stays between the two stratum effects.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{kidney_forest.pdf}
+\caption{Effect of open surgery against PCNL on the risk difference, log risk ratio and log odds ratio scales (panels), from the counts of Table~\ref{fw:tab:simpson}. Filled circles with 95 percent Wald intervals: small and large stones. Filled diamond: stable estimate. Open square with its interval: collapsed contrast. Dotted line: zero.}
+\label{gr:fig:forest}
+\end{figure}
+
+\paragraph{Closed groups and the risk ratio limit.}
+McCullagh would object that neither the risk ratio nor the risk difference is a group action on $\mathcal C=(0,1)$, since $p\mapsto e^{\psi}p$ and $p\mapsto p+\psi$ can leave the interval. Their classes in Table~\ref{gr:tab:gaps} keep the laws whose image stays inside. The logit, the complementary log log and the Aranda Ordaz family (Aranda Ordaz 1981)\index{Aranda Ordaz family|textbf}
+\[
+h_\lambda(p)=\log\frac{(1-p)^{-\lambda}-1}{\lambda},\qquad\lambda\ge0,
+\]
+are closed: each $h_\lambda$ maps $(0,1)$ onto $\R$, so translation in its chart is a group action, with $\lambda=1$ the logit and $\lambda\to0$ the complementary log log. The same family applied to the failure probability, $p\mapsto h_\lambda(1-p)$, is a second closed family. A prior on $\lambda$ turns the choice of scale into inference, with its uncertainty reported.
+
+\begin{proposition}\label{gr:prop:limit}
+Let $F^{\circ}$ have interior cell probabilities and let $\mathcal S_\lambda$ be the stability class of the chart $p\mapsto h_\lambda(1-p)$, with gap $D_\lambda$, and let $\psi_\lambda$ be the effect of any projection of $F^{\circ}$ on $\mathcal S_\lambda$. As $\lambda\to\infty$, $\lambda^{-1}h_\lambda(1-p)\to-\log p$ uniformly on compact subsets of $(0,1)$. Consequently $D_\lambda\to D_{\mathrm{RR}}$, and when the risk ratio projection is unique, $-\psi_\lambda/\lambda\to\psi_{\mathrm{RR}}$, the stable log risk ratio.
+\end{proposition}
+
+The argument is in Appendix~\ref{app:groupsproofs}. For the kidney data (Figure~\ref{gr:fig:closed}) the gap on the failure side decreases at every step of a grid of $\lambda$, from $8.4\times10^{-4}$ at the log log link to the risk ratio value $1.1\times10^{-5}$. On the success side it increases at every step, from $3.6\times10^{-4}$ at the complementary log log to $9.6\times10^{-4}$, where it is flat. The monotonicity is a numerical fact for these data, not part of the proposition. At $\lambda=316$ the stable effect $-\psi_\lambda/\lambda=0.0697$ equals the stable log risk ratio to five decimals.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{kidney_closed_groups.pdf}
+\caption{Gap $D_\lambda$ in units of $10^{-4}$ against $\lambda$ (log axis) on the grid $10^{k/20}$, kidney stone data. Solid line: $h_\lambda(p)$ on the success probability ($\lambda$ up to 19.95). Dashed line: $h_\lambda(1-p)$ on the failure probability ($\lambda$ up to 316.2). Filled dot: the logit. Horizontal lines: the risk difference gap (dotted) and the risk ratio gap (dashes and dots).}
+\label{gr:fig:closed}
+\end{figure}
+
+The data prefer a description that McCullagh's axioms exclude, but it is the boundary of a family his axioms admit. On the failure side grid the posterior odds for any two values of $\lambda$ favour the larger at the exponential rate of Theorem~\ref{gr:thm:select}, the difference of their gaps. These pairwise comparisons do not establish that a continuous prior on $\lambda$ sends its mass to the boundary. A Bayesian analysis that respects McCullagh reports the closed group with large $\lambda$: its rescaled effect $-\psi_\lambda/\lambda$ is, to five decimals on these data, the stable log risk ratio, and it remains a valid group action for patients whose baseline risk lies outside the observed range.
+
+\section{Large deviations for causal questions}\label{gr:sec:ld}
+
+This section can be skipped on a first reading. It uses Sanov's theorem and its inverse\index{large deviations|textbf} to put six more questions to the kidney stone data, one to a paragraph. Cells are $(x,t)$ with design fractions $w_{x,t}$, $L_n=(L_{n,x,t})$ holds the empirical cell laws, and $\KL_w$ is as in Section~\ref{gr:sec:gap}.
+
+\paragraph{One gap, two exponents.}
+The generalized likelihood ratio statistic for stability on $G$ is $W_n=\KL_w(L_n\,\|\,\mathcal S_G)=\mathrm{dev}_G/(2n)$.
+
+\begin{theorem}[Hoeffding 1965; Bahadur 1967]\label{gr:thm:hoeffding}\index{Hoeffding, Wassily!error exponent of tests|textbf}\index{Bahadur exact slope|textbf}
+Let the outcome alphabet have $m$ letters, let there be $C$ cells, let $\mathcal S_G$ be closed and $F^{\circ}$ of full support. (i) For every $F\in\mathcal S_G$, $\Prob_F(W_n\ge\zeta)\le(n+1)^{Cm}e^{-n\zeta}$. (ii) Under $F^{\circ}$, $W_n\to D_G$ almost surely. (iii) If $D_G>0$ and $\{F:\KL_w(F\,\|\,\mathcal S_G)>D_G\}$ meets every neighbourhood of $F^{\circ}$, the $p$ value $p_n=\sup_{F\in\mathcal S_G}\Prob_F(W_n\ge W_n^{\mathrm{obs}})$ satisfies $-n^{-1}\log p_n\to D_G$, so the Bahadur exact slope of the test is $2D_G$.
+\end{theorem}
+
+With Theorem~\ref{gr:thm:select} it says (proof in Appendix~\ref{app:groupsproofs}) that the $p$ value for stability and the posterior odds for stability against the saturated model decay at the same exponential rate $D_G$. Both exponents carry fluctuations of order $\sqrt n$, and the polynomial factors differ: the type count $(n+1)^{Cm}$, only an upper bound, against the Lindley factor $n^{(d_{\mathrm{sat}}-d_G)/2}$ of a smooth positive prior.
+
+\paragraph{Confounding as a Sanov event.}
+Randomization with a common treatment probability makes $T$ independent of $X$, so the table of $(X,T)$ is drawn from $P_X\otimes P_T$, and by Sanov's theorem the probability of an empirical table at least as dependent as the observed one is $\exp\{-n\hat I_{\mathrm{obs}}+O(\log n)\}$, because $\KL(F\,\|\,P_X\otimes P_T)=I_F(X;T)+\KL(F_X\,\|\,P_X)+\KL(F_T\,\|\,P_T)$ and with $P_X$ and $P_T$ set at the observed margins the infimum is $\hat I_{\mathrm{obs}}$, attained by the observed table itself. In the kidney data the mutual information\index{mutual information|textbf} is $\hat I(X;T)=0.144$ nats, so $n\hat I=100.7$ and the probability is of order $10^{-44}$, which shows only that the allocation was not randomized with a common probability: large stones went to open surgery. We do not decompose the reversal into informations, since mutual information carries no sign and, under randomization, $I(T;Y)-I(T;Y\mid X)=-I(X;T\mid Y)$ need not vanish.
+
+\paragraph{The conditional limit theorem and ancillarity.}
+McCullagh holds (Section~\ref{gr:sec:group}) that randomization makes the assignment ancillary\index{ancillarity!large deviation content}, and the conditional limit theorem of Csisz\'ar (1984)\index{conditional limit theorem|textbf} gives a sharp form of this: conditional on $L_n$ falling in a closed convex set $A$ of laws with nonempty interior, an event of positive probability, the law of a single observation converges to the I projection\index{I projection|textbf} $F^{\dagger}=\arg\min_{F\in A}\KL(F\,\|\,P)$.
+
+\begin{proposition}\label{gr:prop:ancillary}
+Let $P$ be a law of $(X,T,Y)$ and let $A$, as above, constrain only the $(X,T)$ margin, for example $A=\{F:F(T=1\mid X=x)\ge\delta\}$, an observed imbalance. Then $F^{\dagger}_{Y\mid X,T}=P_{Y\mid X,T}$. Consequently conditioning on the imbalance leaves every cell law unchanged, and with it every functional of the cell laws alone, including the stable effect $\psi$ of a group on which the data are exactly stable, but in general changes the collapsed contrast.
+\end{proposition}
+
+Appendix~\ref{app:groupsproofs} proves it. A rare imbalance tilts $P_X\otimes P_T$ exponentially while leaving the outcome mechanism untouched.
+
+\paragraph{Pythagoras and the logit group.}
+\begin{theorem}\label{gr:thm:pyth}\index{Pythagorean identity|textbf}
+For binary outcomes the logit stability class $\mathcal S_{\mathrm{logit}}$ is an exponential family with canonical parameters $(\gamma_1,\dots,\gamma_J,\psi)$ and sufficient statistics the stratum success counts and the treated success total. If $F^*$ is its maximum likelihood point for the empirical law $\hat F=L_n$, then for every $F\in\mathcal S_{\mathrm{logit}}$,
+\[
+\KL_w(\hat F\,\|\,F)=\KL_w(\hat F\,\|\,F^*)+\KL_w(F^*\,\|\,F).
+\]
+\end{theorem}
+
+The identity (proof in Appendix~\ref{app:groupsproofs}) belongs to the maximum likelihood projection and fails in general for the log risk ratio class, whose chart curves the family: Figure~\ref{gr:fig:pyth} shows residuals below $10^{-9}$ along the logit family and down to $-3.1\times10^{-4}$ along the log risk ratio family. The risk difference class is a mixture family, and for it the dual identity holds with the divergence the other way round: if every stratum and arm of the data shows both outcomes and $F^\dagger$ is the I projection of $\hat F$ on the class, then
+\[
+\KL_w(F\,\|\,\hat F)=\KL_w(F\,\|\,F^\dagger)+\KL_w(F^\dagger\,\|\,\hat F)
+\]
+for every $F$ in the class (Csisz\'ar 1975).
+
+On the logit group $D_{\mathrm{logit}}=7.2\times10^{-4}$ is the information in the three factor interaction of the $X\times T\times Y$ table. The logit has the cleaner geometry; the risk ratio has the smaller gap.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.9\linewidth]{kidney_information_pythagoras.pdf}
+\caption{Pythagorean residual $\KL_w(\hat F\,\|\,F)-\KL_w(\hat F\,\|\,F^*)-\KL_w(F^*\,\|\,F)$ times $10^4$, kidney stone data, for comparison laws $F$ along the logit family (filled circles) and the log risk ratio family (open triangles). The effect of $F$ takes 25 equally spaced values within $0.6$ (logit) or $0.06$ (log risk ratio) of the estimate, with the fitted baselines or with the two stratum baselines shifted by $0.15$ and $-0.1$ ($0.01$ and $-0.01$) on the chart. Horizontal axis: the effect of $F$ minus the estimate, scaled by its largest value.}
+\label{gr:fig:pyth}
+\end{figure}
+
+\paragraph{Posterior large deviations for the effect.}
+The Laplace argument behind Theorem~\ref{gr:thm:select} also gives the posterior of the effect itself. Define the profile rate function of the stable effect on $G$ at the empirical law,
+\[
+J_G(\psi)=\inf\bigl\{\KL_w(L_n\,\|\,F):\ F\in\mathcal S_G,\ \psi(F)=\psi\bigr\}-W_n,
+\]
+so that $nJ_G(\psi)$ is half the profile deviance and $J_G$ vanishes at the maximum likelihood estimate $\hat\psi$. Profiling maximizes over baselines; the posterior integrates over baselines and the effect. Thus $e^{-nJ_G(\psi_0)}$ supplies only a tail's exponential rate, while the signed root $r(\psi)$ adds the leading factor.
+
+\begin{proposition}\label{gr:prop:effect}
+Under the conditions of Theorem~\ref{gr:thm:select} and a smooth positive prior on $\mathcal S_G$, suppose that at every fixed $\psi$ in the range considered the conditional maximum of the likelihood over the baselines is unique and interior, varies smoothly with $\psi$, and has baseline information that stays positive definite on compact sets, and that $J_G$ is smooth, vanishes only at $\hat\psi$, increases away from it with $J_G'(\psi)\neq0$ for $\psi\neq\hat\psi$, and has $J_G''(\hat\psi)>0$. Then for intervals $A$,
+\[
+\Pi(\psi\in A\mid\text{data})=\exp\Bigl\{-n\inf_{\psi\in A}J_G(\psi)+O_p(\log n)\Bigr\}.
+\]
+The signed root $r(\psi)=\operatorname{sign}(\psi-\hat\psi)\sqrt{2nJ_G(\psi)}$ satisfies $\Pi(\psi\le\psi_0\mid\text{data})=\Phi(r(\psi_0))\{1+O(n^{-1/2})\}$ when $\psi_0-\hat\psi=O(n^{-1/2})$. For fixed $\psi_0$ its relative error is $O(1)$.
+\end{proposition}
+
+The proof is in Appendix~\ref{pg:sec:groups}. Table~\ref{gr:tab:profile} gives, for the kidney data, the probability that open surgery is no better.
+
+\begin{table}[ht]
+\centering\small\setlength{\tabcolsep}{4pt}
+\caption{Posterior probability that the stable effect is at most zero, kidney stone data, $n=700$. The prior is flat on the baselines and the effect in the coordinates of each chart, restricted to valid probabilities. The last column is a numerical quadrature.}
+\label{gr:tab:profile}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+scale & $\hat\psi$ & $10^3J_G(0)$ & $e^{-nJ_G(0)}$ & $\Phi(-\sqrt{2nJ_G(0)})$ & exact $\Pi(\psi\le0)$ \\
+\midrule
+risk difference & $0.059$ & $2.39$ & $0.19$ & $0.034$ & $0.040$ \\
+log risk ratio & $0.070$ & $2.45$ & $0.18$ & $0.032$ & $0.041$ \\
+log odds ratio & $0.357$ & $1.74$ & $0.29$ & $0.059$ & $0.059$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Figure~\ref{gr:fig:effectld} shows the profile rate and the posterior density behind the table. The exponent alone is within a factor of five, and the signed root is within $0.001$ of the exact posterior on the odds ratio scale and within $0.01$ on the other two. The collapsed analysis, with independent uniform priors on the four cell probabilities ($400{,}000$ posterior draws), puts $0.057$ on PCNL being no better and $0.943$ on its being no worse. It is as confident as the stable analyses, in the opposite direction, because the collapsed contrast averages the two arms over different case mixes (Chapter~\ref{ch:frameworks} explains why the stratified numbers govern).
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{kidney_effect_ld.pdf}
+\caption{Kidney stone data, $n=700$; columns are the risk difference, log risk ratio and log odds ratio. Top: $J_G(\psi)$ times $10^3$, with $J_G(0)$ marked. Bottom: posterior density of the stable effect. Light gray histogram: a Metropolis chain with flat priors on the chart coordinates (seed 7, 260,000 steps, 20,000 discarded, every fifth kept draw shown, baseline proposal standard deviations $0.02$, $0.03$ and $0.25$ in the three columns, and effect proposal standard deviations $0.016$, $0.024$ and $0.20$). Black line: $e^{-nJ_G(\psi)}$, normalized. Dark gray area: $\psi\le0$, labelled with the exact $\Pi(\psi\le0)$ from quadrature. Dotted vertical lines: zero.}
+\label{gr:fig:effectld}
+\end{figure}
+
+\paragraph{Transport and the Donsker Varadhan formula.}
+McCullagh's covariate equivariance is a transport property: the effect should mean the same thing in a population with a different case mix $Q'$. The Donsker and Varadhan formula\index{Donsker Varadhan formula|textbf} (Donsker and Varadhan 1975), the variational form of Sanov's theorem, prices the move. Section~\ref{fw:sec:transport} reweights stratum effects over the target's case mix\index{transportability}; the question here is how far the answer shifts.
+
+\begin{proposition}\label{gr:prop:dv}
+Let $\psi_G(x)$ be the stratum effect on the scale of $G$, with range $R_G=\max_x\psi_G(x)-\min_x\psi_G(x)$, and $\bar\psi_G(Q)=\sum_xQ_x\psi_G(x)$ its average over the case mix $Q$. Then
+\[
+|\bar\psi_G(Q')-\bar\psi_G(Q)|\;\le\;R_G\,\|Q-Q'\|_{\mathrm{TV}}\;\le\;R_G\sqrt{\tfrac12\KL(Q'\,\|\,Q)}.
+\]
+If the data are exactly stable on $G$, $R_G=0$ and transport is free on that scale. When the baselines differ across strata and the effect is not zero, other scales generally lack this property.
+\end{proposition}
+
+Appendix~\ref{app:groupsproofs} gives the proof. Transporting the kidney trial, with case mix $Q=(0.51,0.49)$ for small and large stones, to a population of small stones only, with $\KL(Q'\,\|\,Q)=0.67$, moves the average stratum effect by $0.011$ on the risk difference scale (bound $0.013$), $0.0057$ on the log risk ratio scale (bound $0.0067$) and $0.26$ on the log odds ratio scale (bound $0.30$): $18$, $8$ and $72$ percent of the stable estimate. On these data the scale with the smallest information gap transports most cheaply in the sense of Donsker and Varadhan.
+
+\section{In practice}\label{gr:sec:practice}
+
+\paragraph{The target.} The target of this chapter is a stable effect and the averages it supports, all from one posterior. The posterior of $\psi$ on each candidate scale comes from the stable model on that scale, and an average $\tau_Q$ comes from the same draws by the accounting identity of Chapter~\ref{ch:mccullagh}, once for each case mix $Q$ of interest. The finite population effect $\tau_{\mathrm{fp}}$ also needs a joint prior for the pair of potential outcomes, because the likelihood involves only the margins, and the fraction helped is a target only as an interval. For the kidney stones the target is $\psi$ for open surgery against the percutaneous procedure on each of three scales: the posterior probability that open surgery is no better lies between 0.040 and 0.059, and the standardized average effect on the risk difference scale, computed at the observed stratum rates, is 0.054.
+
+\paragraph{What the analyst does differently.} The analyst reports the effect and the averages as different things. She fits the stable model on each candidate scale, or puts a prior on the Aranda Ordaz parameter, and reports the information gap of each, so that the reader sees how far the data are from McCullagh's axiom on the scale used. Each average $\tau_Q$ is a separate number tied to a case mix and a decision. She does not call the fraction helped or the variance of the unit effects identified by a randomized trial, and gives the Fr\'echet interval or the joint prior that fills it. Where she controls the design she allocates both arms in proportion to the strata, and where she does not she reports the standardized contrast. A claim of exact calibration names its conditions, a transformation model with known baselines and the right Haar prior, and with a baseline under BART or a horseshoe the interval is reported as approximate. Stability is a commitment that data refute quickly and confirm slowly, at a rate set by the prior on the departures (Corollary~\ref{gr:cor:select} and Proposition~\ref{gr:prop:hstest}), so she names that prior.
+
+\paragraph{Against DML.} Where the target is one average, such as the marginal risk difference of a randomized trial, DML is adequate, as Chapter~\ref{ch:mccullagh} says, and cheaper than posterior computation. An average does not say on which scale the effect is stable: the risk difference, the risk ratio and the odds ratio of the kidney stones each need their own orthogonal score, and none of the three reports that the gaps differ by a factor of 64. Nor does an average say how it moves with the case mix, which on these data it does in opposite directions on the risk ratio and odds ratio scales. And no estimator, orthogonal or not, narrows the fraction helped below its Fr\'echet interval or pins down the term $S_\tau^2/n$ (Proposition~\ref{gr:prop:fpc}), because both depend on the coupling of the pairs, which the margins leave free. The posterior carries the stable effect, the averages and the interval from one fit. The limits are the group and the baseline. The group is a modelling commitment: the information gap ranks the scales in hand and cannot propose a better one. With a flexible baseline under BART or a horseshoe the exact calibration of Theorem~\ref{gr:thm:recon} is guaranteed only approximately, and only under conditions on the prior for the baseline, with the leakage from shrinkage that Chapter~\ref{ch:horseshoe} meets with the coupled prior.
+
+\section*{Notes}
+
+McCullagh (2002, 2022) gives the process view, the group effect and the requirement that it be stable. Battey and Edgar (2026) state that the group effect and the potential outcomes effect agree for every sample exactly under the conditions C1 to C3 of Section~\ref{gr:sec:group}, and note that C1 and C2 make the model a transformation family. Part (a) of Theorem~\ref{gr:thm:recon} restates their agreement on the chart scale with the coupling made explicit; what is ours is the observation that the same conditions also give the exact calibration of parts (b) and (c). For part (b) the location case is due to Fisher (1934) and Pitman (1939) and the group version to Fraser (1961), and Hora and Buehler (1966) give the confidence property. Part (c) is Barndorff Nielsen's (1983) result that his formula is exact for every transformation model.
+
+Neyman (1923) gives the variance of the difference in means under complete randomization. The kidney stone counts are Charig, Webb, Payne and Wickham (1986). The information theory of Sections~\ref{gr:sec:gap} and~\ref{gr:sec:ld}, divergence, the method of types and large deviations, is the background treated in the authors' book, Polson and Sokolov (2026c), \emph{Elements of Bayes and Information Theory}. 
+
+\begin{exercises}
+\item\label{ex:gr:1} Let $g_\psi(p)=e^{\psi}p/\{1+(e^{\psi}-1)p\}$ be the action of the logit group on a risk $p$. (a) Show that $g_{\psi_1}\circ g_{\psi_2}=g_{\psi_1+\psi_2}$, so that $\psi\mapsto g_\psi$ is an isomorphism of $(\R,+)$ with a group of maps of $(0,1)$. (b) Let $\psi>0$. Show that the risk difference $g_\psi(p)-p$, as a function of the baseline log odds $\gamma=\logit p$, is largest at $\gamma=-\psi/2$, where it equals $\tanh(\psi/4)$. (c) Deduce that $\tau_Q(\psi)\le\tanh(\psi/4)$ for every $Q$ and every $\psi>0$, and, using $e^{2\operatorname{artanh}\tau}=(1+\tau)/(1-\tau)$, that an average effect of $0.2$ needs an odds ratio of at least $\{(1+0.2)/(1-0.2)\}^2=2.25$.
+\item\label{ex:gr:2} Let $I_i$ indicate that unit $i$ is assigned to treatment under complete randomization with $n_1$ of $n$ units treated. Using $\Prob(I_i=1)=n_1/n$ and $\mathrm{Cov}(I_i,I_j)=-n_1(n-n_1)/\{n^2(n-1)\}$ for $i\ne j$, derive the variance of $\bar Y_1$ in Proposition~\ref{gr:prop:fpc} for a binary urn $\{Y_i(1)\}$ with a proportion $p_1$ of ones. Evaluate it for $n=10$, $n_1=5$ and four ones, and check the value $0.0267$ against the hypergeometric distribution of the number of ones among the five units drawn.
+\item\label{ex:gr:3} Take $n=20$ units, five of each of the four types $(Y(1),Y(0))=(1,1),(1,0),(0,1),(0,0)$, so that $\tau_{\mathrm{fp}}=0$ although half the units are affected. Draw 100,000 complete randomizations with $n_1=n_0=10$, compute the difference in means $\hat\tau$ for each, and report its empirical variance. Compare it with the variance of Proposition~\ref{gr:prop:fpc}, computed from the urn with divisor $n-1$, and with the conservative value that drops the term $S_\tau^2/n$. Which of the two does the simulation match, and by what factor does the other overstate it?
+\item\label{ex:gr:4} A randomized trial has $p_1=0.8$ and $p_0=0.5$. (a) Give the bounds of Proposition~\ref{gr:prop:frechet} on the fraction helped $p_{10}$, and the four type fractions at each end of the interval. (b) Give the bounds of Proposition~\ref{gr:prop:sharpvar} on $V_\tau$, and check both directly from the type fractions at the two ends. (c) Since $S_\tau^2/n=V_\tau/(n-1)$, find the range of the amount by which Neyman's conservative variance overstates $\mathrm{Var}(\hat\tau)$ when $n=100$.
+\item\label{ex:gr:5} Let the outcomes be binary. (a) Show that $f:\{0,1\}^2\to\R$ is separable if and only if $f(1,1)+f(0,0)=f(1,0)+f(0,1)$. (b) Show that $f(a,b)=(a-b)^2$ and $f(a,b)=\one\{a=1,b=0\}$ are not separable, by giving two joint laws with margins $p_1=p_0=\tfrac12$ for which $\int f\,dF$ differs. (c) For margins with $0<p_0,p_1<1$ and a function $\kappa$ on $\{-1,0,1\}$, show that the mean of $\kappa(a-b)$ is the same for every joint law with those margins only if $\kappa(1)+\kappa(-1)=2\kappa(0)$, and that the mean is then an affine function of the ATE.
+\item\label{ex:gr:6} A stratified experiment has two strata of 200 units each. In the first stratum 50 units are treated and 150 are controls, and in the second 150 are treated and 50 are controls. The stratum means of $Y(1)$ and $Y(0)$ are $0.95$ and $0.90$ in the first stratum and $0.55$ and $0.50$ in the second. (a) Compute $\tau_{\mathrm{fp}}$ and the expected value of the collapsed contrast of Proposition~\ref{gr:prop:strat}. (b) Derive the bias of the collapsed contrast for general allocations $n_{x,t}$, and show that it vanishes for every urn exactly when both arms are allocated in proportion to the stratum sizes.
+\item\label{ex:gr:7} For a Bernoulli law with success probability $0.30$ and the set $\{p\ge0.45\}$, compute (a) $\KL(0.45\,\|\,0.30)$ and $\KL(0.30\,\|\,0.45)$; (b) for $n=100$, $400$ and $1600$, the Sanov rate $-n^{-1}\log\Prob\{\mathrm{Bin}(n,0.30)\ge0.45n\}$ and the rate $-n^{-1}\log\Pi(p\ge0.45\mid\text{data})$ when the sample proportion is $0.30$ and the prior is flat, so that the posterior is Beta$(0.3n+1,\,0.7n+1)$. Compare each rate with its limit, as in Figure~\ref{gr:fig:sanov}, and say which of Theorems~\ref{gr:thm:sanov} and~\ref{gr:thm:isanov} each limit belongs to.
+\item\label{ex:gr:8} Take the gaps of Table~\ref{gr:tab:gaps}, $d_G=3$ for each of the three groups, $d_{\mathrm{sat}}=4$ for the heterogeneous model with gap zero, equal prior probabilities on the four models and the leading order weights $e^{-nD_G-\frac12d_G\log n}$ of Section~\ref{gr:sec:gap}. (a) Normalize the weights to sum to one at $n=700$ and compare them with the values quoted in the text. (b) Find the $n$ at which the leading order odds of the risk ratio over the odds ratio reach $19$ to $1$, and say why the polynomial factors play no part in the answer.
+\item\label{ex:gr:9} (a) For the affine group with composition $(\sigma_2,\mu_2)(\sigma_1,\mu_1)=(\sigma_2\sigma_1,\sigma_2\mu_1+\mu_2)$, compute the Jacobians of the maps $g\mapsto gg_0$ and $g\mapsto g_0g$ on $(\sigma,\mu)$, and show that $d\sigma\,d\mu/\sigma$ is invariant under the first and $d\sigma\,d\mu/\sigma^2$ under the second. (b) For $n$ independent $N(\mu,\sigma^2)$ observations with mean $\bar y$ and variance $s^2$ (divisor $n-1$), show that the prior $\sigma^{-k}\,d\sigma\,d\mu$ gives $\mu$ a Student $t$ posterior with $n+k-2$ degrees of freedom and scale $s\{(n-1)/(n(n+k-2))\}^{1/2}$, and write out the right Haar case, $k=1$, and the left Haar case, $k=2$.
+\item\label{ex:gr:10} Draw $n$ independent $N(0,1)$ observations, for $n=3$ and $n=5$, with 100,000 replications for each $n$. For each sample form the 95 percent credible interval for $\mu$ under the right Haar prior, $\bar y\pm t_{n-1}\,s/\sqrt n$, and under the left Haar prior, $\bar y\pm t_n\,s\sqrt{n-1}/n$, where $t_\nu$ is the $0.975$ quantile of the Student $t$ distribution with $\nu$ degrees of freedom. Report the fraction of replications in which each interval contains $\mu=0$, and compare the left Haar fraction with the exact coverage $\Prob(|T_{n-1}|\le t_n\sqrt{(n-1)/n})$, where $T_{n-1}$ has a Student $t$ distribution with $n-1$ degrees of freedom.
+\end{exercises}

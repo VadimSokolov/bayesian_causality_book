@@ -1,0 +1,374 @@
+\chapter{Models, Accounting and Randomization}\label{ch:mccullagh}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+The model is the object of inference. The average treatment effect is an accounting identity: an average of fitted contrasts over a population the analyst chooses. Noncollapsibility of the odds ratio shows the gap between model and accounting even under randomization. Randomization makes the assignment ignorable, so the outcome model need not also model the people who assigned the treatment; the Lanarkshire milk experiment is a case where the assignment was not ignorable and a model of the recorded variables could not repair it.
+\end{tcolorbox}
+
+The model first position fits in one sentence: do the modelling, report the posterior, and stop. If the data call for a logistic regression of outcome on treatment and covariates, fit it. The average treatment effect is not a further statistic needing its own estimator, asymptotics and confidence interval. It is an accounting identity\index{accounting identity} computed from the fitted model, and a different accounting gives a different number from the same evidence.
+
+\section{What a statistical model is}
+
+In ``What is a statistical model?'', McCullagh (2002)\index{McCullagh, Peter|textbf}\index{McCullagh, Peter!what is a statistical model|textbf} asked a question most of us never ask. The usual definition of a statistical model\index{statistical model|textbf}, a family of distributions on a sample space indexed by a parameter, says nothing about how the family behaves when a new unit arrives, a covariate takes an unseen value, or the units are relabelled.
+
+His answer was that a model must be coherent across all these changes: in his language, a functor from a category of designs to a category of probability spaces. The content is a set of requirements\index{statistical model!coherence requirements|textbf}:
+\begin{enumerate}
+\item The model for $n$ units must be the marginal of the model for $n + 1$ units. A parameter must not change meaning when a unit is added.
+\item The model must be defined at covariate values not observed, so that prediction at new units is possible.
+\item Relabelling the units, or reparametrizing the covariates, must transform the model in the obvious way.
+\end{enumerate}
+Many common models fail the first requirement, among them certain random effects models whose variance components change meaning with cluster size, and models whose parameters are defined relative to the sample's covariate distribution.
+
+\begin{proposition}
+Every model defined by the de Finetti\index{de Finetti theorem@de Finetti's theorem} representation \eqref{eq:definetti} satisfies requirements 1 and 3. If, in addition, the conditional law of the outcome given treatment and covariates, $f(y \mid t, x, \theta)$, is specified at every treatment and covariate value of interest, including values outside the support of the observed covariates, it also satisfies requirement 2.
+\end{proposition}
+
+\begin{proof}
+Integrating the $(n+1)$st factor out of \eqref{eq:definetti} leaves the $n$ unit representation with the same $\pi$ (requirement 1). Permuting factors or pushing each forward under the same covariate reparametrization gives requirement 3. Requirement 2 needs a conditional law even where the joint density vanishes. If the covariate law carries no information about the parameters of $f(y \mid t, x, \theta)$, as with separate parameters and independent priors, the predictive density at a new $(t, x)$ is $\int f(y \mid t, x, \theta) \, \pi(d\theta \mid z_1, \ldots, z_n)$, defined wherever that law is. Otherwise the new covariates also update $\theta$, and the posterior conditions on them.
+\end{proof}
+
+Exchangeable Bayesian models therefore pass by construction. Estimand first procedures, which fix the target functional before the model\index{estimand!model parameter versus functional|textbf}, often fail because the target's meaning shifts with the sample or covariate distribution.
+
+\section{Kolmogorov consistency and the extendibility requirement}
+
+The first coherence requirement, that the model for $n$ units be the marginal of the model for $n + 1$\index{extendibility|textbf}, is Kolmogorov's consistency condition\index{Kolmogorov consistency|textbf}. Kolmogorov's extension theorem guarantees that a consistent family of finite dimensional laws defines a law on infinite sequences.
+
+\begin{example}[A model that is not extendible]
+Suppose an analyst defines the treatment effect, in a sample of size $n$, as the coefficient $\tau_n$ of $T$ in a regression of $Y$ on $T$, the sample centred covariate $X - \bar X_n$ and their product, so that the treatment contrast at $x$ is $\tau_n + \delta(x - \bar X_n)$. The coefficient's meaning (the effect at $X = \bar X_n$) depends on $\bar X_n$, which changes when a unit is added, and two analysts with nested samples are estimating different quantities. Recentring leaves the family of laws unchanged, but the same regression function needs a different coefficient once a unit is added:
+\[
+\tau_{n+1} = \tau_n + \delta(\bar X_{n+1} - \bar X_n).
+\]
+With a prior on the centred coefficients that is the same for every $n$, the probability model itself fails to marginalize. Take $\delta = 1$ and $\tau_n \sim N(0, 1)$ for every $n$: the implied prior on the effect at a fixed $x_0$ is $N(x_0 - \bar X_n, 1)$, which moves with $\bar X_n$.
+\end{example}
+
+The fix is easy: define the parameter relative to a fixed reference point or the population law, and report sample specific quantities, such as an average over the observed covariate values, as accounting.
+
+\section{The average treatment effect as an accounting identity}
+
+Suppose we fit the logistic model
+\begin{equation}
+\logit \Prob(Y = 1 \mid T = t, X = x) = \alpha + \beta t + \gamma^\top x.
+\label{eq:logistic}
+\end{equation}
+Write $\theta = (\alpha, \beta, \gamma)$. The inferential content of the analysis is the posterior $\pi(\theta \mid \text{data})$. Under consistency and ignorability given $x$ (Chapter~\ref{ch:predictive}), and if the conditional law of the outcome carries over to the population of interest (Section~\ref{fw:sec:transport}), the treatment contrasts of \eqref{eq:logistic} are causal effects. Given any population of covariate values, represented by a law $Q$, the average treatment effect\index{average treatment effect!as an accounting identity|textbf} is
+\begin{equation}
+\tau_Q(\theta) = \int \bigl\{ \expit(\alpha + \beta + \gamma^\top x) - \expit(\alpha + \gamma^\top x) \bigr\} \, Q(dx).
+\label{eq:tauQ}
+\end{equation}
+
+\begin{definition}[Accounting identity]
+A causal summary $\tau_Q(\theta)$ is an accounting identity\index{accounting identity|textbf} if it is a known functional of the model parameter $\theta$ and an analyst chosen law $Q$ that does not enter the likelihood.
+\end{definition}
+
+Four choices of $Q$ are common.
+\begin{itemize}
+\item The empirical law of the sample's covariates, giving the average effect for units with those covariates. This is not the finite population effect of Chapter~\ref{ch:predictive}, which averages the units' own potential outcomes and is taken up below.
+\item The empirical law of the treated units' covariates, giving the effect on the treated in the same sense.
+\item A census or registry population, giving a population effect for policy.
+\item A hypothetical future cohort, giving a forecast of what a policy would do.
+\end{itemize}
+All four use the same posterior. A minister of health needs a single number for the population she governs, and obtaining it takes no further inference: draw $\theta^{(s)}$, evaluate \eqref{eq:tauQ}, and the resulting values form the posterior of $\tau_Q$.
+
+\paragraph{When $Q$ is unknown.} This treats $Q$ as fixed, which suits the sample, a census or a stated cohort. When $Q$ is a population law known only through a sample $X_1, \ldots, X_n$ drawn from it, as for the superpopulation effect below, its uncertainty belongs in the posterior too. If the covariate law is a priori independent of $\theta$, the Bayesian bootstrap (Rubin 1981) supplies it: pair each draw $\theta^{(s)}$ with independent weights $W^{(s)} \sim \mathrm{Dirichlet}(1, \ldots, 1)$ and set $\tau_Q^{(s)} = \sum_i W_i^{(s)} d_i(\theta^{(s)})$, where $d_i(\theta)$ is the contrast in \eqref{eq:tauQ} at $x = X_i$. With $\bar d(\theta)$ the average of the $d_i(\theta)$, the law of total variance gives
+\[
+\mathrm{Var}(\tau_Q \mid \text{data}) = \mathrm{Var}_{\theta \mid \text{data}}\{\bar d(\theta)\} + \E_{\theta \mid \text{data}}\Bigl[\frac{1}{n(n+1)} \sum_{i=1}^n \{d_i(\theta) - \bar d(\theta)\}^2\Bigr].
+\]
+The first term is the variance with the sample law held fixed. The second is the price of estimating the covariate mix, and it vanishes when the contrast does not vary with $x$.
+
+\section{Noncollapsibility makes the point concrete}
+
+The odds ratio\index{odds ratio|textbf} shows the gap between model and accounting even without confounding\index{noncollapsibility|textbf}. Take two equally sized strata and randomize treatment within each. Table~\ref{tab:noncollapse} gives the outcome probabilities.
+
+\begin{table}[ht]
+\centering
+\caption{Conditional and marginal odds ratios with randomized treatment.}
+\label{tab:noncollapse}
+\begin{tabular}{lccc}
+\toprule
+Stratum & $\Prob(Y=1)$, control & $\Prob(Y=1)$, treated & Odds ratio \\
+\midrule
+A & 0.50 & 0.80 & 4.00 \\
+B & 0.20 & 0.50 & 4.00 \\
+Pooled & 0.35 & 0.65 & 3.45 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The conditional odds ratio is 4 in each stratum, yet the marginal odds ratio is 3.45. Treatment is randomized within balanced strata, so there is no confounding and no bias. The marginal number is a different average of the same model, moving whenever the covariate mix moves.
+
+Figure~\ref{fig:noncollapse} shows how far the marginal odds ratio falls below the conditional one as the strata's baseline risks spread apart. The two strata have baseline log odds equal to minus and plus the spread, and the common conditional odds ratio is 2, 4 or 8. With a conditional odds ratio of 8 and a spread of 4 (a gap of 8 on the log odds scale), the marginal odds ratio is about 1.3, a sixth of the conditional one.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{noncollapse.pdf}
+\caption{Marginal odds ratio against the spread of baseline log odds in two equal strata, for three values of the common conditional odds ratio (marked by dotted lines).}
+\label{fig:noncollapse}
+\end{figure}
+
+\begin{proposition}
+Under randomization with the same assignment probability in every stratum, the marginal risk difference equals the $Q$ weighted average of the conditional risk differences, where $Q$ is the stratum distribution. When the conditional odds ratio is the same in every stratum and different from one, the marginal odds ratio equals it only when the baseline risk is constant across strata, and is otherwise strictly closer to one.
+\end{proposition}
+
+\begin{proof}
+The marginal risks are $\bar p_t = \sum_k q_k p_{kt}$, so $\bar p_1 - \bar p_0 = \sum_k q_k(p_{k1} - p_{k0})$. For a common odds ratio $c > 1$, write $p_{k1} = g(p_{k0})$ with $g(p) = cp/\{1 + (c - 1)p\}$. Since $g$ is strictly concave and $g(p) > p$, Jensen's inequality gives $\bar p_0 < \bar p_1 \le g(\bar p_0)$, with equality on the right only when the baseline risks coincide. The increasing odds $h(p) = p/(1 - p)$ satisfy $h\{g(p)\} = c\,h(p)$, hence $1 < h(\bar p_1)/h(\bar p_0) \le c$. The case $c < 1$ follows by exchanging treatment and control. Appendix~\ref{app:theory} gives the details.
+\end{proof}
+
+The risk difference is collapsible and the odds ratio is not, which is often offered as a reason to prefer the risk difference. The model first view draws the opposite lesson: the model is logistic, its natural parameter is $\beta$, and every marginal summary, risk difference or odds ratio, is accounting. Prefer the model, and compute whatever summary the user needs. Section~\ref{gr:sec:many} makes the point exact: for one conditional odds ratio above one, the average risk difference takes every value between zero and a bound set by the odds ratio, depending on the case mix.
+
+Pearl reaches a related conclusion in Chapter 6 of \emph{Causality} (Pearl 2009), from confounding rather than models: a change in the odds ratio on adjustment is not evidence of confounding, so collapsibility cannot serve as a test for it (Greenland, Robins and Pearl 1999). Section~\ref{fw:sec:pearlbook} reads this book alongside Pearl.
+
+\section{Logistic regression and the choice of scale}
+
+We use logistic regression\index{logistic regression|textbf} because the log odds\index{log odds|textbf} is the canonical parameter of the Bernoulli family, and because for some treatments the conditional odds ratio is more stable across populations than the risk difference\index{logistic regression!choice of scale|textbf}. If a treatment's conditional odds ratio is roughly constant across patients with different baseline risks, a log odds model needs fewer interactions than a risk difference model, and is therefore easier to estimate and more transportable.
+
+Whether the odds ratio is the more stable scale depends on the treatment, but the choice illustrates a general point: the modelling scale is chosen for the model's stability and simplicity, the reporting scale for the user's needs, and they need not coincide. The model first view separates them; estimand first methods tend to conflate them by modelling directly on the reporting scale. Section~\ref{gr:sec:gap} measures how stable each scale is by an information gap, and finds the odds ratio the least stable of three for the kidney stone data of Table~\ref{fw:tab:simpson}.
+
+\paragraph{Covariate adjustment in randomized trials.} Adjusting for a prognostic covariate changes the odds ratio even under perfect randomization (Table~\ref{tab:noncollapse}), leading critics to say that adjustment ``changes the estimand''\index{noncollapsibility}.
+
+On the model first view, adjustment changes the model, not the estimand. The adjusted model describes the data better because it includes a predictor of the outcome. The marginal risk difference, if the regulator wants it, is computed from the adjusted model by averaging over the trial's covariate law, and in large trials, when the adjusted model is correctly specified, is at least as precise as the unadjusted difference in proportions. 
+
+\section{Finite population and superpopulation}
+
+Neyman's randomization analysis targets the finite population effect\index{finite population effect}\index{average treatment effect!finite population|textbf} $\tau_{\mathrm{fp}}$; most model based analyses target the superpopulation\index{superpopulation} effect\index{average treatment effect!superpopulation|textbf} $\tau$.
+
+On the model first view the superpopulation effect is the accounting identity $\tau_Q$ with $Q$ the superpopulation covariate law. The finite population effect averages the completed table of potential outcomes, so it is a function of the observed and imputed outcomes rather than of $\theta$. A Bayesian computes both from one fit: the first from $\theta$ and, when $Q$ is known only through the sample, the Bayesian bootstrap weights above; the second from $\theta$ and draws of the missing outcomes.
+
+The superpopulation posterior carries uncertainty about $\theta$ and $Q$, which shrinks with $n$. The finite population posterior conditions on the observed outcomes and imputes the rest; its uncertainty depends on the association between $Y(0)$ and $Y(1)$, which the data never inform. In the bivariate normal case of Chapter~\ref{ch:predictive} without covariates, $\tau$ is the difference of means and $Q$ drops out. Take flat priors on the means, known standard deviations $\sigma_0$ and $\sigma_1$, correlation $\rho$ between $Y(0)$ and $Y(1)$, and $n_1$ treated and $n_0$ control units, $n = n_1 + n_0$. The posterior variances are
+\begin{align*}
+\mathrm{Var}(\tau \mid \text{data}) &= \frac{\sigma_1^2}{n_1} + \frac{\sigma_0^2}{n_0}, \\
+\mathrm{Var}(\tau_{\mathrm{fp}} \mid \text{data}) &= \frac{1}{n}\Bigl(\sigma_1^2\,\frac{n_0}{n_1} + \sigma_0^2\,\frac{n_1}{n_0} + 2\rho\,\sigma_0\sigma_1\Bigr),
+\end{align*}
+and their difference is $\mathrm{Var}\{Y(1) - Y(0)\}/n = (\sigma_1^2 + \sigma_0^2 - 2\rho\sigma_0\sigma_1)/n$, which is never negative. The finite population effect is therefore never more uncertain than the superpopulation effect, and its variance rises with $\rho$. With $n_1 = n_0 = 50$ and $\sigma_0 = \sigma_1 = 1$ the superpopulation variance is 0.040, while the finite population variance is 0.010, 0.020, 0.030 and 0.040 at $\rho = -0.5$, $0$, $0.5$ and $1$. The two variances coincide only for constant unit effects, $\rho = 1$ with equal standard deviations, when both equal Neyman's conservative variance\index{Neyman conservative variance estimator@Neyman's conservative variance estimator} $\sigma_1^2/n_1 + \sigma_0^2/n_0$. Otherwise it is an upper bound on the finite population variance, so the randomization analyst who uses it reports the interval for constant effects without assuming them. With unequal standard deviations the bound exceeds even the largest finite population variance, the one at $\rho = 1$, by $(\sigma_1 - \sigma_0)^2/n$. The Bayesian states the association explicitly, by a prior, and can show the reader how much the finite population interval depends on it.
+
+A ministry extending a programme to next year's cohort wants the superpopulation effect under that cohort's covariate law. A court asking what the trial's participants gained wants their finite population effect. Both come from one fit; reporting both, with the association prior stated, adds one imputation step to the posterior draws.
+
+\section{What this does to double machine learning}
+
+DML fixes a target functional, typically the average treatment effect, then builds an estimator from an orthogonal score, so that its first order error is insensitive to errors in the nuisance functions. Part II gives the details.
+
+On the model first view the functional is an accounting step\index{accounting identity!and double machine learning|textbf}, and DML\index{double machine learning!and accounting|textbf} concentrates on it. The hard part, getting the conditional model right, is delegated to black box learners, with orthogonalization and cross fitting keeping their errors from reaching the estimate to first order.
+
+The Bayesian alternative reverses the emphasis: spend the effort on the model and its prior, then propagate uncertainty about the nuisance functions to every summary, rather than making it second order and leaving it out of the interval.
+
+DML builds one estimate and interval per functional. The effect on the treated\index{effect on the treated}, a subgroup effect and a quantile effect each need a score: the first two can reuse the outcome and propensity fits, while quantiles need new nuisance fits. Joint intervals need stacked scores and their covariance. One posterior supplies all these summaries with joint uncertainty; estimates from different DML scores and splits need not cohere.
+
+\section{The average treatment effect in econometrics}
+
+Econometrics usually treats the average treatment effect\index{average treatment effect!in econometrics|textbf} as a fixed population parameter to be estimated consistently and efficiently. Semiparametric efficiency theory (Bickel, Klaassen, Ritov and Wellner 1993; Hahn 1998) gives the smallest asymptotic variance for a regular estimator; DML attains it when nuisance estimators converge fast enough.
+
+The accounting view accepts that the average treatment effect is well defined, but denies that it is the natural object of inference. In survey sampling, a design based estimator targets a population mean directly; modelling the population targets the same number when the model is right, and gives much more besides.
+
+Efficiency theory is also less decisive than it looks: the efficient estimator changes with the target. In a correctly specified regular parametric model, the Bernstein von Mises\index{Bernstein von Mises theorem} theorem makes a Bayesian posterior efficient for every smooth functional at once, provided the prior has a positive continuous density at the true parameter. The posterior attains the parametric efficiency bound for each target without being rebuilt. The semiparametric bound for the average effect is subtler: an outcome surface prior that ignores the propensity score can leave a first order bias in the functional, so a nonparametric prior attains the bound only under conditions (Appendix~\ref{app:guarantees} and Section~\ref{sec:rrw}).
+
+\section{Objections}
+
+\paragraph{Misspecification.} If the logistic model is wrong, its posterior functional is wrong too, whereas DML is robust to some nuisance errors\index{accounting identity!objections to|textbf}. Our reply, developed in Part III, is that a flexible model with a heavy tailed shrinkage prior is not a parametric logistic regression. The model first view does not require a small model, only a coherent probability model from which summaries are computed.
+
+\paragraph{Counterfactual metaphysics.} Dawid (2000) objects that potential outcomes are metaphysical, since we never observe both. We half agree. Superpopulation and conditional effects can be defined without counterfactuals, through the decision theoretic contrast of interventional distributions described in Chapter~\ref{ch:predictive}. Individual attributions cannot, and neither can effects defined on the units of one sample; Part IV treats the attributions as partially identified for that reason.
+
+\paragraph{The estimand framework.} Under the ICH E9(R1) addendum, regulators ask trial sponsors to specify the estimand before the analysis, which might seem to favour the estimand first view. The addendum asks for five attributes: the treatment, the population, the outcome variable, the handling of intercurrent events and the population level summary. In our language, the population is $Q$ and the summary is the functional; the other three fix what the model describes. None requires a separate estimator. A prespecified posterior functional of a model built on those choices satisfies the addendum (Exercise~\ref{ex:ch02:6}).
+
+\paragraph{Computation.} DML is cheap, a handful of regressions, while posterior computation can be expensive. This is a real advantage, and Chapter~\ref{ch:computation} shows that for the horseshoe models of this book a Gibbs sampler closes most of the gap, and that where the likelihood is costly to evaluate, a map learned once from simulations (generative Bayesian computation) returns posterior draws for each new data set in a single pass.
+
+\section{One posterior, several accountings: a worked example}
+
+We simulate one data set of 1,500 people with standardized age $A \sim N(0,1)$\index{accounting identity}\index{accounting identity!one posterior, several accountings|textbf}. Treatment probability is $\Prob(T = 1 \mid A = a) = \expit(0.8a)$, and the outcome follows
+\[
+\logit\Prob(Y = 1 \mid T = t, A = a) = -0.5 + 0.8t + 0.6a - 0.7ta.
+\]
+The treatment helps the young and harms the old: the log odds contrast $0.8 - 0.7a$ changes sign at $a = 8/7$, and the risk difference is about 0.20 at $a = 0$ and $-0.14$ at $a = 2$. We fit the logistic model with an interaction and represent the posterior by 400 draws from a Bayesian bootstrap\index{Bayesian bootstrap} of the maximum likelihood fit, in the weighted likelihood form of Newton and Raftery (1994): each draw refits the model with the units reweighted by independent standard exponential weights, which approximates the posterior under a flat prior in large samples.
+
+From the same draws we compute three average treatment effects on the risk difference scale: for the sample covariate law, for the treated units only, and for a hypothetical older cohort whose standardized age is normal with mean one and standard deviation one, represented by 5,000 ages drawn once from that law and used for every draw. Figure~\ref{fig:tauQ} shows the three posteriors\index{average treatment effect!posterior of}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{tauQ.pdf}
+\caption{Posteriors of three average treatment effects computed from one logistic posterior: the sample, the treated units, and an older cohort.}
+\label{fig:tauQ}
+\end{figure}
+
+\input{chapters/tauQ_numbers}
+
+The numbers differ because the treated units and the older cohort are older than the sample, and treatment does less for older people. 
+
+\section{The Lanarkshire milk experiment and randomization}\chlabel{ch:milk}\label{sec:milk}
+
+The Lanarkshire\index{Lanarkshire milk experiment|textbf} milk experiment shows that a large trial with a poor assignment mechanism can be worth less than a small trial with a good one. Student made that case in 1931, and his argument is still the clearest account of why randomization\index{randomization|textbf} matters.
+
+It is also where the model first view meets its limit: a model fitted to the recorded variables can remove selection on those variables and cannot remove selection on anything else, and no amount of data, 20,000 children included, tells the two apart. Randomization does not enter the likelihood; Rubin's\index{Rubin, Donald B.!ignorability|textbf} reason for a Bayesian to care is that it makes the assignment mechanism\index{assignment mechanism!and randomization|textbf} ignorable.
+
+\subsection{The experiment}
+
+In the spring of 1930 the Department of Health for Scotland ran a feeding trial on about 20,000 schoolchildren in 67 schools in Lanarkshire. Around 10,000 children received three quarters of a pint of milk a day for four months, from February to June. Half of those received raw milk and half pasteurized; the other 10,000 were controls. Every child was weighed and measured at the start and end, and the report by Leighton and McKinlay (1930) concluded that milk produced a definite improvement in growth.
+
+On paper the design was careful: within each school, children were to be allocated to milk or control by ballot or by alphabet. The trouble lay in one permission. If the groups looked unbalanced, with too many well fed or ill nourished children in one, the teachers could substitute children to restore balance.
+
+Student's reading was that the teachers, swayed by the very human feeling that poorer children needed the milk more, unconsciously substituted too many ill nourished children into the milk group and too few into the controls. Their intervention was kind and nutritionally sensible, and it made the two groups unequal at the start.
+
+\subsection{What Student found}
+
+Student found\index{Lanarkshire milk experiment!Student's analysis|textbf} in the report that controls began ahead of the milk group by about three months' growth in weight and four months' growth in height. Any four month growth difference therefore mixed milk's effect with differences in how smaller, poorer children grew.
+
+A second problem was subtler. Children were weighed in their indoor clothes, and Student judged that older children wore about a pound more clothing in February than in June. Since the selection was probably related to poverty, the milk group would have shed less clothing than the controls, inflating its apparent gain in weight. This fits his observation that the estimated benefit of milk was 8 to 10 per cent of the gain in height but 30 to 45 per cent of the gain in weight, rising to over 70 per cent among older children, who had the most clothing to shed.
+
+A third problem concerned raw against pasteurized milk. Each school received only one kind, and controls were pooled across schools. Fisher and Bartlett (1931) concluded that raw milk was superior, but conditionally: if the raw and pasteurized groups were random samples from the same population, the differences would be decisive. Student was cautious: in a socially heterogeneous district, the 67 schools, split into groups of about 33 and 34, could differ in their children's starting measurements and growth rates. Treatment assigned by school is confounded with the school, however many children it contains.
+
+For a repeat at the same scale, Student proposed matching children on age, sex and condition, then tossing a coin within each pair to assign milk. Taking milk's benefit as agreed, he proposed twins for the raw against pasteurized comparison. Lanarkshire might have 200 to 300 pairs, about 50 identical; a coin would assign one twin raw milk and the other pasteurized. He judged that 50 pairs of identical twins would give more reliable results than the 20,000 children at a tiny fraction of the cost.
+
+\subsection{A simulation in the spirit of Lanarkshire}
+
+We cannot reanalyse the Lanarkshire measurements, so we simulate the mechanism\index{Lanarkshire milk experiment!simulation|textbf}\index{simulation study!Lanarkshire|textbf}. Children have a standardized initial size $S$. Without milk their four month gain is $G(0) = 1 - 0.3 S + \varepsilon$, with $S \sim N(0,1)$ and $\varepsilon \sim N(0, 0.5^2)$, so smaller children grow more, as children below their growth curve tend to. Milk adds $0.2$ to the gain. Teachers assign milk with probability $\expit(-1.2 S)$, favouring small children.
+
+Figure~\ref{fig:milk} shows the result for 2,000 simulated children. The naive difference in mean gain between milk and control is 0.49, more than twice the true effect, because the milk group is full of small children who would have grown more anyway. A regression of gain on treatment and initial size recovers 0.22, as does a properly randomized trial on the same population, in which a fair coin reassigns the same 2,000 children.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{milk_sim.pdf}
+\caption{Simulated milk trial. Left: initial size in the two groups after teacher substitution. Right: naive, model based and randomized estimates; the dashed line is the true effect of 0.2.}
+\label{fig:milk}
+\end{figure}
+
+The model works because teachers selected on recorded $S$ alone.
+
+Suppose instead that the teachers went by how well nourished a child looked, a score $U$ that nobody wrote down, and that recorded size is only a proxy for it: $(S, U)$ is standard bivariate normal with correlation $r$. Milk goes to a child with probability $\expit(-1.2\,U)$, the rule above with $U$ in place of $S$, and the gain is $1 - 0.3S - 0.3U + 0.2T + \varepsilon$, so a child who looks poorly nourished grows more whatever its size. Over 1,000 simulated trials of 2,000 children, the regression of gain on treatment and size puts the effect of 0.2 at 0.23 on average when $r = 0.95$, at 0.32 when $r = 0.8$ and at 0.42 when $r = 0.5$; when size says nothing about nourishment it gives 0.48, no better than the naive comparison (Monte Carlo standard errors about 0.001; Exercise~\ref{ex:ch03:2} derives these values). A record that correlates 0.8 with what the teachers saw still leaves a bias of 0.12, more than two fifths of the 0.28 left when size says nothing about nourishment. The Lanarkshire teachers looked at the children; the records hold their height, weight, age, sex and school.
+
+\subsection{Randomization in Bayesian terms}
+
+Rubin (1978) made precise what randomization\index{randomization!in Bayesian terms|textbf} buys a Bayesian. Write the full data as covariates $X$, potential outcomes $Y(0), Y(1)$ and assignments $T$. Let $Y_{\mathrm{obs}}$ contain outcomes under the assigned arms and $Y_{\mathrm{mis}}$ those under the other arms. The assignment mechanism\index{assignment mechanism} is
+\[
+p(T \mid X, Y(0), Y(1), \phi).
+\]
+
+\begin{definition}[Ignorable assignment]
+The assignment mechanism is ignorable if
+\[
+p(T \mid X, Y(0), Y(1), \phi) = p(T \mid X, Y_{\mathrm{obs}}, \phi)
+\]
+and $\phi$ is a priori independent of the parameter $\theta$ of the outcome model. This is Rubin's version: strong ignorability (Definition~\ref{def:ignorability}) implies the first condition, which also allows assignment to depend on observed outcomes, and the second is a further requirement on the prior.
+\end{definition}
+
+\begin{theorem}[Rubin]
+Under ignorable assignment, the posterior distribution of $\theta$, and of any missing potential outcomes, does not depend on the assignment mechanism.
+\end{theorem}
+
+\begin{proof}
+Ignorability removes $Y_{\mathrm{mis}}$ from the assignment factor; prior independence lets $\phi$ be integrated out separately:
+\begin{align*}
+\pi(\theta, Y_{\mathrm{mis}} \mid X, Y_{\mathrm{obs}}, T) &\propto \pi(\theta)\, p(X, Y(0), Y(1) \mid \theta) \\
+&\qquad \times \int p(T \mid X, Y_{\mathrm{obs}}, \phi)\, \pi(\phi)\, d\phi.
+\end{align*}
+The integral is constant in $\theta$ and $Y_{\mathrm{mis}}$, so it drops out. Integrating out $Y_{\mathrm{mis}}$ gives the posterior of $\theta$.
+\end{proof}
+
+Randomization guarantees ignorability\index{ignorability} by design, because a random number generator does not look at the potential outcomes. This is the precise sense in which randomization matters to a Bayesian: without it the outcome model must also model the teachers. Selection on recorded variables is ignorable conditional on them. The Lanarkshire teachers also went by apparent nourishment; if that unrecorded information predicted growth, the analysis must model the teachers or report its sensitivity to them.
+
+\paragraph{Randomization and the likelihood principle.} The likelihood principle\index{likelihood principle|textbf} says inference should depend on the data only through the likelihood, and the randomization distribution is not part of it. Randomization does not change the likelihood of the observed data under a correct model; it makes the correct model easier to write down, and so insures against the analyst's ignorance of the selection process.
+
+Kadane and Seidenfeld (1990) argue that randomization protects the experimenter\index{randomization!protects the experimenter|textbf} against others' suspicion: she may trust that her allocation was unrelated to outcomes, but her reader cannot unless she randomized.
+
+\subsection{What a model based reanalysis would look like}
+
+If substitutions depended only on recorded height, weight, age, sex and school, assignment would be ignorable conditional on them. A Bayesian reanalysis\index{Lanarkshire milk experiment!model based reanalysis|textbf} would model four month weight and height gains jointly as functions of those variables, with treatment interacting with initial size. School effects would be exchangeable (partial exchangeability\index{exchangeability}). The model would absorb the initial imbalance rather than correct it by weighting.
+
+The clothing problem would enter as measurement error: recorded weight is true weight plus clothing, whose seasonal component varies with poverty. A Bayesian measurement error model would put a prior on the February to June clothing difference, perhaps informed by the fraction of children recorded as poor, and propagate it.
+
+The weak point is what was not recorded: teachers also judged poverty and family circumstance by eye, confounders we cannot see. The honest report is a sensitivity analysis\index{sensitivity analysis} as in Section~\ref{sec:sensitivity}, showing how strong that unrecorded selection would need to be to explain away the benefit of milk.
+
+\subsection{Student, Guinness and small samples}
+
+William Sealy Gosset\index{Gosset, William Sealy|textbf} published as Student\index{Student|see{Gosset, William Sealy}} because the Guinness brewery did not want competitors to know that it employed scientists. His 1908 paper introducing the $t$ distribution\index{Gosset, William Sealy!t distribution|textbf} was motivated by experiments on barley and hops with a handful of observations each. He spent his scientific life extracting reliable conclusions from small, carefully designed comparisons.
+
+To a man used to drawing firm conclusions from a dozen paired plots, Lanarkshire\index{Lanarkshire milk experiment}, a study of 20,000 children that could not answer its question, looked wasteful. 
+
+Gosset favoured systematic, balanced plots, including his half drill strip method, believing they controlled fertility gradients better than random allocation. Fisher insisted on randomization\index{Fisher, Ronald A.!randomization} as the only basis for a valid error estimate. Lanarkshire's failed balancing supported Fisher, and Gosset recognized it: for a repeat he recommended coin tosses within matched pairs, or at least drawing lots rather than alphabetical allocation.
+
+\subsection{Pairing and the variance of a comparison}
+
+Let $Y_{j1}$ and $Y_{j2}$ be the growths of the two members of pair $j$, one given milk\index{Lanarkshire milk experiment!pairing|textbf}. If each child's growth has variance $\sigma^2$ and the within pair correlation is $\rho$, the variance of the paired difference\index{pairing|textbf} is $2\sigma^2(1 - \rho)$. With $m$ pairs the estimator of the effect has variance $2\sigma^2(1-\rho)/m$. An unpaired, perfectly randomized trial with $N$ children split equally has variance $4\sigma^2/N$.
+
+Student's claim concerned raw against pasteurized milk in the flawed trial. Figure~\ref{fig:twins} instead compares 50 twin pairs with 20,000 perfectly randomized, unpaired children; for the actual 10,000 fed children, 50 pairs break even at $\rho\approx0.99$. Against 20,000, they break even only at $\rho \approx 0.995$. Student's claim therefore depended on imperfect randomization, whose bias does not shrink with $N$. With bias $b$ in the large trial, 50 pairs have lower mean squared error when $b^2 > 2\sigma^2(1 - \rho)/50 - 4\sigma^2/N$; at $\rho = 0.9$ and $\sigma^2 = 1$, a bias of about 0.06 standard deviations is enough.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{twins.pdf}
+\caption{Variance of the estimated effect for 50 twin pairs, as a function of the within pair correlation of growth, against 20,000 unpaired children under ideal randomization. Total variance of growth is one. The curves meet at a correlation of 0.995, and the paired variance falls to zero at a correlation of one.}
+\label{fig:twins}
+\end{figure}
+
+
+
+\paragraph{A Bayesian model for the paired design.} For twin pairs the natural model has a pair effect:
+\[
+Y_{jk} = \mu + \alpha_j + \tau T_{jk} + \varepsilon_{jk}, \qquad \alpha_j \sim N(0, \sigma_\alpha^2), \qquad \varepsilon_{jk} \sim N(0, \sigma_\varepsilon^2).
+\]
+With the variance components known and flat priors on $\mu$ and $\tau$, let $D_j$ be the treated child's growth minus the control child's in pair $j$. The pair effect cancels, so the $D_j$ are independent $N(\tau, 2\sigma_\varepsilon^2)$, and the pair averages, which are independent of the differences, inform only $\mu + \tau/2$, which the flat prior on $\mu$ leaves free. With $\bar D$ the mean difference,
+\[
+\tau \mid \text{data} \sim N\bigl(\bar D, 2\sigma_\varepsilon^2/m\bigr),
+\]
+where $\sigma_\varepsilon^2 = \sigma^2(1 - \rho)$ is the within pair residual variance, so the posterior variance is the paired variance above and $\sigma_\alpha^2$ drops out. Randomization within pairs makes the assignment ignorable conditional on the pair, so the theory of this section applies directly. Section~\ref{gr:sec:transform} adds that the coin toss within pairs makes the assignment mechanism ancillary, whatever the teachers saw.
+
+A hierarchical extension, $\tau_j \sim N(\tau, \sigma_\tau^2)$, allows effects to vary across pairs. If $\tau_j$ is independent of $\alpha_j$, the milk and control children's growth variances differ by $\sigma_\tau^2$, so the data say how much effects vary between families; if they are correlated, $\sigma_\tau^2$ is not identified.
+
+\subsection{Randomization inference and Bayesian inference}
+
+Fisher's randomization test\index{randomization inference|textbf}\index{randomization test} treats potential outcomes as fixed and assignment as random. Under the sharp null of no effect on any child, growth is unchanged by assignment, so the distribution of any test statistic over all possible assignments can be computed exactly. The $p$ value is the probability, under the assignment mechanism, of a statistic at least as extreme as observed. With fair coins in $m$ pairs, it is the fraction of the $2^m$ equally likely assignments meeting that condition.
+
+The Bayesian analysis treats the assignment as fixed, once observed, and the outcomes as random. The randomization test asks whether the observed difference is surprising under the sharp null; the posterior asks what the effect is likely to be, given the data and a model.
+
+Both need information about the assignment mechanism: randomization inference needs each assignment's probability, and Bayesian inference can omit the mechanism only if it is ignorable. Lanarkshire's unrecorded substitution rule left the probabilities unknown and used outcome predictors. Unless the recorded measurements capture everything the teachers saw, a Bayesian must model the teachers or report sensitivity to them.
+
+\subsection{What modern trials learned from Lanarkshire}
+
+Several features of modern trial practice\index{randomization!what modern trials learned|textbf} can be read as answers to Student.
+
+\paragraph{Concealed allocation.} The person enrolling a patient must not know the next assignment, or, as at Lanarkshire, can steer patients toward or away from treatment.
+
+\paragraph{Stratified and blocked randomization.} Balance on important prognostic variables is achieved by randomizing within strata, not by substitution after randomization.
+
+\paragraph{Prespecified analysis.} The analysis model, including covariate adjustment, is fixed before the data are seen. In the Bayesian version the prior and model are fixed, and the posterior is reported regardless of what it shows.
+
+\paragraph{Cluster randomization.} When spillovers between units are likely, whole schools or villages are randomized. Lanarkshire allocated within schools, allowing spillovers between milk and control children in the same school.
+
+
+
+
+\subsection{Lessons for the rest of the book}
+
+Twenty thousand children selected by kind teachers told us less, in Student's judgement, than fifty pairs of identical twins would have\index{Lanarkshire milk experiment!lessons for the book|textbf}. Today's analogue is the administrative database with millions of records and an unknown selection process, whose size invites confidence its design does not justify. Many modern selection processes, from clinicians choosing treatments to algorithms targeting interventions, share the teachers' logic: the people most in need are chosen, and need predicts outcome.
+
+Pairing and stratification are prior information about where variability lies: Student's twins encode the judgement that genetic and household differences dominate the variance of growth. A model is the natural tool for such information, because it states what was matched and what was not.
+
+\section{In practice}
+
+\paragraph{The target.} The target is $\tau_Q$ from \eqref{eq:tauQ}, computed draw by draw for every $Q$ of interest. For Lanarkshire the target is the expected four month gain in weight and height from milk for a child of given initial size, age and sex. Each posterior draw of the growth model gives that conditional gain; averaging over the Lanarkshire covariate distribution gives the Department's population figure, and averaging over poor children gives the figure a targeted policy needs.
+
+\paragraph{What the analyst does differently.} The analyst states the model and the accounting separately. The model is the logistic regression \eqref{eq:logistic}, with whatever interactions the policy question needs, on the scale where the effect is most nearly stable, and it is checked as a model, by posterior predictive checks of fitted probabilities against observed frequencies. The accounting is a list of laws $Q$, each tied to a question. In the worked example (Figure~\ref{fig:tauQ}) the sample, the treated units and the older cohort gave three different posterior means on the risk difference scale, the last indistinguishable from zero; the report names all three and says which decision each serves.
+
+
+
+The analyst records how treatment was assigned. When she controls the design, she randomizes within pairs or strata where prognostic variables are known. Otherwise she conditions on the recorded variables the assigners could have used and reports sensitivity (Section~\ref{sec:sensitivity}) to what they saw but did not record.
+
+\paragraph{Against DML.} If the average effect is the only number wanted and the model is a low dimensional logistic regression, DML is adequate and costs less than posterior computation. The worked example shows what it leaves out: the effect on the treated and the effect for the older cohort each need a new score, while the posterior gives all three jointly. A conditional odds ratio of 4 and a marginal odds ratio of 3.45 (Table~\ref{tab:noncollapse}) are two accountings of one model, and two estimators built for two scales cannot say so. DML can no more repair a compromised design than the posterior can: its score presumes ignorability given the recorded covariates, the assumption the Lanarkshire teachers broke. The honest limit is misspecification: a wrong logistic model gives a wrong $\tau_Q$ for every $Q$, while DML's orthogonality protects it from some nuisance errors. Part III answers with a flexible model under a shrinkage prior, propensity aware where selection matters, rather than by abandoning the model.
+
+\section*{Notes}
+
+For noncollapsibility with covariates omitted from a randomized experiment, see Gail, Wieand and Piantadosi (1984). The estimand framework for trials is ICH (2019). Ray and van der Vaart (2020) prove a semiparametric Bernstein von Mises theorem for the mean of a binary outcome in one treatment arm, and the first order bias that a prior ignoring the propensity score can leave is the regularization induced confounding of Hahn, Carvalho, Puelz and He (2018).
+
+Fisher (1935) is where the randomization test is set out, and Cox (1958) treats blocking and randomization from the experimenter's side. The randomization analysis of the finite population effect that the chapter sets beside the Bayesian one is Neyman (1923), given in full by Imbens and Rubin (2015).
+
+For Lanarkshire, Leighton and McKinlay (1930) is the report, Student (1931) the critique with the proposals of pairs and twins, and Fisher and Bartlett (1931) the note on raw against pasteurized milk. Student (1908) is the paper on the $t$ distribution, and Student (1938) argues for balanced layouts in field experiments, the position that the chapter sets against Fisher's. Senn (2023) is a modern account of Student and the milk experiment. Spillovers between children in one school, which cluster randomization is meant to avoid, are modelled in Section~\ref{sec:interference}.
+
+\begin{exercises}
+\item\label{ex:ch02:1} Verify the entries of Table~\ref{tab:noncollapse}, and find stratum probabilities with a common conditional odds ratio of 4 for which the marginal odds ratio is below 2.
+\item\label{ex:ch02:2} Show that the hazard ratio in a proportional hazards model is noncollapsible, and give a two stratum example with no confounding.
+\item\label{ex:ch02:3} In model \eqref{eq:logistic}, derive the posterior mean and variance of $\tau_Q$ by the delta method, linearizing $\tau_Q$ about the posterior mean of $\theta$.
+\item\label{ex:ch02:4} The first coherence requirement fails for a model in which $Y_{ij} = \mu + b_i + e_{ij}$ with $b_i \sim N(0, \sigma_b^2 / m_i)$ and $e_{ij} \sim N(0, \sigma_e^2)$ independent, where $m_i$ is the number of units of cluster $i$ in the sample. Explain why, and propose a coherent alternative.
+\item\label{ex:ch02:5} Suppose two analysts report $\tau_Q$ for the sample's covariate law and for a population covariate law from the same logistic posterior. Add an interaction $t\,\delta^\top x$ to the logistic model and show that their posterior means can then have opposite signs.
+\item\label{ex:ch02:6} Write the ICH E9(R1) estimand for a trial of milk supplementation in terms of a law $Q$ and a functional of $\theta$.
+
+\item\label{ex:ch03:1} In the simulation of Figure~\ref{fig:milk}, derive the bias of the naive difference in means as a function of the selection slope and the growth slope, and check it against the simulated value.
+\item\label{ex:ch03:2} Suppose the gain is $G = 1 - 0.3S + cU + 0.2T + \varepsilon$, where $(S, U)$ is standard bivariate normal with correlation $r$, and teachers assign milk with probability $\expit(-1.2\,U)$, the rule of the simulation but using the unrecorded $U$ alone. Derive, as a function of $r$, the bias of the coefficient of $T$ in the regression of $G$ on $T$ and $S$, and evaluate it for $c = -0.3$ and the values of $r$ simulated in Section~\ref{sec:milk}.
+\item\label{ex:ch03:3} Student argued that 50 pairs of identical twins would compare raw and pasteurized milk more reliably than the 20,000 children. Take the generic comparison of Figure~\ref{fig:twins}, with all 20,000 children unpaired and perfectly randomized, and, under a model in which twin pairs share a random effect with variance $\sigma_\alpha^2$ and children have residual variance $\sigma_\varepsilon^2$, find the ratio $\sigma_\alpha^2/\sigma_\varepsilon^2$ at which his claim holds for estimating the mean effect.
+\item\label{ex:ch03:4} Write a Bayesian measurement error model for the clothing problem, with clothing weight depending on season and poverty, so that poor children shed less clothing between February and June, and show how it biases the naive weight gain comparison.
+\item\label{ex:ch03:5} Show that Fisher's randomization test of the sharp null of no effect is exact under complete randomization, and explain why it ceases to be exact under the Lanarkshire substitution rule.
+\item\label{ex:ch03:6} Kadane and Seidenfeld (1990) argue that randomization protects the experimenter against suspicion. Formalize this as a game between an experimenter and a sceptical reader.
+\end{exercises}

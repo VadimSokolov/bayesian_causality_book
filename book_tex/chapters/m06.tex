@@ -1,0 +1,401 @@
+\chapter{Generative Treatment Effects and Joint Potential Outcomes}\label{ch:gente}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+Noise outsourcing represents any conditional law as a map from noise to outcomes. Learning that map for treated and untreated outcomes gives every conditional and quantile effect and every other functional of the two marginal laws, and decisions under concave utility need exactly these, not the average effect. The joint law of the two potential outcomes is a separate question: the marginals bound it without identifying it, and optimal transport supplies a canonical coupling, and a copula prior covers the rest.
+\end{tcolorbox}
+
+Average effects hide almost everything a decision maker needs. A drug that lowers mean blood pressure by five points might lower it by fifteen in a third of patients and do nothing for the rest. A tax credit that raises mean earnings might raise the lower quantiles and leave the upper ones alone. This chapter develops a generative approach to heterogeneous and distributional effects, built around the GenTE learner developed with Maria Nareklishvili. The object to learn is not a number but a map that turns noise, covariates and treatment into draws of the outcome.
+
+\section{Conditional and distributional targets}
+
+Under the strong ignorability\index{ignorability} of Chapter~\ref{ch:predictive}, which includes overlap, the conditional laws $F_t(\cdot \mid x)$ of $Y(t)$ given $X = x$ are identified for $t = 0, 1$ as the laws of $Y$ given $X = x$ and $T = t$. Every effect in the list below\index{distributional target} is a functional of this pair; effects that depend on the joint law of $Y(0)$ and $Y(1)$ are not, and Section~\ref{sec:ot} takes them up.
+\begin{itemize}
+\item The conditional average effect $\tau(x) = \int y\,dF_1(y \mid x) - \int y\,dF_0(y \mid x)$.
+\item The conditional quantile effect\index{quantile treatment effect}\index{quantile treatment effect!conditional|textbf} at level $u$, $q_1(u \mid x) - q_0(u \mid x)$, where $q_t(\cdot \mid x) = F_t^{-1}(\cdot \mid x)$.
+\item The unconditional quantile effect\index{quantile treatment effect!unconditional|textbf}, the difference of quantiles of the marginal laws $F_t = \int F_t(\cdot \mid x)\,Q(dx)$, which in general is not the average over $x$ of the conditional quantile effects, since the quantile of a mixture is not the mixture of the quantiles.
+\item Effects on inequality measures, tail probabilities, or any other functional of the marginals.
+\end{itemize}
+In the terms of Chapter~\ref{ch:mccullagh}, the pair of conditional laws is the model and each of these is accounting; a method that learns the laws well can report all of them.
+
+We therefore take the pair of conditional laws as the object to learn, and we need a representation of a conditional law that a learner can fit directly.
+
+\paragraph{Noise outsourcing.} By Kallenberg's (2002) noise outsourcing\index{noise outsourcing} lemma (Theorem~\ref{comp:thm:outsourcing}), for random elements $(X, Y)$ in standard Borel spaces there are, on a possibly enlarged probability space, a measurable function $G$ and a random variable $U \sim \mathrm{Uniform}(0,1)$, independent of $X$, such that $Y = G(U, X)$ almost surely. For real valued $Y$ the function can be the conditional quantile function, $G(u, x) = F^{-1}(u \mid x)$, so learning $G$ is learning the whole conditional law. Chapter~\ref{ch:computation} learns posteriors as such maps; here we use the lemma for the outcome law itself.
+
+This turns distribution learning into regression with one extra input: the network that fits $G$ takes $(u, x)$ and returns a quantile. Once it is fitted, every functional in the list above is computed by simulation: draw uniforms, evaluate $G$ at the covariates of interest under $t = 0$ and $t = 1$, and average the function of each arm's outputs that the question asks for, or, for a quantile, sort the outputs and read off the level. No density is written down and no integral is done by hand. A function of the two outputs together, such as the share of units whose treated draw exceeds their control draw, is another matter: feeding the same uniform to both arms couples them comonotonically, which is the rank preservation of Section~\ref{sec:ot}.
+
+\section{The GenTE learner}
+
+GenTE\index{GenTE|textbf}\index{generative treatment effects|see{GenTE}}, from Nareklishvili, Polson and Sokolov (2025), is a multihead feed forward network\index{GenTE!multihead network|textbf} with three jointly estimated subnetworks, propensity, baseline and treatment effect, each with its own covariate encoder. The propensity network produces a low dimensional embedding $e_\pi(x)$, which a logistic output layer turns into the propensity score\index{propensity score} $\hat e(x)$. The baseline network returns the conditional quantile function of the untreated outcome, $\mu(x, e_\pi(x), u) \approx q_0(u \mid x)$, and the effect network returns the quantile indexed treatment effect $\Delta(u \mid x) \approx q_1(u \mid x) - q_0(u \mid x)$. The model for the observed outcome is
+\[
+q_t(u \mid x) = \mu(x, e_\pi(x), u) + \Delta(u \mid x)\,t,
+\]
+and the conditional average effect is $\tau(x) = \int_0^1 \Delta(u \mid x)\,du$, since a mean is the integral of its quantile function.
+
+The propensity embedding enters the baseline encoder and not the effect encoder, the neural counterpart of the propensity covariate of Chapter~\ref{ch:horseshoe} and of the Bayesian causal forest: the baseline cheaply represents outcome variation that moves with the propensity, so that variation is not pushed into the effect, the mechanism of regularization induced confounding. The effect is also a separate component, so regularization acts on it directly and can shrink it toward homogeneity.
+
+Following the implicit quantile networks\index{implicit quantile network|textbf} of Dabney and coauthors (2018), a cosine embedding of $u$, built from $\cos(\pi iu)$ for $i = 1, \ldots, 32$, multiplies the covariate features elementwise before the output layer. The training loss combines a cross entropy term for treatment, the check loss
+\[
+\rho_u(r) = r\{u - \mathbf{1}(r < 0)\}
+\]
+for the observed outcome at a randomly drawn quantile level, and a penalty that discourages quantile crossing by comparing fits at two random levels. The propensity network thus receives gradients from both the treatment and the outcome terms.
+
+\begin{remark}
+A representation trained only for the outcome can discard covariate information that predicts treatment strongly but outcome only moderately, exactly the information needed to adjust for confounding by such covariates. The joint loss keeps it.
+\end{remark}
+
+\section{Benchmarks}
+
+The GenTE paper\index{GenTE!benchmarks|textbf} compares the learner with generalized random forests\index{generalized random forest|textbf}, DML with a gradient boosted outcome regression and a random forest for treatment, and the generative adversarial GANITE\index{generative adversarial network|textbf} of Yoon, Jordon and van der Schaar (2018), all at default settings. Each design draws covariates $X \sim N(0, I_p)$, treatment with probability $\logit^{-1}(0.3x_1 - 0.2x_2 + 0.1x_3)$ (the last term dropped when $p = 2$), and outcome $Y = X^\top\beta + \tau(X)T + \varepsilon$ with $\varepsilon \sim N(0, 0.25)$ and $\beta \sim N(0, 0.25 I_p)$ drawn once per replication. The effect function is linear, $1 + x_1 + 0.5x_2$, nonlinear, $1 + x_1^2 + 0.5x_2^2$, an interaction, $1 + x_1x_2$, or a nonlinear interaction, $1 + x_1^2x_2$; the sample size is 200, 500 or 1,000 and the number of covariates two, four or eight, which makes 36 design cells of 100 replications each. The reported quantity is the mean squared error of the estimated $\tau(x)$ on held out test units, averaged over the replications. GenTE had the lowest out of sample mean squared error for the conditional average effect in 30 of the 36 design cells, with average reductions relative to a given benchmark from 5 to 94 percent; its margin was widest for effects nonlinear in the covariates and narrowest in the nonlinear interaction design, where all methods struggled. Joint estimation of the three components more than halved the error on average relative to fitting the treated and control quantile functions separately. A direct mean parametrization of the effect does slightly better when errors are symmetric and unimodal; the quantile indexed version wins when outcomes are skewed or bimodal.
+
+ The forest and DML target a conditional or average mean; GANITE imputes counterfactuals, then predicts effects. GenTE targets the conditional laws, of which the others are accountings.
+
+\section{A simple illustration}
+
+We simulate a randomized trial\index{GenTE!simple illustration|textbf} with 1,500 units in which treatment raises outcomes by 30\% for units above the control median and leaves the rest unchanged; control outcomes are lognormal with log mean 0 and log standard deviation 0.5, and each unit is treated with probability one half. The average effect is positive but conceals that half the population is unaffected.
+
+Figure~\ref{fig:qte} shows the posterior of the quantile treatment effect\index{quantile treatment effect}\index{quantile treatment effect!simulated example|textbf} under the Bayesian bootstrap\index{Bayesian bootstrap}\index{Bayesian bootstrap!for quantile effects|textbf} of Rubin (1981), which places a Dirichlet posterior on the empirical law of each arm. The effect is near zero up to the median and rises sharply above it.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{qte.pdf}
+\caption{Posterior mean and 95\% band, from 400 Bayesian bootstrap draws, of the quantile treatment effect in a simulated randomized trial in which only units above the control median benefit.}
+\label{fig:qte}
+\end{figure}
+
+The Bayesian bootstrap is the simplest generative posterior: each draw reweights the observed units by Dirichlet weights and computes every functional on the reweighted law. In a randomized trial without covariates it is the limit of the Dirichlet process posterior as the concentration parameter tends to zero (Exercise~\ref{ex:ch08:5}). With covariates, GenTE replaces it with a learned conditional map.
+
+\section{Uncertainty for a learned map}
+
+Stochastic gradient descent gives a point estimate of $G$. Three routes supply uncertainty\index{GenTE!uncertainty for a learned map|textbf}.
+
+\paragraph{Bayesian bootstrap of the training data.} Retrain the network on Dirichlet reweighted data, one full training run per draw. This approximates a posterior under a nonparametric prior. The 401(k) analysis of Section~\ref{sec:deephd} uses 200 fits for bands on average, quantile and subgroup effects.
+
+\paragraph{Deep ensembles.} Train networks from different initializations\index{deep ensemble|textbf}. Their spread captures sensitivity to the optimizer's starting point, but has no direct Bayesian justification or posterior interpretation.
+
+\paragraph{Generative Bayesian computation.} Learn a second map, from noise and a summary of the data to a low dimensional parameter such as the average effect, trained on data sets simulated from the prior and the model and amortized over them (Chapter~\ref{ch:computation}).
+
+In practice we use the bootstrap for final reporting and generative Bayesian computation for exploration. The bootstrap measures sampling variability given the architecture; the ensemble measures training variability. Neither covers architecture error: in the 401(k) analysis, 200 irrelevant covariates, fed directly to the network, move the quantile effect curve without widening its bands (Section~\ref{sec:deephd}). Before reporting a band on real data, simulate from a truth resembling the data, refit, and check how often it covers the truth (Section~\ref{comp:sec:checks}).
+
+\section{Deep learning for high dimensional inference}\label{sec:deephd}
+
+Every object of Bayesian causal inference, a posterior, a conditional outcome law, a potential outcome, is a conditional distribution, and so by noise outsourcing a function of uniform noise and the conditioning variables. Deep networks are the standard tool for learning functions of many inputs. Put the two together and high dimensional inference\index{deep learning for high dimensional inference|textbf} becomes supervised learning: the curse of dimensionality moves from integration, where Markov chain Monte Carlo suffers, to regression, where networks are strong.
+
+\paragraph{Generative causal inference.} Nareklishvili, Polson and Sokolov (2023a) learn a posterior map from uniform noise and a data summary $S(D)$, without evaluating a likelihood or estimating a density (Chapter~\ref{ch:computation}). Models with deterministic latent updates need only a simulator; accuracy rests on the summary and network. Here the outcome map is fitted to a fixed observed data set rather than amortized over prior simulations.
+
+\paragraph{Deep partial least squares.} With many covariates or instruments, Nareklishvili, Polson and Sokolov (2023b) first project them onto a few partial least squares\index{deep partial least squares|textbf} directions, chosen for their covariance with the outcome, and then fit a deep network to the scores. A result of Brillinger (2012) explains why this works: with Gaussian regressors, the least squares direction is proportional to the index of a single index model for any link correlated with that index, and the first partial least squares direction to the covariance matrix of the regressors times the index, the same direction when that matrix is spherical. When the retained directions span the index, the projection keeps the signal and the network learns the nonlinearity in a few dimensions. The paper applies it to the Angrist and Evans (1998) data on childbearing and mothers' labour supply, with sparse and correlated instruments.
+
+\paragraph{Feature selection for personalized policy.} Forest PLS (Nareklishvili, Polson and Sokolov 2023c) uses the same projection to select the covariate directions along which effects vary, and fits causal forests within them, with consistency and asymptotic normality for the personalized effects. In the Pennsylvania reemployment bonus experiments it found that cash incentives drew some young nonwhite participants into work while cushioning others from searching, a heterogeneity an average effect hides.
+
+
+
+\paragraph{How the pieces fit.} The pipeline is: reduce dimension along directions that predict both outcome and treatment, by projection or a learned embedding; learn the conditional law with a quantile network; obtain uncertainty by training on prior simulations, which gives a posterior, or by refitting under Dirichlet weights, the weighted Bayesian bootstrap of Newton, Polson and Xu (2021); and read off effects as accountings. A network does not remove confounding: a projection chosen only for the outcome can discard the covariates that drive treatment, as the remark on the propensity network explains.
+
+\subsection{A high dimensional distributional analysis of 401(k) eligibility}
+
+We fit the pipeline to the 1991 SIPP data of Chapter~\ref{ch:k401}: 9{,}915 households, eligibility for a 401(k) plan\index{401(k) plan!high dimensional distributional analysis|textbf} as treatment, net financial assets in thousands of dollars as outcome, and the nine standard covariates (age, income, education, family size, marital status, two earner status, defined benefit pension, IRA participation and home ownership). A single quantile network, with eligibility as one of its inputs and without GenTE's propensity and effect heads, learns the conditional law of assets given covariates and eligibility. The level $u$ enters through a cosine embedding with 32 terms, the covariates and eligibility $(x, t)$ through two ReLU layers of width 64, and the two are multiplied coordinatewise before a two layer head that returns the quantile. This is the architecture of Figure~\ref{fig:qnnarch}, with $(x, t)$ in the place of the summary. Training minimizes the weighted check loss at four random levels per observation for 40 epochs. We refit it 200 times under independent exponential weights (normalized, these are Dirichlet weights), so that each fit is one draw from the weighted Bayesian bootstrap, and for each draw simulate both potential outcomes for every household. Every generative estimate below comes from those 200 fits, and each network in the experiment with 200 added covariates is refitted 200 times in the same way.
+
+\paragraph{The average effect.} The posterior mean of the average effect is 8.87 thousand dollars, with 95\% interval $[7.54, 10.20]$, the mean of the 200 refits plus or minus 1.96 standard deviations.
+
+The DML estimates of Table~\ref{tab:k401} are 9.52, $[6.89, 12.14]$, with lasso nuisances and 8.59, $[6.05, 11.12]$, with forests, with intervals about twice as wide. The DML rows come from one random partition of the data and use the partially linear score, which with varying effects estimates the average of $\tau(x)$ weighted by $e(x)\{1 - e(x)\}$. The generative 8.87 averages the household effects without weights. DML with the interactive score, which estimates that unweighted average, gives 8.17, $[5.74, 10.59]$, with lasso nuisances and 7.74, $[5.37, 10.11]$, with forests on the same partition, and the medians over 20 and 5 partitions are 8.40 and 8.05. The forest puts the propensity of 41 to 56 households, depending on the partition, below 0.01 or above 0.99, and clipping it at 0.01 and 0.99 leaves them weights of up to 100. Both estimates lie below the generative one but within one of their standard errors of it, and their intervals are again about twice as wide. The lasso median sits 0.47 below 8.87, close to the upward bias of 0.44 that the coverage check below finds in the refits on simulated data.
+
+The bootstrap interval reflects sampling variability given the network; it does not include uncertainty about the architecture, and in the coverage check after Figure~\ref{fig:deepcate} it covers 92 percent rather than 95. Nor is all of its width sampling variability. When 20 fixed sets of weights are each refitted under three training seeds, the seed accounts for 14 percent of the variance of the average effect across refits (a standard deviation of 0.22 against 0.53 from the weights) and for 46 percent of the variance of a quantile effect, averaged over the 19 levels (20 to 84 percent).
+
+\paragraph{Every quantile.} Figure~\ref{fig:deepqte} shows the quantile treatment effects. They are between 1.1 and 1.7 thousand dollars up to the 30th percentile, 3.72 at the median, 12.87 at the upper quartile and 23.93 at the 90th percentile. The classical inverse propensity weighted quantiles of Firpo (2007) are 1.01, 0.87, 5.03 and 13.46 at the 10th, 25th, 50th and 75th percentiles. Their propensity score is a logistic regression of eligibility on the nine covariates, linear in them and fitted once, and their bands come from 200 Bayesian bootstrap draws. They track the generative curve up to about the 80th percentile except around the median, where they run higher and the two bands do not overlap; they then flatten to 15.59 at the 90th, with a wide band. In the upper tail the weighted estimator rests on a few heavily weighted households, while the generative model borrows strength across covariates; the two disagree most where the data are thinnest, and the model's answer there leans on its extrapolation.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.92\linewidth]{deep401k_qte.pdf}
+\caption{Quantile treatment effects of 401(k) eligibility on net financial assets: the deep generative model with 200 weighted Bayesian bootstrap fits, and the inverse propensity weighted quantiles of Firpo with 200 Bayesian bootstrap draws. Bands are nominal 95\% intervals: for the generative model the mean of the 200 fits plus or minus 1.96 standard deviations, for Firpo's estimator the 2.5 and 97.5 percent points of the 200 draws. The text checks the coverage of the first.}
+\label{fig:deepqte}
+\end{figure}
+
+\paragraph{Every subgroup.} The same draws give conditional effects for any subgroup at no extra cost. Figure~\ref{fig:deepcate} shows them by income quintile and by age. The effect rises steadily with income, from 3.11 thousand dollars in the lowest quintile to 18.15 in the highest, with intervals $[2.30, 3.91]$ and $[14.20, 22.11]$, and with age, from 4.87 for households headed by someone under 36 to 14.73 for those over 55. Eligibility matters most for households that have the income to save and the years of saving behind them.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{deep401k_cate.pdf}
+\caption{Mean effect of 401(k) eligibility by income quintile and by age of the household head, with nominal 95\% weighted Bayesian bootstrap intervals, the mean of the 200 refits plus or minus 1.96 standard deviations.}
+\label{fig:deepcate}
+\end{figure}
+
+\paragraph{Coverage of the bands.} The check of Section~\ref{comp:sec:checks} needs a known truth, so we built one that resembles these data. One network, fitted to them once with unit weights and the same training, serves as the true conditional law. Each of 1,000 simulated data sets keeps the 9,915 households' covariates and eligibility and draws their assets from that law, so unconfoundedness holds and every effect is known; the true average effect is 8.49. Each data set was then analysed as the real one, with 200 refits under Bayesian bootstrap weights and the band printed in this section, the mean of the refits plus or minus 1.96 standard deviations, and again with only its first twenty refits. The bands covered the truth in these percentages of the data sets:
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Target & 20 refits & 200 refits \\
+\midrule
+Average effect & 90 & 92 \\
+Quantile effects, mean over 19 levels & 92 & 94 \\
+Income quintile effects & 85 to 93 & 89 to 95 \\
+\bottomrule
+\end{tabular}
+\end{center}
+The Monte Carlo standard error of the 92 is 0.8 points. Quantile coverage is pointwise, at the levels 0.05 to 0.95; with 200 refits it is lowest at the 15th percentile, 84 percent, and 90 percent at the 95th. A calibrated band of this form built from 200 draws would cover about 95 percent. Most of the rest of the shortfall is bias: the refits overstate the average effect by 0.44, two thirds of their standard deviation, every quintile effect by 0.30 to 0.57 and the effect at the 95th percentile by 3.1 thousand dollars. Going from twenty refits to 200 raises coverage by two to four points but leaves the bias of the average effect where it was, 0.44 either way; only a better fitted network would remove it. With twenty refits the other natural band, the 2.5 and 97.5 percent points of the refits, lies close to the smallest and largest draws and covers only 82 percent for the average effect, which is why we print the wider one; with 200 the two nearly agree (91 and 92 percent).
+
+\paragraph{A truth outside the network family.} The truth of the check above comes from the model's own family, the most favourable case. We repeated the check on 200 data sets drawn from a truth outside it, keeping the households' covariates and eligibility. With $x_1, \ldots, x_4$ the standardized age, income, education and family size, the outcome under treatment $t$ was
+\[
+Y(t) = 3x_1 + 2\sin x_2 + x_3x_4 + t\{2 + 2\,\mathbf{1}(x_2 > 0)\} + (1 + 0.5|x_1|)(1 + 0.5t)\,\varepsilon,
+\]
+\[
+\varepsilon = \frac{e^{Z} - e^{1/2}}{\sqrt{e(e - 1)}}, \qquad Z \sim N(0, 1),
+\]
+a nonlinear mean, an effect of 2 below mean income and 4 above it, and skewed heteroskedastic noise with mean zero and variance one, drawn independently for each household and data set. The true average and income quintile effects follow from the effect function, and the true quantile effects were computed from 1,000 noise draws per household. Each data set was analysed with 200 refits, as before. There the nine covariate band covered the average effect in 29 of the 200 data sets (34 with twenty refits): its bias of $-0.10$ on an effect of 2.80 is small, but nearly three times the spread of the refits. It covered the quantile effects in 75 percent on average and missed the effect in three of the five income quintiles in every data set.
+
+\paragraph{Two hundred irrelevant covariates.} To see what high dimensions do, we appended 200 independent standard normal covariates, so that 209 inputs carry the information of nine. A network fed all 209 inputs gives an average effect of 7.76, $[6.29, 9.22]$, and its quantile effect curve lies at a root mean squared distance of 1.48 from the nine covariate curve. Projecting the 209 inputs onto five partial least squares directions that predict both assets and eligibility puts 73.5\% of the squared weight on the nine real covariates, which are 4.3\% of the inputs. The network on those five scores gives 8.39, $[6.94, 9.84]$, at a distance of 1.08 (Figure~\ref{fig:deephd}). The projection helps, but neither version recovers the nine covariate answer exactly. Each network was refitted 200 times, as the nine covariate fit was. The average band width, the width of the 95\% band averaged over the 19 levels, is 2.89 for the nine covariate fit, 2.74 for the raw network and 3.05 for the projected one. The raw network, the farther of the two from the nine covariate answer, reports the narrower band. The fits use the same households, so the distance between them measures how much the answer depends on the inputs and the architecture, though not which fit is nearer the truth, and a bootstrap over one architecture does not see it. The projected network's band is wider at most levels and most of all at the top, where its 200 refits put the effect at the 0.95 quantile anywhere from 18 to 39 thousand dollars. 
+
+We ran the high dimensional check on the first 200 of the 1,000 data sets generated from the fitted network, each with 200 fresh noise covariates, and 20 refits per fit. The projected network had its directions either fitted once per data set or refitted with the weights in every refit. Coverage, in percent of the data sets, was
+\begin{center}
+\small
+\begin{tabular}{lccc}
+\toprule
+Inputs & Average & Quantile & Lowest income \\
+ & effect & effects & quintile \\
+\midrule
+Nine covariates & 90.5 & 91.8 & 83.5 \\
+All 209 inputs & 85.0 & 68.3 & 88.0 \\
+Five PLS scores, directions fixed & 92.5 & 84.5 & 51.0 \\
+Five PLS scores, directions refitted & 90.0 & 81.6 & 39.5 \\
+\bottomrule
+\end{tabular}
+\end{center}
+with the quantile column averaged over the 19 levels. The raw network understates the average effect by 0.46, covers the quantile effect at its worst level in 3.5 percent of the data sets, and covers the second and third income quintiles in about half. A hundred refits on 20 of the data sets left the coverage of the quantile effects where it was. The raw network's band, the narrowest of the three, is the one that covers least.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.92\linewidth]{deep401k_hd.pdf}
+\caption{Quantile treatment effects with the nine covariates, with 200 added irrelevant covariates fed directly to the network, and with the 209 covariates projected onto five partial least squares directions. Bands are nominal 95\% weighted Bayesian bootstrap intervals, the mean plus or minus 1.96 standard deviations of 200 refits each, in gray fill for the nine covariate fit and as thin lines in the style of their curves for the other two.}
+\label{fig:deephd}
+\end{figure}
+
+\section{Individualized decisions}
+
+The conditional laws support decisions\index{individualized decisions|textbf} that averages cannot. If treatment costs $k$ and outcome $y$ has utility $\mathcal{U}(y)$, treating a unit with covariates $x$ is optimal when
+\[
+\int \mathcal{U}(y)\,dF_1(y \mid x) - \int \mathcal{U}(y)\,dF_0(y \mid x) > k.
+\]
+When $\mathcal{U}$ is linear this depends only on $\tau(x)$. When $\mathcal{U}$ is concave, as usual for health or income, it depends on the whole conditional law, particularly the lower tail. A risk averse policymaker wants to know whether treatment protects against bad outcomes, a statement about lower quantiles, which GenTE supplies.
+
+In the simulated trial of Figure~\ref{fig:qte}, a linear utility and $\tau(x) > k$ would treat everyone, and for half of them the cost $k$ buys nothing. A concave utility weights the unaffected lower half more heavily, and the quantile effect curve, flat up to the median, shows at once where the gain is absent, if ranks are preserved (Section~\ref{sec:ot}). In quantile form the expected utility\index{expected utility|textbf} rule is
+\[
+\int_0^1 \bigl[\mathcal{U}\{q_1(u \mid x)\} - \mathcal{U}\{q_0(u \mid x)\}\bigr]\,du > k,
+\]
+computed from the fitted map by averaging over draws of $u$.
+
+Report both conditional quantile functions, or the baseline $q_0(u \mid x)$ and difference $\Delta(u \mid x)$. The difference alone suffices for linear utility; concave utility needs the level as well as the change. For any specified utility and cost, the posterior of the expected utility difference shows how confident the recommendation to treat is for a unit at $x$. Changing the utility needs no refit.
+
+\paragraph{Dominance.} At zero cost and fixed $x$, with finite means, treatment is at least as good for every increasing utility if and only if $F_1(y \mid x) \leq F_0(y \mid x)$ for every $y$ (first order dominance), equivalently $q_1(u \mid x) \geq q_0(u \mid x)$ for every $u$. It is at least as good for every increasing concave utility if and only if $\int_0^u q_1(v \mid x)\,dv \geq \int_0^u q_0(v \mid x)\,dv$ for every $u \in (0, 1]$ (second order dominance), a statement about the lower tail that does not require choosing $\mathcal{U}$ (Shaked and Shanthikumar 2007). Both compare marginal laws and need no coupling. Neither identifies the fraction of units helped, which the marginals bound but do not determine (Section~\ref{sec:ot}). The posterior probability of the inequality over the whole curve is computed draw by draw; pointwise bands on the quantile effect do not establish it.
+
+\section{Heterogeneity and the horseshoe}
+
+Shrinkage matters most for heterogeneity\index{heterogeneous treatment effects!and the horseshoe|textbf}. With $p$ covariates there are $p$ potential effect modifiers, most doing nothing. Writing $\tau(x) = \tau_0 + \sum_j \delta_j x_j$ with a horseshoe on $\delta_j$ gives a posterior that shrinks the many small modifiers toward zero and, through its heavy tails, leaves a strong modifier nearly unshrunk; a moderate modifier is still shrunk, as Chapter~\ref{ch:horseshoe} finds for confounders.
+
+The Bayesian causal forest\index{Bayesian causal forest} takes a related route with tree ensembles: a baseline forest $\mu_0(x)$ with the propensity as input, and a separate, more strongly regularized forest for $\tau(x)$, which encodes the judgement that effects vary less than outcomes. GenTE encodes it through its separate $\Delta$ head.
+
+The common thread is that heterogeneity is a sparse signal on top of a dense one. Outcomes depend on many covariates; the effect, in most applications, depends on a few, and a learner that treats the two symmetrically, fitting a treated surface and a control surface and subtracting, spends its capacity on the baseline and reports the noise of that subtraction as heterogeneity. The 401(k) analysis of Section~\ref{sec:deephd} uses a single quantile network with eligibility as an input, so it does not test this design, but it does show an effect of eligibility that moves with income and age.
+
+Report the posterior of each modifier: a horseshoe posterior that leaves $\delta_j$ near zero is a finding about covariate $j$, not a failure to find one.
+
+\section{Quantile regression as a likelihood}
+
+The check loss\index{check loss!as a likelihood|textbf} training GenTE's quantile heads\index{quantile regression|textbf} has a Bayesian reading. Yu and Moyeed observed in 2001 that minimizing $\sum_i \rho_u(y_i - q(x_i))$ is equivalent to maximizing the likelihood of an asymmetric Laplace distribution\index{quantile regression!asymmetric Laplace likelihood|textbf} with location $q(x)$:
+\[
+f_u(y \mid q) = u(1 - u)\exp\{-\rho_u(y - q)\}.
+\]
+The check loss identifies the true conditional quantile, but the spread of the posterior under this working likelihood is not calibrated, because the asymmetric Laplace is not the true conditional law. Sandwich corrections, or a Bayesian bootstrap\index{Bayesian bootstrap} of the check loss, aim to restore calibration. 
+
+The reading also clarifies what the network is doing. Minimizing the check loss at a randomly drawn level $u$ on every pass is, in expectation over $u$, maximizing a product of asymmetric Laplace likelihoods across all levels at once, and because the levels share one set of weights, the network is a joint model of the whole conditional law and not a collection of separate quantile regressions. The product is a working criterion, not the likelihood of one outcome; integrated over $u$, the same loss of a curve that increases in $u$ is half the continuous ranked probability score of the law the curve describes (Section~\ref{comp:sec:network}), a proper score for the whole distribution.
+
+Joint training shares information across quantile levels but does not prevent crossing. A monotone head, such as a cumulative sum of positive increments over a grid of $u$, rules out crossing by construction.
+
+\section{The Stefan Boltzmann application}
+
+The Stefan Boltzmann law states that the luminosity of a star is $L = 4\pi R^2\kappa T^4$, where $R$ is its radius, $T$ its surface temperature and $\kappa$ the Stefan Boltzmann constant. Temperature causes luminosity, and the law makes sharp predictions: the effect must be positive for every star and, for a given temperature contrast, scale with the emitting area $R^2$, so it should vary over orders of magnitude across stars of different sizes.
+
+The GenTE paper\index{GenTE!Stefan Boltzmann application|textbf} uses a public catalogue of 240 stars, 40 in each of six classes from brown dwarfs to hypergiants. Treatment is being hotter than the median temperature, the outcome is luminosity, and the covariates are radius and, in one specification, stellar colour and class. The example teaches an overlap lesson. Colour is nearly a deterministic function of temperature, and three of the six classes lie entirely on one side of the median, so with colour and class as covariates the propensity is zero or one for almost every star. The generalized random forest then returned negative effects for every star, with a median of about $-7.6 \times 10^4$ solar luminosities, a sign the law forbids; GenTE's stayed positive, but where overlap fails neither method estimates anything, only extrapolates. With radius alone, which varies within both temperature groups, both recovered the correct sign, and GenTE's estimates spanned five and a half orders of magnitude, ordered by stellar size, dwarfs smallest and supergiants and hypergiants largest, as the $R^2$ factor requires.
+
+ A physical law also gives an external standard no simulation can provide: the estimates lie where the law says they must.
+
+\section{Comparison with conformal prediction}
+
+Conformal methods\index{conformal prediction|textbf} give distribution free prediction intervals for individual outcomes, extended to individual treatment effects\index{individual treatment effect|textbf} by Lei and Cand\`es (2021), with marginal coverage under exchangeability\index{exchangeability} and no outcome model, given the propensity score. Their weakness is the converse of their strength: coverage is marginal over covariates, so an interval can have the right average coverage while undercovering some subgroups and overcovering others.
+
+The generative approach reports the conditional law itself, giving intervals for the outcome under either treatment at any covariate value, with coverage that depends on the model being adequate. The two are complementary: conformal calibration can check the generative model's intervals, and a failed check means the model needs work. But how the effect varies across people comes from the model, and a conformal interval around a poor model is valid on average and too wide to help.
+
+A posterior band and a conformal interval cover different objects, so their widths cannot be compared. The nominal 95\% band $[2.30, 3.91]$ thousand dollars for the lowest income quintile in the 401(k) analysis (Section~\ref{sec:deephd}) covers a mean effect and shrinks as the sample grows. A conformal interval for one household's effect must also cover the spread of individual effects among similar households, with validity averaged over households. That spread depends on the conditional covariance of $Y(1)$ and $Y(0)$, unidentified without a coupling (Section~\ref{sec:ot}). The conditional laws do determine outcome intervals for $Y(t)$ at a given $x$, which a conformal check can test.
+
+Use conformal checks as a diagnostic and the generative model as the report. Split off a calibration set and compute coverage of the model's outcome intervals within each arm and a few subgroups that matter for the decision, with binomial standard errors. If coverage is far from nominal, revise the model. This cheap check uses the learner's own intervals and assumes only independent draws from the training population. It tests the laws of $Y$ given $X = x$ and $T = t$, which equal those of $Y(t)$ given $X = x$ only under ignorability and overlap; it cannot test those assumptions.
+
+\section{Policy learning}
+
+Given the posterior of the conditional laws, the optimal policy of Chapter~\ref{ch:predictive} can be computed directly. The frequentist alternative, empirical welfare maximization\index{empirical welfare maximization|textbf}\index{EWM|see{empirical welfare maximization}}, chooses a policy from a restricted class to maximize a doubly robust estimate of welfare, as in Athey and Wager's (2021) work on policy learning\index{policy learning|textbf}, with regret\index{regret} bounds relative to the best policy in the class.
+
+The Bayesian policy maximizes posterior expected welfare within the permitted class, say simple rules clinicians can apply. The model first approach separates the scientific step, learning how outcomes depend on covariates and treatment, from the decision step, and lets each be done properly.
+
+Empirical welfare maximization cross fits its nuisances once, so a new policy class or a cost per treated unit reuses the same doubly robust scores; a utility not linear in the outcome, or a target such as a quantile or the lower tail, needs a new score and a new outcome regression, of $\mathcal{U}(Y)$ or of $\mathbf{1}(Y \leq y)$ on the covariates, unless the nuisance fitted is the whole conditional law. The Bayesian analyst fits the conditional laws once and evaluates any policy, cost and utility against the same posterior draws. In the 401(k) analysis of Section~\ref{sec:deephd}, a program that targets eligibility by income and one that targets it by age can both be read from the same 200 fits, and their posterior welfare compared directly, concave utilities included.
+
+Two rules whose posterior welfare difference, computed draw by draw, puts substantial mass on both sides of zero are not distinguished by the data, and a regret bound for the better one does not change that. We regard the comparison of posterior welfare across candidate rules, and not the optimality of the maximizer, as the output a decision maker should see.
+
+\section{Optimal transport and joint potential outcomes}\chlabel{ch:ot}\label{sec:ot}
+
+So far this chapter has concerned the marginal laws $F_0$ and $F_1$ of the potential outcomes. The fraction helped, the fraction harmed and the distribution of individual gains depend on their joint law\index{potential outcomes!joint law of|textbf}, a never observed coupling that the marginals bound without identifying, and whose posterior does not concentrate.
+
+Practitioners ask these questions most naturally and answer them most carelessly. A quantile treatment effect that is positive at every $u$ is routinely read as saying that everyone gains, and a zero average effect as saying that treatment does nothing, and neither reading follows from the marginals. Optimal transport\index{optimal transport|textbf} defines a canonical coupling, and a prior covers the rest.
+
+\subsection{The coupling problem}
+
+Suppose the marginals $F_0$ and $F_1$ are known exactly, as from an infinitely large randomized trial. The joint law $H$ of $(Y(0), Y(1))$\index{coupling!of potential outcomes|textbf} can be any law with these marginals\index{coupling|textbf}. By Sklar's theorem\index{Sklar theorem@Sklar's theorem},
+\[
+H(y_0, y_1) = C\{F_0(y_0), F_1(y_1)\}
+\]
+for some copula\index{copula|textbf} $C$, and every copula is possible. The data say nothing about $C$.
+
+\begin{theorem}[Fr\'echet and Hoeffding]
+Every copula satisfies
+\[
+\max(u + v - 1, 0) \leq C(u, v) \leq \min(u, v).
+\]
+The upper bound\index{Frechet Hoeffding bounds@Fr\'echet Hoeffding bounds} is the comonotone copula, under which $Y(1) = F_1^{-1}\{F_0(Y(0))\}$ when $F_0$ is continuous; the lower bound is the countermonotone copula.
+\end{theorem}
+
+The comonotone coupling\index{coupling!comonotone and countermonotone|textbf} is rank preservation\index{rank preservation|textbf}: a unit at the $u$ quantile under control stays there under treatment, so its individual effect equals the quantile treatment effect\index{quantile treatment effect} at that level. For a group action, Theorem~\ref{gr:thm:recon} makes every unit's effect the group effect on the chart scale. Rank preservation is often implicit and rarely defended. The countermonotone coupling sends the best off under control to the worst off under treatment. Though rarely plausible, it is as consistent with the data as any other copula.
+
+\paragraph{Bounds on the distribution of gains.} Let $\eta = Y(1) - Y(0)$ be the individual gain\index{individual gain|textbf}. Its distribution function $F_\eta$ is not identified, but it is bounded.
+
+\begin{theorem}[Makarov]
+For every $\delta$,
+\begin{align*}
+F_\eta(\delta) &\geq \sup_y \max\{F_1(y) - F_0(y - \delta), 0\},\\
+F_\eta(\delta) &\leq 1 + \inf_y \min\{F_1(y) - F_0(y - \delta), 0\},
+\end{align*}
+and, when $F_0$ and $F_1$ are continuous, the bounds\index{Makarov bounds|textbf} are pointwise sharp: each is the infimum or supremum of $F_\eta(\delta)$ over the joint laws with these margins.
+\end{theorem}
+
+Figure~\ref{fig:makarov} shows the bounds\index{fraction helped!bounds on|textbf} on $\Prob\{Y(1) > Y(0)\}$, the fraction helped\index{fraction helped|textbf}, when both marginals are normal with unit variance and the treated marginal is shifted by $s$. Even with a shift of one standard deviation, the fraction helped can be anywhere from about 0.38 to 1: 0.76 under independence, 1 under rank preservation, and only 0.69 under the countermonotone coupling, so the extreme copula does not give the extreme fraction helped. No amount of data can choose among these. An analyst who reports the fraction helped from a trial, without saying which coupling she assumed, has reported a number that could be replaced by any other in that interval on the same evidence.
+
+\paragraph{Covariates sharpen the bounds.} With identified conditional laws that are continuous for $Q$ almost every $x$, the coupling can be chosen separately at each $x$, so the sharp bounds on $F_\eta(\delta)$ are the conditional Makarov bounds, computed from $F_0(\cdot \mid x)$ and $F_1(\cdot \mid x)$ and then averaged over $Q(dx)$ (Makarov 1981; Kallus 2022). The result is never looser than the unconditional bounds. Let $X$ be 0 or 1 with probability one half, the control outcome uniform on $(10x, 10x + 0.1)$ and the treated outcome uniform on $(10x + 1, 10x + 1.1)$. Given $x$, every unit is helped. From the unconditional marginals alone the fraction helped can be anywhere from one half to one. In a posterior analysis the conditional bounds are computed within each draw of the conditional laws, so the band on each endpoint is distinct from the width of the identified interval. Chapter~\ref{ch:tianpearl} gives the binary case.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{makarov.pdf}
+\caption{Bounds on the fraction helped by treatment, with standard normal control outcomes and treated outcomes shifted by the amount on the horizontal axis. Independent and comonotone couplings are shown for comparison.}
+\label{fig:makarov}
+\end{figure}
+
+\subsection{Optimal transport}
+
+Optimal transport gives a principled way to pick a coupling, or a family of them, when one must. Given a cost $c(y_0, y_1)$, the Kantorovich problem is
+\[
+\min_{H \in \Pi(F_0, F_1)} \int c(y_0, y_1)\,dH(y_0, y_1),
+\]
+over all couplings $H$ with the given marginals.
+
+\begin{proposition}
+For real valued outcomes with finite means and any cost $c(y_0, y_1) = h(y_1 - y_0)$ with $h$ convex, the comonotone coupling is optimal.
+\end{proposition}
+
+\begin{proof}
+For convex $h$ the cost is submodular, and for submodular costs on the real line the monotone rearrangement is optimal. This is the classical result on monotone transport; see Villani (2009), and Exercise~\ref{ex:ch09:4} for a two point exchange argument.
+\end{proof}
+
+Rank preservation\index{rank preservation} minimizes the average convex cost of individual gains. Optimal transport\index{optimal transport} thus gives a canonical coupling, but no causal justification for it. The analyst must say whether she believes it.
+
+
+
+\subsection{A Bayesian treatment of the coupling}
+
+The Bayesian response to an unidentified parameter is to put a prior on it. For the coupling, a Gaussian copula\index{copula!Gaussian|textbf} with correlation $\rho$ is convenient:
+\[
+C_\rho(u, v) = \Phi_2\{\Phi^{-1}(u), \Phi^{-1}(v); \rho\}.
+\]
+Then $\rho = 1$ is rank preservation, $\rho = 0$ is independence, and $\rho = -1$ is the countermonotone coupling.
+
+The full posterior is $\pi(F_0, F_1, \rho \mid \text{data}) = \pi(F_0, F_1 \mid \text{data})\,\pi(\rho)$, since the data do not inform $\rho$ and the prior takes $\rho$ independent of $(F_0, F_1)$. A functional such as the fraction helped\index{fraction helped!posterior of|textbf} is computed draw by draw: for each draw of the marginals and $\rho$, compute $\Prob\{Y(1) > Y(0)\}$. Its posterior spread has a part from the marginals, which shrinks with $n$, and a part from $\rho$, which does not.
+
+\begin{proposition}
+Suppose $\rho$ is a priori independent of $(F_0, F_1)$, the likelihood depends on $(F_0, F_1)$ alone, the posterior of $(F_0, F_1)$ is consistent at the true marginals, and $\psi$ is continuous in $(F_0, F_1)$ for each $\rho$. As $n \to \infty$, the posterior of $\psi(F_0, F_1, \rho)$ converges weakly to the law of $\psi(F_0^*, F_1^*, \rho)$ with $\rho$ drawn from its prior, where $F_t^*$ are the true marginals.
+\end{proposition}
+
+This is Proposition~\ref{prop:partial} of Chapter~\ref{ch:tianpearl} with $\phi = (F_0, F_1)$ and $\xi = \rho$; Appendix~\ref{app:theory} gives the proof. A reader who disagrees can substitute her own prior and see at once how the answer changes.
+
+Take the setting of Figure~\ref{fig:makarov}: both marginals normal with unit variance, the treated one shifted by $s$, and a Gaussian copula. The gain $Y(1) - Y(0)$ is then normal with mean $s$ and variance $2 - 2\rho$, so the fraction helped is $\Phi\{s/\sqrt{2 - 2\rho}\}$. At $s = 1$, a uniform prior on $\rho \in [0, 1]$ gives a limiting posterior on $[0.76, 1]$ with median 0.84, and more data cannot narrow it. Even $\rho = -1$ gives only 0.69, against the Makarov lower bound of 0.38, so the Gaussian copula family is itself a restriction that the prior imposes.
+
+\paragraph{Where prior information about the coupling comes from.} The copula is not identified from a single experiment, but it is not beyond knowledge. In a crossover trial, units are observed under both treatments at different times, partly revealing the joint law under assumptions about carryover and time trends. In Student's (1931) twin design, one twin's control outcome informs the other's because identical twins share most determinants of $Y(0)$; within pair correlation constrains $\rho$. Earlier crossover or twin studies in the same field can supply strong priors on $\rho$. Rank preservation\index{rank preservation} is plausible if treatment adds a dose depending weakly on individual characteristics; if it switches some units into a different regime, it is not.
+
+\subsection{An empirical consideration}
+
+When panel data span a policy change affecting only some units, persistence among unaffected units can inform the copula\index{copula} prior: if persistence is high, rank preservation is plausible for the treated too, and a prior concentrated near $\rho = 1$ is defensible.
+
+Among unaffected units, compute the Spearman correlation $r_S$ of pre and post outcomes. Under a Gaussian copula, $\rho = 2\sin(\pi r_S/6)$ estimates rank persistence; its sampling uncertainty gives the prior width. Centre the prior there and widen it to allow treatment to disturb ranks more than time alone. For each posterior draw of the marginals and $\rho$, compute the fraction helped, fraction harmed\index{fraction harmed|textbf} and gain quantiles. Report these alongside the same functionals under rank preservation and independence, so the reader sees how much the prior supplies.
+
+Persistence among unaffected units concerns $Y(0)$ over time, so it informs $\rho$ without measuring the relation between $Y(0)$ and $Y(1)$. Treatment can break ranks that time preserves. At $\rho = 1$, each unit's gain equals the quantile effect at its rank (Exercise~\ref{ex:ch09:2}); concentrating a prior near that point nearly asserts the same and should be reported as such.
+
+\subsection{Brenier's theorem and multivariate outcomes}
+
+For real outcomes the monotone rearrangement solves every convex transport problem; for vector outcomes the analogue is Brenier's theorem\index{Brenier theorem@Brenier's theorem|textbf}.
+
+\begin{theorem}[Brenier]
+Let $\mu$ and $\nu$ be probability measures on $\R^d$ with finite second moments, and suppose $\mu$ is absolutely continuous. Then there is a convex function $\varphi$ whose gradient, unique $\mu$ almost everywhere, pushes $\mu$ forward to $\nu$, and the coupling $(X, \nabla\varphi(X))$ with $X \sim \mu$ is the unique optimal coupling for the squared Euclidean cost.
+\end{theorem}
+
+The gradient of a convex function generalizes a monotone map. For multivariate potential outcomes, such as blood pressure and cholesterol under a drug, Brenier's map couples each patient's untreated and treated vectors so as to move patients least in aggregate. Chernozhukov, Galichon, Hallin and Henry (2017) used this idea to define multivariate quantiles, and the same construction defines multivariate quantile treatment effect\index{quantile treatment effect}s. The caveat of the real valued case carries over unchanged: Brenier's map is the canonical coupling for the squared cost, not the true one, and a multivariate fraction helped computed from it rests on the multivariate form of rank preservation.
+
+\paragraph{Conditional transport and causal maps.} With covariates, a causal map is a family $\{T_x\}$ with $T_x$ pushing $F_0(\cdot \mid x)$ to $F_1(\cdot \mid x)$. We take $F_0(\cdot \mid x)$ continuous for each $x$ in what follows, so that such a map exists. Under rank preservation\index{rank preservation} conditional on $x$, the individual effect for a unit with covariates $x$ and untreated outcome $y_0$ is $T_x(y_0) - y_0$.
+
+Composing the learned treated quantile function with the untreated distribution function, the inverse of the learned $q_0$, gives the conditional map without another fit. With GenTE's $q_1 = q_0 + \Delta$,
+\[
+T_x(y_0) = q_1\{F_0(y_0 \mid x) \mid x\} = y_0 + \Delta\{F_0(y_0 \mid x) \mid x\}.
+\]
+Under rank preservation, then, the individual effect is the effect head evaluated at the unit's own conditional rank. A second route learns $T_x$ as the gradient in $y_0$ of an input convex neural network conditioned on $x$, minimizing transport cost subject to matching the treated conditional law. It enforces Brenier's structure and extends to vector outcomes, where quantile composition is unavailable. Either route inherits uncertainty from the conditional laws; a Bayesian bootstrap gives draws of $T_x$ and every functional of it.
+
+\subsection{Wasserstein effect measures}
+
+Optimal transport also summarizes the difference between treated and untreated laws\index{Wasserstein effect measure|textbf} without choosing a coupling. The $r$ Wasserstein distance\index{Wasserstein distance|textbf}, for $r \geq 1$,
+\[
+W_r(F_0, F_1) = \Bigl(\int_0^1 |q_1(u) - q_0(u)|^r\,du\Bigr)^{1/r}
+\]
+for real outcomes, is the size of the smallest individual effects consistent with the two marginals. Depending only on the marginals, it is identified.
+
+\begin{proposition}
+For outcomes with finite means and any coupling of $Y(0)$ and $Y(1)$, $\E|Y(1) - Y(0)| \geq W_1(F_0, F_1) \geq |\E Y(1) - \E Y(0)|$.
+\end{proposition}
+
+\begin{proof}
+The comonotone coupling is optimal for the convex cost $|y_1 - y_0|$ (the proposition above), and its cost is $\int_0^1 |q_1(u) - q_0(u)|\,du = W_1$ (Exercise~\ref{ex:ch09:2}), which gives the first inequality. Jensen's inequality under that coupling gives the second.
+\end{proof}
+
+This is an identified lower bound on how much treatment changes people. A treatment with zero average effect but large Wasserstein distance must change some people a great deal, in opposite directions. For real outcomes, $W_1 = \int_0^1 |\Delta(u)|\,du$, the area between the quantile functions. It equals the absolute average effect exactly when $\Delta(u)$ does not change sign. In the 401(k) analysis the curve is positive at every computed level, 0.05 to 0.95, so equality holds unless it changes sign between those levels or in the uncomputed tails. In the simulated trial of Figure~\ref{fig:qte}, the curve is zero below the median and positive above, so $W_1$ equals the average. A sign change, the one case that separates them, is when the average is most misleading.
+
+The identified gap $W_1(F_0, F_1) - |\E\{Y(1) - Y(0)\}|$ bounds $\E|Y(1) - Y(0)| - |\E\{Y(1) - Y(0)\}|$ from below and uses the same posterior draws. The bound can vanish despite large individual changes: if $Y(0)$ is Bernoulli with probability one half and $Y(1) = 1 - Y(0)$, the marginals coincide, $W_1$ and the average effect are zero, and every unit changes by one.
+
+\section{In practice}
+
+\paragraph{The target.} The targets are $\tau(x)$, $\Delta(u \mid x)$, the unconditional quantile effect, and the expected utility difference. Each posterior draw of $G$ gives draws of $q_0$ and $q_1$ at any $(u, x)$: integrating over $u$ gives conditional means, integrating over $x$ with any $Q$ gives marginals, and composing with $\mathcal{U}$ gives expected utilities, all from one fitted model. The fraction helped, the fraction harmed and the distribution of individual gains also depend on the coupling (Section~\ref{sec:ot}) and are computed draw by draw under a prior on it. The posterior mixes a part that concentrates and a part that does not, and the analyst reports both.
+
+\paragraph{What the analyst does differently.} An analyst who wants distributional effects states which functionals of the conditional laws the decision needs, and fits the laws rather than the functionals. She gives the baseline the propensity and keeps the effect as its own component, so that regularization pushes the effect toward homogeneity. She checks overlap before reading any estimate: the generalized random forest gave every star a negative effect when colour and class removed the overlap. She reports bands from refits under Dirichlet weights, says that they condition on the architecture, checks them for coverage on a simulated truth that resembles the data, and checks the model's outcome intervals by conformal coverage in the subgroups that matter. And she reports the quantile curve and the subgroup effects, not the average alone: in the 401(k) data, the average of 8.87 thousand dollars hides effects of 3.11 in the lowest income quintile and 18.15 in the highest.
+
+\paragraph{Against DML.} DML targets a mean, and for a mean it is adequate: with the interactive score, which estimates the same unweighted average as the generative model, the 401(k) estimates are 8.17 and 7.74 against the generative 8.87, each within one standard error of it. DML is also cheaper, since its interval comes from one pass of cross fitting. Quantile effects and lower tail protection under a concave utility are functionals of the conditional laws, and DML with mean nuisances needs a separate score and outcome fit for each (localized DML, Kallus, Mao and Uehara 2024, does this for quantile effects), where the posterior gives them all from the same draws. The fraction helped and the distribution of gains also depend on the coupling, which no method identifies from the marginals; the generative approach can carry a prior on it through the same draws. In the GenTE benchmarks the generative learner had the lowest error for the conditional average effect in 30 of 36 designs. The generative bands do not cover the error of the architecture: on simulated data they covered the quantile effects in only 68 to 85 percent of data sets when 200 irrelevant covariates were among the inputs, and the average effect in 15 percent when the truth lay outside the network family. Two hundred fits also cost more than one.
+
+\section*{Notes}
+
+The GenTE learner, benchmarks and star application are from Nareklishvili, Polson and Sokolov (2025). The earlier work reviewed in Section~\ref{sec:deephd} is their (2023a, 2023b, 2023c); the coupling analysis is their (2026b) working paper. For deep networks with valid inference see Farrell, Liang and Misra (2021). Sources for noise outsourcing, the check loss and the quantile network are in the Notes of Chapter~\ref{ch:computation}.
+
+Quantile treatment effects by inverse propensity weighting are Firpo's (2007), and Chernozhukov, Fern\'andez Val and Melly (2013) treat distributional effects in general as functionals of counterfactual distributions. Chernozhukov and Hansen (2004) estimate quantile effects with an instrument for 401(k) participation. Yu and Moyeed (2001) read the check loss as an asymmetric Laplace likelihood. The Bayesian bootstrap is Rubin's (1981) and its weighted version Newton, Polson and Xu's (2021); for the Dirichlet process behind Exercise~\ref{ex:ch08:5}, see Ferguson (1973).
+
+On the joint law of the potential outcomes, Sklar's theorem and the Fr\'echet and Hoeffding bounds are in Nelsen (2006), the bound on the distribution of gains is Makarov's (1981), and Heckman, Smith and Clements (1997) take up the distribution of gains in programme evaluation.  Brenier's theorem is Brenier (1991), and Chernozhukov, Galichon, Hallin and Henry (2017) turn it into multivariate quantiles. 
+
+
+
+\begin{exercises}
+\item\label{ex:ch08:3} Explain why the conditional quantile effect $q_1(u \mid x) - q_0(u \mid x)$ is not, in general, the $u$ quantile of the individual effect $Y(1) - Y(0)$ given $x$. Give a two point example.
+\item\label{ex:ch08:4} In the simulation of Figure~\ref{fig:qte}, compute the true average effect and compare it with the area under the true quantile effect curve on $(0, 1)$ and with the area of the part of that curve shown in the figure (levels 0.05 to 0.95).
+\item\label{ex:ch08:5} Show that, for a base law with a finite mean, the Bayesian bootstrap posterior of a mean is the limit in distribution of the Dirichlet process posterior of the mean as the concentration parameter tends to zero.
+\item\label{ex:ch08:6} For a positive outcome and the concave utility $\mathcal{U}(y) = \log y$, with the cost $k$ in utility units, derive the treatment rule in terms of the conditional laws and show that it can differ from the rule $\tau(x) > k$ that linear utility gives.
+\item\label{ex:ch08:7} Write a horseshoe model for linear effect modification and derive the Gibbs step for the modifier coefficients $\delta_j$.
+
+\item\label{ex:ch09:1} Verify the Makarov bounds in Figure~\ref{fig:makarov} at $s = 1$ by direct computation.
+\item\label{ex:ch09:2} Show that under the comonotone coupling the distribution of gains is the distribution of $F_1^{-1}(U) - F_0^{-1}(U)$, $U$ uniform.
+\item\label{ex:ch09:3} For normal marginals with unit variances and a Gaussian copula with correlation $\rho$, compute $\Prob\{Y(1) > Y(0)\}$ as a function of the mean shift and $\rho$.
+\item\label{ex:ch09:4} Show that the submodularity of $c(y_0, y_1) = h(y_1 - y_0)$ for convex $h$ implies optimality of the monotone coupling, using a two point exchange argument.
+\item\label{ex:ch09:5} In a crossover trial with no carryover and no period effect, show that the within subject correlation of the normal scores (equivalently the Spearman correlation through $\rho = 2\sin(\pi r_S/6)$) identifies $\rho$ under a Gaussian copula, and that for normal marginals it is the Pearson correlation of the two outcomes.
+\item\label{ex:ch09:6} Suppose a prior on $\rho$ is uniform on $[0, 1]$. Derive the distribution function of the limiting posterior of the fraction helped at $s = 1$, which the text describes only by its support and median, and use it to find the posterior mean and the probability that more than 90\% of units are helped. Compare the width of the posterior with that of the Makarov interval.
+\end{exercises}

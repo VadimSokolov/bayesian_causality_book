@@ -1,0 +1,435 @@
+\chapter{What Double Machine Learning Assumes}\label{ch:dml}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+Double machine learning estimates one effect while flexible learners fit the nuisance functions around it. A Neyman orthogonal score makes nuisance errors enter as products, and cross fitting removes overfitting bias. The main theorem gives root $n$ normal inference when the treatment keeps some variation after adjustment and the treatment error times the sum of the treatment and outcome errors is $o_p(n^{-1/2})$, a condition that includes the square of the treatment error. The partially linear score estimates a variance weighted average of effects, and its estimated denominator is not an overlap diagnostic.
+\end{tcolorbox}
+
+\section{The question DML answers}\label{sec:dml:question}
+
+A household survey records, for 9,915 households, whether the employer offers a 401(k) plan, the household's net financial assets\index{net financial assets|textbf}, and nine other characteristics: age, income, years of education, family size, and indicators for marriage, two earner households, a defined benefit pension, an individual retirement account and home ownership. Eligible households hold 19.6 thousand dollars more in financial assets than the others. Much of that gap is income. Richer households tend to work for employers who offer plans, and richer households hold more assets whatever a plan does. The analyst wants what is left of the gap once income and the other characteristics are held fixed, and she does not know the form in which they matter.
+
+Least squares with the nine characteristics entering linearly is the first thing to try. Chapter~\ref{ch:k401} shows that it leaves confounding behind: the estimate is 5.9 thousand dollars, against 9.8 when the nine characteristics are expanded into 54 terms. A flexible learner such as a lasso or a random forest can find the right form, but it converges slowly, and its error passes into the estimate of the effect.
+
+Double machine learning\index{double machine learning|textbf} (DML)\index{DML|see{double machine learning}} estimates a low dimensional causal parameter at the $\sqrt{n}$ rate while high dimensional nuisance functions are estimated by slowly converging flexible learners. Chernozhukov and coauthors (2018) do it by combining an estimating equation\index{estimating equation|textbf} insensitive to small nuisance errors with sample splitting to remove overfitting bias\index{overfitting bias|textbf}. The nuisance functions need no model. The learner is a black box, and all the theory asks of it is a rate of convergence in $L_2$.
+
+We try to be fair to the method. The criticism belongs to Chapter~\ref{ch:critique}.
+
+\section{The partially linear model and partialling out}\label{sec:dml:plm}
+
+If the covariates predicted eligibility exactly, households with the same characteristics would all have the same status, and nothing would be left to compare. The effect can only be learned from the part of treatment that the covariates do not explain. Robinson's (1988) partially linear model\index{partially linear model|textbf} puts this part at the center,
+\begin{align}
+Y &= \tau T + g(X) + \varepsilon, & \E(\varepsilon \mid X, T) &= 0, \label{eq:plm1}\\
+T &= m(X) + \nu, & \E(\nu \mid X) &= 0. \label{eq:plm2}
+\end{align}
+The target is $\tau$, with true value $\tau_0$; the nuisance functions\index{nuisance function|textbf}\index{nuisance parameter|see{nuisance function}} are $g$ and $m$, with $m(x) = e(x)$ for a binary treatment\index{propensity score}. The condition $\E(\varepsilon \mid X, T) = 0$ makes the unexplained treatment $\nu$ exogenous, identifying $\tau_0$ from how $Y$ moves with $\nu$.
+
+The naive approach estimates $g$ by a machine learner, say a lasso or a random forest, then regresses $Y - \hat g(X)$ on $T$. This fails: regularization biases\index{regularization bias|textbf} $\hat g$, and since $T$ is correlated with $X$ the bias leaks into the estimate of $\tau$. The leak is of the order of the error in $\hat g$, slower than $n^{-1/2}$ for high dimensional learners, so the naive estimator is not $\sqrt{n}$ consistent.
+
+Robinson's insight was to partial out\index{partialling out|textbf}\index{Robinson, Peter M.!partialling out|textbf} $X$ from both $Y$ and $T$. Define $\ell(X) = \E(Y \mid X) = \tau m(X) + g(X)$. Then
+\[
+Y - \ell(X) = \tau \{T - m(X)\} + \varepsilon,
+\]
+and $\tau$ is the coefficient in a regression of one residual on the other. With fitted $\hat\ell$ and $\hat m$ in place of the truth the residuals are $\hat V_{Y,i} = Y_i - \hat\ell(X_i)$ and $\hat V_{T,i} = T_i - \hat m(X_i)$, and the estimator has a closed form,
+\begin{equation}
+\hat\tau = \frac{\sum_{i=1}^n \hat V_{T,i}\,\hat V_{Y,i}}{\sum_{i=1}^n \hat V_{T,i}^2}.
+\label{eq:dml:ratio}
+\end{equation}
+Errors in $\hat\ell$ and $\hat m$ now cost the estimate only at second order, a statement that Section~\ref{sec:dml:exact} makes exact.
+
+ A household whose eligibility the covariates predict well has a small $\hat V_{T,i}$ and adds little; the estimate is built from the households that the covariates leave undecided. The denominator measures how many such households there are. Its population version is $J_0 = \E\nu^2 = \E\,\mathrm{Var}(T \mid X)$, which for a binary treatment equals $\E[e(X)\{1 - e(X)\}]$ and shrinks as propensities approach zero or one. This is the content of overlap\index{overlap}: a household whose treatment status is nearly determined by its covariates has no comparable household with the other status. When $J_0$ is small the estimator divides by a number near zero, and a small error in the numerator becomes a large error in $\hat\tau$. Section~\ref{sec:dml:thm} states the overlap requirement, and Chapter~\ref{ch:critique} shows what happens as it fails (Proposition~\ref{crit:prop:dufour}).
+
+\section{Scores and Neyman orthogonality}\label{sec:dml:score}
+
+Suppose the outcome error $\delta_g = \hat g - g$ lines up with the part of treatment the covariates explain. The plug in estimator, which regresses $Y - \hat g(X)$ on $T$, attributes the misfit to treatment: to first order it moves by $-\E\{m(X)\,\delta_g(X)\}/\E(T^2)$, which shrinks no faster than the learner's own error. A score is Neyman orthogonal\index{Neyman orthogonality!and bias|textbf} when no such first order term exists (Neyman\index{Neyman, Jerzy!orthogonal scores|textbf} 1959).
+
+\begin{definition}[Neyman orthogonal score]
+Let $\psi(W; \tau, \eta)$ be a score function of the data $W$, the target $\tau$ and a nuisance parameter $\eta$, with $\E\psi(W; \tau_0, \eta_0) = 0$ at the truth. The score is Neyman orthogonal\index{Neyman orthogonality|textbf}\index{orthogonal score|see{Neyman orthogonality}}\index{orthogonal moment|see{Neyman orthogonality}} if the G\^ateaux derivative\index{Gateaux derivative|textbf} with respect to $\eta$ vanishes at the truth:
+\[
+\left.\frac{\partial}{\partial r} \E\, \psi\bigl(W; \tau_0, \eta_0 + r(\eta - \eta_0)\bigr)\right|_{r=0} = 0
+\]
+for all $\eta$ in a suitable neighbourhood.
+\end{definition}
+
+For the partially linear model the Robinson score, with nuisance parameter $\eta = (\ell, m)$, is
+\begin{equation}
+\psi(W; \tau, \ell, m) = \{Y - \ell(X) - \tau(T - m(X))\}\{T - m(X)\}.
+\label{eq:robscore}
+\end{equation}
+We write $\delta_m = \hat m - m$ and $\delta_\ell = \hat\ell - \ell$ for the errors of the fitted nuisance functions\index{nuisance function}, and $\|f\| = \{\E f(X)^2\}^{1/2}$ and $\langle f, h\rangle = \E f(X)h(X)$ for a function of the covariates held fixed while $X$ is a fresh draw.
+
+\begin{proposition}\label{dml:prop:orth}
+Let $\delta_\ell$ and $\delta_m$ be square integrable functions of $X$, and let $\varepsilon$ and $\nu$ have finite second moments. Under \eqref{eq:plm1} and \eqref{eq:plm2}, for every $r$,
+\[
+\E\,\psi\bigl(W; \tau_0, \ell + r\delta_\ell, m + r\delta_m\bigr) = r^2\,\E\bigl[\delta_m(X)\{\delta_\ell(X) - \tau_0\delta_m(X)\}\bigr].
+\]
+In particular the score \eqref{eq:robscore} is Neyman orthogonal\index{Neyman orthogonality}, and its second order remainder is the product of the error in $m$ with the error in $g = \ell - \tau_0 m$.
+\end{proposition}
+
+\begin{proof}
+At the perturbed nuisance functions,
+\[
+\psi = (\varepsilon - r\delta_\ell + r\tau_0\delta_m)(\nu - r\delta_m).
+\]
+The constant and linear terms have mean zero by $\E(\varepsilon \mid T, X) = 0$ and $\E(\nu \mid X) = 0$, leaving the stated quadratic term.
+\end{proof}
+
+The expected score is exactly quadratic in the perturbation, with a product coefficient that also governs estimator bias (Section~\ref{sec:dml:exact}). Since the score is linear in $\tau$, setting its sample average to zero gives \eqref{eq:dml:ratio} and an exact error identity.
+
+\begin{table}[ht]
+\centering
+\caption{Orthogonal scores used in this book. The functions $\ell$, $m$ and $\zeta$ are evaluated at $X$.}
+\label{tab:dml:scores}
+\small
+\begin{tabular}{L{1.4in}L{2.7in}}
+\toprule
+Model and target & Score $\psi(W; \tau, \eta)$ and nuisance functions \\
+\midrule
+Partially linear, constant effect $\tau$ & $\{Y - \ell - \tau(T - m)\}\{T - m\}$ \newline with $\ell = \E(Y \mid X)$ and $m = \E(T \mid X)$ \\
+\addlinespace
+Interactive, $\tau = \E\{\mu_1(X) - \mu_0(X)\}$ & augmented score \eqref{eq:aipw} \newline with $\mu_1$, $\mu_0$ and $e$ \\
+\addlinespace
+Partially linear with an instrument $Z$ (Chapter~\ref{ch:iv}) & $\{Y - \ell - \tau(T - m)\}\{Z - \zeta\}$ \newline with $\ell$, $m$ and $\zeta = \E(Z \mid X)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The instrumental variable score\index{double machine learning!instrumental variable score|textbf} in Table~\ref{tab:dml:scores}\index{Neyman orthogonality!table of scores|textbf} identifies $\tau$ when $Z$ is a valid instrument given $X$ and $\E\{(T - m)(Z - \zeta)\} \neq 0$. All three scores are orthogonal: Exercises~\ref{ex:ch04:2} and~\ref{ex:ch04:10} check the augmented score, and the proof of Proposition~\ref{dml:prop:orth} gives the instrumental variable score with $Z - \zeta$ replacing $T - m$ in the second factor and $\E(\varepsilon \mid Z, X) = 0$ replacing $\E(\varepsilon \mid T, X) = 0$.
+
+Orthogonality does not make nuisance errors harmless; it makes their effect second order, and a second order term can still be larger than $n^{-1/2}$.
+
+A close relative is the debiased, or desparsified, lasso\index{debiased lasso|textbf} of Zhang and Zhang (2014), van de Geer and coauthors (2014), and Javanmard and Montanari (2014). In the linear model $Y = X\beta + \varepsilon$ with $p > n$, the lasso estimate $\hat\beta$ is biased by shrinkage, and the debiased estimate adds a one step correction,
+\[
+\tilde\beta = \hat\beta + \frac{1}{n}\hat\Theta X^\top(Y - X\hat\beta),
+\]
+where $\hat\Theta$ approximates the inverse covariance of $X$. Each coordinate of $\tilde\beta$ is asymptotically normal under sparsity conditions. The correction is Neyman orthogonalization\index{Neyman orthogonality} applied coordinate by coordinate. For the treatment coefficient the relevant row of $\hat\Theta$ is, up to scaling by the inverse residual variance, the vector that forms the residual in a regression of $T$ on the other covariates, so the correction is a residualized regression, as in Robinson's partialling out.
+
+\section{Cross fitting and the algorithm}\label{sec:dml:cf}
+
+A random forest\index{random forest|textbf} fitted to all 9,915 households predicts them too well, because it has seen their outcomes: its residuals are too small and correlated with the noise that the score averages. Orthogonality does not remove this overfitting bias\index{overfitting bias}, which for flexible learners can be large. Cross fitting does. It splits the sample\index{sample splitting|see{cross fitting}} into $K$ folds $I_1, \dots, I_K$, fits $\hat\eta^{(-k)}$ outside $I_k$ and evaluates the score inside it. Each observation's score uses nuisance estimates independent of it, so the overfitting term has mean zero. The box gives the partially linear algorithm\index{cross fitting!algorithm|textbf}\index{double machine learning!algorithm|textbf}.
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=Algorithm: cross fitted DML in the partially linear model,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+\begin{enumerate}[leftmargin=*,itemsep=2pt,topsep=2pt]
+\item Choose learners for $\ell(x) = \E(Y \mid X = x)$ and $m(x) = \E(T \mid X = x)$, the number of folds $K$, and the number of repetitions $S$.
+\item Draw a random partition of the $n$ observations into folds $I_1, \dots, I_K$ of nearly equal size.
+\item For each fold $k$, fit $\hat\ell^{(-k)}$ and $\hat m^{(-k)}$ using only the observations outside $I_k$. For every $i \in I_k$ compute $\hat V_{T,i} = T_i - \hat m^{(-k)}(X_i)$ and $\hat V_{Y,i} = Y_i - \hat\ell^{(-k)}(X_i)$.
+\item Pooled estimate (DML2): $\hat\tau = \sum_i \hat V_{T,i}\hat V_{Y,i} \big/ \sum_i \hat V_{T,i}^2$, with both sums over all $n$ observations. Fold wise estimate (DML1): the same ratio within each fold, then the average of the $K$ ratios.
+\item Standard error: put $\hat\varepsilon_i = \hat V_{Y,i} - \hat\tau\hat V_{T,i}$ and $\widehat{\mathrm{se}} = \bigl\{\sum_i \hat V_{T,i}^2\hat\varepsilon_i^2\bigr\}^{1/2} \big/ \sum_i \hat V_{T,i}^2$.
+\item Repeat steps 2 to 5 for $S$ random partitions, giving estimates $\hat\tau_s$ and standard errors $\widehat{\mathrm{se}}_s$. Report the median $\tilde\tau$ of the $\hat\tau_s$ and the standard error $\bigl[\mathrm{median}_s\{\widehat{\mathrm{se}}_s^2 + (\hat\tau_s - \tilde\tau)^2\}\bigr]^{1/2}$, which adds each partition's squared distance from the median to its squared standard error.
+\end{enumerate}
+\end{tcolorbox}
+
+The two versions of step 4 (Chernozhukov and coauthors 2018) differ in their weights: DML2 averages the fold ratios $\hat\tau_k$ with weights proportional to $\sum_{i \in I_k}\hat V_{T,i}^2$, while DML1 uses $1/K$. They have the same limit and differ in a sample when treatment variation and fold ratios differ across folds.
+
+Table~\ref{tab:dml:six} shows the difference on six observations and two folds. The example was constructed for this chapter and no data set lies behind it. We chose the disturbances $\nu_i$ and $\varepsilon_i$ and the nuisance errors $\delta_{m,i} = \hat m(X_i) - m(X_i)$ and $\delta_{\ell,i} = \hat\ell(X_i) - \ell(X_i)$ directly, with $\tau_0 = 1$, and computed the residuals an analyst would see. In fold 2 the treatment fit runs too high by one unit for two of the three households, which leaves residuals of $\pm 0.5$ and a denominator of 0.75, against 11.25 in fold 1. DML1 gives the fold estimates 1.200 and 1.667 equal weight and returns 1.433. DML2 gives them the weights 0.9375 and 0.0625 and returns 1.229, the estimate that Section~\ref{sec:dml:exact} takes apart.
+
+\begin{table}[ht]
+\centering
+\caption{A constructed example with six observations, two folds and $\tau_0 = 1$. The first four value columns are known only because we built the example; an analyst sees $\hat V_{T,i} = \nu_i - \delta_{m,i}$ and $\hat V_{Y,i} = \tau_0\nu_i + \varepsilon_i - \delta_{\ell,i}$. DML1 averages the fold ratios $13.5/11.25 = 1.200$ and $1.25/0.75 = 1.667$ to 1.433. DML2 divides the pooled sums, $14.75/12 = 1.229$.}
+\label{tab:dml:six}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{rrrrrrrrr}
+\toprule
+$i$ & $\nu_i$ & $\varepsilon_i$ & $\delta_{m,i}$ & $\delta_{\ell,i}$ & $\hat V_{T,i}$ & $\hat V_{Y,i}$ & $\hat V_T\hat V_Y$ & $\hat V_T^2$ \\
+\midrule
+\multicolumn{9}{l}{Fold 1} \\
+1 & $1.5$ & $-0.5$ & $0.5$ & $0.5$ & $1.0$ & $0.5$ & $0.50$ & $1.00$ \\
+2 & $-1.5$ & $-1.0$ & $1.0$ & $1.5$ & $-2.5$ & $-4.0$ & $10.00$ & $6.25$ \\
+3 & $-1.0$ & $1.0$ & $1.0$ & $1.5$ & $-2.0$ & $-1.5$ & $3.00$ & $4.00$ \\
+\multicolumn{7}{r}{sums, fold 1} & $13.50$ & $11.25$ \\
+\addlinespace
+\multicolumn{9}{l}{Fold 2} \\
+4 & $1.5$ & $1.0$ & $1.0$ & $1.5$ & $0.5$ & $1.0$ & $0.50$ & $0.25$ \\
+5 & $1.5$ & $0.5$ & $1.0$ & $1.0$ & $0.5$ & $1.0$ & $0.50$ & $0.25$ \\
+6 & $-0.5$ & $-0.5$ & $0.0$ & $-0.5$ & $-0.5$ & $-0.5$ & $0.25$ & $0.25$ \\
+\multicolumn{7}{r}{sums, fold 2} & $1.25$ & $0.75$ \\
+\midrule
+\multicolumn{7}{r}{pooled sums} & $14.75$ & $12.00$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The number of folds trades the quality of the fits against their cost. Each fit uses a share $(K-1)/K$ of the sample, 80 percent at $K = 5$ and 50 percent at $K = 2$, and each learner is fitted $K$ times. Cross fitting also adds randomness that has nothing to do with the data: different partitions give different estimates. Under the hypotheses of Theorem~\ref{dml:thm:main} the differences vanish at first order, but in a finite sample they need not be small. Chernozhukov and coauthors recommend repeating the procedure over several partitions and reporting the median, with a variance that adds the spread across partitions (step 6 of the box). The standard error of a single partition omits this spread. Theorem~\ref{crit:thm:single} says what a single split leaves out; under cross fitting Proposition~\ref{crit:prop:cfvar} gives only a variance identity, and the simulations after it show the part left to the cross term depending on the number of folds and changing sign. How many partitions to use depends on cost and on how far the estimate moves; in the 401(k) analysis of Chapter~\ref{ch:k401} we used 20 for the lasso and 5 for the forest.
+
+\section{The error, exactly}\label{sec:dml:exact}
+
+In Table~\ref{tab:dml:six} the pooled estimate is 1.229 and the true effect is 1, an error of 0.229. Because the example was built from known pieces, the error can be traced to its sources\index{error decomposition|textbf}\index{double machine learning!error decomposition|textbf}, and the identity that does it holds for any data set and any nuisance fits. We write $\delta_{m,i}$ and $\delta_{\ell,i}$ for the errors of the fits\index{nuisance function!estimation error of|textbf} applied to observation $i$, each fit being the one that did not use that observation.
+
+\begin{lemma}[Exact decomposition]\label{dml:lem:exact}
+Under \eqref{eq:plm1} and \eqref{eq:plm2}, for any nuisance fits and with no approximation\index{error decomposition}, the pooled estimator \eqref{eq:dml:ratio} satisfies
+\begin{equation}
+\hat\tau - \tau_0 = \frac{S_n + C_n + B_n}{\hat J_n}, \qquad \hat J_n = \frac{1}{n}\sum_{i=1}^n \hat V_{T,i}^2,
+\label{eq:dml:exact}
+\end{equation}
+where
+\begin{align*}
+S_n &= \frac{1}{n}\sum_i \nu_i\varepsilon_i, \\
+C_n &= \frac{1}{n}\sum_i \bigl(\tau_0\nu_i\delta_{m,i} - \nu_i\delta_{\ell,i} - \varepsilon_i\delta_{m,i}\bigr), \\
+B_n &= \frac{1}{n}\sum_i \bigl(\delta_{m,i}\delta_{\ell,i} - \tau_0\delta_{m,i}^2\bigr).
+\end{align*}
+\end{lemma}
+
+\begin{proof}
+With $\hat V_{T,i} = \nu_i - \delta_{m,i}$ and $\hat V_{Y,i} = \tau_0\nu_i + \varepsilon_i - \delta_{\ell,i}$, \eqref{eq:dml:ratio} gives
+\[
+\hat\tau - \tau_0 = \frac{n^{-1}\sum_i(\nu_i - \delta_{m,i})(\varepsilon_i - \delta_{\ell,i} + \tau_0\delta_{m,i})}{\hat J_n}.
+\]
+Expanding the numerator gives $S_n + C_n + B_n$.
+\end{proof}
+
+$S_n$ is the oracle term, the numerator with the nuisance functions known, and $\sqrt{n}\,S_n$ is asymptotically normal with variance $\E(\nu^2\varepsilon^2)$. $C_n$ pairs fresh noise with nuisance error. Under cross fitting its summands have mean zero given the fit, which turns a bias into a contribution to the variance, and that is all cross fitting buys. $B_n$ contains no noise. It is a bias, it does not average away, and the rate condition has to control it. Its product structure is a mixed bias\index{mixed bias|textbf} in the sense of Rotnitzky, Smucler and Robins (2021).
+
+\begin{table}[ht]
+\centering
+\caption{The decomposition of Lemma~\ref{dml:lem:exact} for the six observations of Table~\ref{tab:dml:six}, with $s_i = \nu_i\varepsilon_i$, $c_i = \tau_0\nu_i\delta_{m,i} - \nu_i\delta_{\ell,i} - \varepsilon_i\delta_{m,i}$ and $b_i = \delta_{m,i}\delta_{\ell,i} - \tau_0\delta_{m,i}^2$. The two right hand columns agree row by row. Means over the six observations are $S_n$, $C_n$ and $B_n$.}
+\label{tab:dml:decomp}
+\small
+\begin{tabular}{rrrrrr}
+\toprule
+$i$ & $s_i$ & $c_i$ & $b_i$ & $s_i + c_i + b_i$ & $\hat V_{T,i}(\hat V_{Y,i} - \tau_0\hat V_{T,i})$ \\
+\midrule
+1 & $-0.75$ & $0.25$ & $0.00$ & $-0.50$ & $-0.50$ \\
+2 & $1.50$ & $1.75$ & $0.50$ & $3.75$ & $3.75$ \\
+3 & $-1.00$ & $-0.50$ & $0.50$ & $-1.00$ & $-1.00$ \\
+4 & $1.50$ & $-1.75$ & $0.50$ & $0.25$ & $0.25$ \\
+5 & $0.75$ & $-0.50$ & $0.00$ & $0.25$ & $0.25$ \\
+6 & $0.25$ & $-0.25$ & $0.00$ & $0.00$ & $0.00$ \\
+\midrule
+sum & $2.25$ & $-1.00$ & $1.50$ & $2.75$ & $2.75$ \\
+mean & $0.375$ & $-0.167$ & $0.250$ & $0.458$ & $0.458$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:dml:decomp} evaluates the three terms. They are $S_n = 0.375$, $C_n = -0.167$ and $B_n = 0.250$, which add to 0.458. The denominator is $\hat J_n = 12/6 = 2.000$, and $0.458/2.000 = 0.229$ is the error of the pooled estimate. With known nuisance functions the denominator would have been $n^{-1}\sum_i\nu_i^2 = 1.708$ and the error $S_n/1.708 = 0.220$. The nuisance errors raised the numerator by 22 percent and the denominator by 17 percent, and the ratio moved from 0.220 to 0.229.
+
+Averaging the numerator and the denominator of the identity separately over the data, with the fits taken as given, gives the bias.
+
+\begin{corollary}[Two channels]\label{dml:cor:channels}
+Assume $J_0 > 0$ and that $\nu$, $\varepsilon$, $\delta_m$ and $\delta_\ell$ have finite second moments. Let the fits for fold $k$ use only observations outside fold $k$, with $\|\cdot\|$ and $\langle\cdot,\cdot\rangle$ taken over a fresh draw of $X$ and the fits held fixed. Conditional on the fits, fold by fold,
+\[
+\E(C_n) = 0, \quad \E(B_n) = \langle\delta_m, \delta_\ell\rangle - \tau_0\|\delta_m\|^2, \quad \E(\hat J_n) = J_0 + \|\delta_m\|^2,
+\]
+and, when the fits are held fixed as $n$ grows, $\hat\tau - \tau_0$ converges in probability to
+\begin{equation}
+\frac{\langle\delta_m, \delta_\ell\rangle - \tau_0\|\delta_m\|^2}{J_0 + \|\delta_m\|^2},
+\label{eq:dml:twochannel}
+\end{equation}
+which we call the bias of $\hat\tau$ at the realized fits\index{error decomposition!two channels|textbf}. With fold specific errors, $\langle\delta_m, \delta_\ell\rangle$ and $\|\delta_m\|^2$ in these displays are averages over folds weighted by fold size, taken separately in the numerator and the denominator of \eqref{eq:dml:twochannel}.
+\end{corollary}
+
+\begin{proof}
+For $i$ in fold $k$ the observation is independent of the fit $\hat\eta^{(-k)}$, so $\delta_{m,i}\delta_{\ell,i}$ and $\delta_{m,i}^2$ have conditional means $\langle\delta_m, \delta_\ell\rangle$ and $\|\delta_m\|^2$. The summands of $C_n$ have mean zero because $\E(\nu_i \mid X_i) = \E(\varepsilon_i \mid T_i, X_i) = 0$. Finally $\hat V_{T,i}^2 = \nu_i^2 - 2\nu_i\delta_{m,i} + \delta_{m,i}^2$ has conditional mean $J_0 + \|\delta_m\|^2$. The conditioning is fold by fold on purpose, because conditioning on all $K$ fits at once would be wrong: every observation helps train the fits of the other folds. With the fits held fixed, finite second moments give fold wise laws of large numbers for $S_n$, $C_n$, $B_n$ and $\hat J_n$. Since $\E S_n = 0$ and $J_0 + \|\delta_m\|^2 > 0$, the error ratio converges to \eqref{eq:dml:twochannel}.
+\end{proof}
+
+The cross channel $\langle\delta_m, \delta_\ell\rangle$ and the own square channel $\tau_0\|\delta_m\|^2$ enter with opposite signs, so reducing one can raise the net bias. Since $\delta_\ell - \tau_0\delta_m$ is the error in the implied estimate of $g = \ell - \tau_0 m$, the numerator of \eqref{eq:dml:twochannel} is $\langle\delta_m, \delta_\ell - \tau_0\delta_m\rangle$, as in Proposition~\ref{dml:prop:orth}. The sample denominator $\hat J_n$ estimates $J_0 + \|\delta_m\|^2$, overstating overlap by the squared treatment error; it is not an overlap diagnostic. In the example it is 2.000 against 1.708 for the oracle.
+
+The corollary states a limit in probability and not a mean, because a ratio need not have a finite mean. For a single split, with the fits trained on one part of the sample and the estimator computed on the other, the display is also the leading term of the conditional mean of $\hat\tau - \tau_0$ given the fits, when the nuisance errors have fourth moments bounded by a multiple of the squared second moments, $\E\delta^4 \le C\|\delta\|^4$, and $\nu$ has a bounded density given $X$, which keeps the mean finite. Polson and Sokolov (2026b) prove that version with an explicit remainder (Theorem~\ref{crit:thm:single}). Under cross fitting no such conditional statement is available, for the reason given at the end of the proof above, and nothing else in this chapter uses it.
+
+Figure~\ref{fig:orthbias} shows the trade in a case simple enough to compute. Take $X \sim N(0,1)$, $T = X + \nu$ and $Y = \tau T + X + \varepsilon$ with standard normal $\nu$ and $\varepsilon$ and $\tau = 1$, so that $m(x) = g(x) = x$, and perturb the nuisance functions by $c\,x$: $\hat m = m + cx$ and $\hat g = g + cx$, which makes $\hat\ell = \tau\hat m + \hat g$ err by $2cx$. The plug in estimator regresses $Y - \hat g(X)$ on $T$, and its bias is $-c\,\E(TX)/\E(T^2) = -c/2$, linear in $c$. For the orthogonal estimator $\delta_m = cx$ and $\delta_\ell - \tau\delta_m = cx$, so \eqref{eq:dml:twochannel} gives $c^2/(1 + c^2)$, where $1 + c^2$ is the denominator $J_0 + \|\delta_m\|^2$ with $J_0 = 1$. At $c = 0.2$ the formulas give $-0.100$ and $0.038$. The figure draws one sample of 200,000 observations from this model and computes both estimators on it at 41 values of $c$ evenly spaced from $-0.5$ to $0.5$; at $c = 0.2$ their errors are $-0.097$ and $0.037$. Halving the nuisance error halves the first bias and, for small $c$, quarters the second.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{orth_bias.pdf}
+\caption{Error of the plug in and orthogonal estimators of $\tau$ in one sample of 200,000 observations when the nuisance functions are perturbed by $c\,x$. Left: both estimators. Right: the orthogonal error, with the curve $c^2$ for comparison.}
+\label{fig:orthbias}
+\end{figure}
+
+
+
+\section{The main theorem and what it assumes}\label{sec:dml:thm}
+
+Software returns an estimate and an interval, and the interval is a claim about coverage. The theorem behind that claim has hypotheses the analyst cannot inspect.
+
+\begin{theorem}[Chernozhukov and coauthors, 2018, partially linear model]\label{dml:thm:main}
+Let $(Y_i, T_i, X_i)$, $i = 1, \dots, n$, be independent draws from \eqref{eq:plm1} and \eqref{eq:plm2}, cross fitted with $K$ folds of equal size\index{double machine learning!main theorem|textbf}, and suppose that
+\begin{enumerate}[label=(\roman*),leftmargin=*,itemsep=1pt,topsep=2pt]
+\item (moments) $\E(\varepsilon^2 \mid T, X) \le \bar\sigma^2$ and $\E(\nu^2 \mid X) \le \bar\sigma^2$ for a constant $\bar\sigma$, and $\E(\nu^2\varepsilon^2) > 0$;
+\item (overlap) $J_0 = \E\nu^2 = \E\,\mathrm{Var}(T \mid X) > 0$;
+\item (cross fitting) $K$ is fixed, and the fits $\hat\ell^{(-k)}$ and $\hat m^{(-k)}$ use only observations outside fold $k$;
+\item (consistency) $\|\delta_m\| + \|\delta_\ell\| = o_p(1)$ for the fits of every fold;
+\item (rate) $\|\delta_m\|\bigl(\|\delta_m\| + \|\delta_\ell\|\bigr) = o_p(n^{-1/2})$ for the fits of every fold.
+\end{enumerate}
+Then the pooled estimator \eqref{eq:dml:ratio} satisfies $\sqrt{n}(\hat\tau - \tau_0) \Rightarrow N(0, \sigma^2)$\index{asymptotic normality|textbf} with
+\[
+\sigma^2 = \frac{\E(\nu^2\varepsilon^2)}{J_0^2},
+\]
+and so does the fold wise estimator DML1.
+\end{theorem}
+
+\begin{proof}
+By Lemma~\ref{dml:lem:exact}, $\sqrt{n}(\hat\tau - \tau_0) = (\sqrt{n}S_n + \sqrt{n}C_n + \sqrt{n}B_n)/\hat J_n$, and we take the pieces in turn. The $\nu_i\varepsilon_i$ are independent with mean zero and variance $\E(\nu^2\varepsilon^2) \le \bar\sigma^2 J_0$, so the central limit theorem gives $\sqrt{n}S_n \Rightarrow N(0, \E\nu^2\varepsilon^2)$.
+
+Fix a fold $k$ and condition on its fit, with errors $\delta_m$ and $\delta_\ell$. The summands of $C_n$ in this fold are independent with mean zero. Because $\nu$ is a function of $(T, X)$, $\E(\nu\varepsilon \mid X) = 0$, and the second moment of a summand given $X$ is $(\tau_0\delta_m - \delta_\ell)^2\E(\nu^2 \mid X) + \delta_m^2\E(\varepsilon^2 \mid X) \le \bar\sigma^2\{(\tau_0\delta_m - \delta_\ell)^2 + \delta_m^2\}$. The conditional variance of $\sqrt{n}$ times the fold's part of $C_n$ is therefore at most $\bar\sigma^2(\|\tau_0\delta_m - \delta_\ell\|^2 + \|\delta_m\|^2)$, which is $o_p(1)$ by (iv), and Chebyshev's inequality given the fit makes that part $o_p(1)$.
+
+For $B_n$, the Cauchy and Schwarz inequality\index{Cauchy Schwarz inequality|textbf} gives $\E|\delta_m\delta_\ell - \tau_0\delta_m^2| \le \max(1, |\tau_0|)\,\|\delta_m\|(\|\delta_m\| + \|\delta_\ell\|)$. By (v), the conditional absolute mean of the fold's part of $\sqrt{n}B_n$ is $o_p(1)$, so Markov's inequality makes it $o_p(1)$.
+
+Finally $\hat J_n = n^{-1}\sum_i\nu_i^2 - 2n^{-1}\sum_i\nu_i\delta_{m,i} + n^{-1}\sum_i\delta_{m,i}^2$. The first term tends to $J_0$ by the law of large numbers\index{law of large numbers|textbf}. The third has conditional mean $\|\delta_m\|^2$ and tends to zero. The second has conditional mean zero and conditional variance at most $4\bar\sigma^2\|\delta_m\|^2/n$ in each fold. So $\hat J_n \to J_0 > 0$ in probability, and Slutsky's lemma gives the limit. Since $K$ is fixed, the sums over folds are finite sums of $o_p(1)$ terms. The same steps inside each fold show that every fold estimate is asymptotically normal with variance $\sigma^2$ at the scale $\sqrt{n/K}$. The leading terms use disjoint observations and are independent, so the average of the $K$ fold estimates has the same limit as the pooled one.
+\end{proof}
+
+This convergence is pointwise, for one distribution. Chernozhukov and coauthors prove uniform convergence for general orthogonal scores over classes with fixed constants, including a lower bound on $J_0$. Proposition~\ref{crit:prop:dufour} in Chapter~\ref{ch:critique} treats overlap failure outside that class.
+
+The rate condition\index{rate condition|textbf} has the shape $\|\delta_m\|\{\|\delta_m\| + \|\delta_\ell\|\}$ and not the bare product $\|\delta_m\|\|\delta_\ell\|$. The square is the own square channel of Corollary~\ref{dml:cor:channels}. It asks the treatment nuisance to be better than $n^{-1/4}$\index{fourth root rate|textbf} on its own, whatever the outcome nuisance does, since $\|\delta_m\|^2 \le \|\delta_m\|(\|\delta_m\| + \|\delta_\ell\|) = o_p(n^{-1/2})$. The outcome nuisance may be slower than $n^{-1/4}$ if the treatment nuisance is faster (Exercise~\ref{ex:ch04:4}); the roles do not reverse, and Exercise~\ref{ex:ch04:8} shows why. At $n = 9{,}915$, the size of the 401(k) sample, $n^{-1/4}$ is 0.100 and $n^{-1/2}$ is 0.0100. The rate is an asymptotic statement, and numbers like these fix a scale and nothing more. The condition is sufficient and can be wasteful: what enters the bias is the inner product $\langle\delta_m, \delta_\ell - \tau_0\delta_m\rangle$, which the product of norms bounds by the Cauchy and Schwarz inequality, and Chapter~\ref{ch:critique} replaces the bound by the exact quantity (Theorem~\ref{crit:thm:sharp}).
+
+Under slightly stronger moment conditions on the nuisance errors, Chernozhukov and coauthors show that the sandwich standard error of step 5 consistently estimates $\sigma/\sqrt{n}$. The confidence interval\index{confidence interval|textbf} $\hat\tau \pm 1.96\,\widehat{\mathrm{se}}$ then has asymptotic coverage 0.95, the claim the rest of the book tests.
+
+With clustered observations, such as households sharing an employer or repeated observations of one unit, form folds from whole clusters so that no fit trains on observations dependent on those used for evaluation. Sum the scores within clusters before squaring for the standard error; the number of clusters replaces $n$. Chiang, Kato, Ma and Sasaki (2022) give the theory, including clustering in more than one dimension.
+
+Conditions (iv) and (v) cannot be checked from the data, since they are statements about the distance between fitted and true functions. 
+
+\section{The interactive model, AIPW and the estimand}\label{sec:dml:wate}
+
+Suppose the retirement plan helps high income households more than low income ones. The partially linear model, with one $\tau$ for everybody, is then misspecified, and a DML routine will still return a number. The number is an average\index{estimand!of the partially linear model|textbf}\index{partially linear model!estimand of|textbf}, each household's effect weighted by the variance of its treatment given its covariates.
+
+\begin{proposition}[The partially linear estimand]\label{dml:prop:wate}
+Suppose $Y = \tau(X)T + g(X) + \varepsilon$ with $\E(\varepsilon \mid T, X) = 0$, so that the effect varies with $X$. Let $\tau_*$\index{partially linear model!estimand of} solve the population Robinson moment condition\index{moment condition|textbf} $\E\,\psi(W; \tau, \ell, m) = 0$ at $\ell(X) = \E(Y \mid X)$ and $m(X) = \E(T \mid X)$, and assume $\E\varepsilon^2 < \infty$, $0 < \E\,\mathrm{Var}(T \mid X) < \infty$ and $\E|\tau(X)\,\mathrm{Var}(T \mid X)| < \infty$. Then
+\[
+\tau_* = \frac{\E\bigl[\mathrm{Var}(T \mid X)\,\tau(X)\bigr]}{\E\bigl[\mathrm{Var}(T \mid X)\bigr]}.
+\]
+If also $\E|\tau(X)| < \infty$, then $\tau_* - \ATE = \Cov\bigl(\tau(X), \mathrm{Var}(T \mid X)\bigr)\big/\E\,\mathrm{Var}(T \mid X)$. For a binary treatment the weight is $\mathrm{Var}(T \mid X) = e(X)\{1 - e(X)\}$.
+\end{proposition}
+
+\begin{proof}
+Since $\ell(X) = \tau(X)m(X) + g(X)$, the outcome residual is $V_Y = Y - \ell(X) = \tau(X)V_T + \varepsilon$ with $V_T = T - m(X)$. The moment condition gives $\tau_* = \E[V_TV_Y]/\E[V_T^2]$. Now $\E[V_TV_Y] = \E[\tau(X)V_T^2] + \E[V_T\varepsilon] = \E[\tau(X)\,\mathrm{Var}(T \mid X)]$, because $\E(\varepsilon \mid T, X) = 0$ and the tower property apply, and $\E V_T^2 = \E\,\mathrm{Var}(T \mid X)$. The second display follows from $\E[\tau\,\mathrm{Var}] = \E\tau\,\E\mathrm{Var} + \Cov(\tau, \mathrm{Var})$.
+\end{proof}
+
+The discrepancy is a property of the moment condition, so neither more data, cross fitting nor a different learner removes it. This is the classical weighting problem for regression adjustment (Angrist 1998; Aronow and Samii 2016; S{\l}oczy\'nski 2022; Vansteelandt and Daniel 2014).
+
+Whether the weighting is a defect depends on the question. The households that receive least weight are those whose treatment is most nearly determined by their covariates, about which an observational study has least to say. Crump, Hotz, Imbens and Mitnik (2009) argue for trimming to the subpopulation with adequate overlap, because the variance of any estimator of the unweighted average effect is dominated by the region where the propensity is near zero or one. Li, Morgan and Zaslavsky (2018) develop overlap weighting\index{overlap weighting|textbf}, whose weight $e(1 - e)$ is exactly the one above, on variance grounds. The estimand $\tau_*$ is defensible. The difficulty is that a DML routine arrives at it silently: an analyst who chooses overlap weighting knows which population she describes, and an analyst who calls a routine for the average effect has been handed a different one.
+
+The interval such a routine reports is still asymptotically valid, but for $\tau_*$. For a binary treatment and a bounded $\tau(X)$, write $Y - \ell(X) = \tau_*\nu + r$ with $r = \varepsilon + \{\tau(X) - \tau_*\}\nu$. Then $\E(r \mid X) = 0$, and $\E(\nu r) = 0$ by the definition of $\tau_*$, so the proof of Theorem~\ref{dml:thm:main} goes through with $r$ in place of $\varepsilon$ (only the bound on the second moments in $C_n$ becomes cruder: $\E(\nu r \mid X)$ no longer vanishes, and $(u + v)^2 \le 2u^2 + 2v^2$ absorbs the cross term) and gives $\sqrt{n}(\hat\tau - \tau_*) \Rightarrow N\bigl(0, \E(\nu^2 r^2)/J_0^2\bigr)$. The residuals $\hat\varepsilon_i$ of step 5 estimate the $r_i$, so the sandwich standard error is aimed at this variance. Coverage survives; the target is what moved.
+
+The arithmetic is simple enough to do by hand. Take eight strata of equal size, with propensities spaced evenly from 0.06 to 0.50 and stratum effects spaced evenly from 2.0 down to 0.0, so that the effect is largest where overlap is weakest. The average effect is 1.0. Table~\ref{tab:dml:strata} lists the weights $w_g = \pi_g(1 - \pi_g)$ and the weighted effects. The weights sum to 1.4469 and the weighted effects to 1.1150, and since the strata are equal the common stratum probability cancels, so $\tau_* = 1.1150/1.4469 = 0.7706$. The partially linear score answers 0.7706 to a question posed about an average effect of 1.0, a shortfall of 23 percent that no learner, sample size or number of folds can close. The stratum with the largest effect, 2.0, receives 3.9 percent of the weight, and the stratum with no effect receives 17.3 percent. Section~\ref{sec:crit:repair} returns to these strata.
+
+\begin{table}[ht]
+\centering
+\caption{Eight strata of equal size. The propensities $\pi_g$ are spaced evenly from 0.06 to 0.50 and the effects $\tau_g$ evenly from 2.0 to 0.0, so the average effect is 1.0000. The totals add the unrounded entries, and $\tau_* = 1.1150/1.4469 = 0.7706$.}
+\label{tab:dml:strata}
+\small
+\begin{tabular}{rrrrr}
+\toprule
+Stratum $g$ & $\pi_g$ & $\tau_g$ & $w_g = \pi_g(1 - \pi_g)$ & $w_g\tau_g$ \\
+\midrule
+1 & 0.0600 & 2.0000 & 0.0564 & 0.1128 \\
+2 & 0.1229 & 1.7143 & 0.1078 & 0.1847 \\
+3 & 0.1857 & 1.4286 & 0.1512 & 0.2160 \\
+4 & 0.2486 & 1.1429 & 0.1868 & 0.2135 \\
+5 & 0.3114 & 0.8571 & 0.2144 & 0.1838 \\
+6 & 0.3743 & 0.5714 & 0.2342 & 0.1338 \\
+7 & 0.4371 & 0.2857 & 0.2460 & 0.0703 \\
+8 & 0.5000 & 0.0000 & 0.2500 & 0.0000 \\
+\midrule
+Total & & & 1.4469 & 1.1150 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+When the effect varies, DML can target the average effect directly by using the interactive regression model\index{interactive regression model|textbf},
+\[
+Y = \mu_T(X) + \varepsilon, \qquad \E(\varepsilon \mid X, T) = 0,
+\]
+with no restriction on how $\mu_1$ and $\mu_0$ differ. The target is $\tau = \E\{\mu_1(X) - \mu_0(X)\}$, and for a binary treatment the orthogonal score is the augmented inverse probability weighted (AIPW)\index{augmented inverse probability weighting|textbf}\index{AIPW|see{augmented inverse probability weighting}} score of Robins, Rotnitzky and Zhao (1994),
+\begin{equation}
+\psi = \mu_1(X) - \mu_0(X) + \frac{T\{Y - \mu_1(X)\}}{e(X)} - \frac{(1-T)\{Y - \mu_0(X)\}}{1 - e(X)} - \tau,
+\label{eq:aipw}
+\end{equation}
+where $\mu_t(x) = \E(Y \mid X = x, T = t)$. It is doubly robust\index{double robustness!and the augmented estimator|textbf}: it has mean zero if either the outcome regressions or the propensity score\index{propensity score} are correct. At nuisance values $(\hat\mu_1, \hat\mu_0, \hat e)$ and the true $\tau$ its mean is exactly
+\[
+\E\Bigl[(\hat e - e)\Bigl\{\frac{\hat\mu_1 - \mu_1}{\hat e} + \frac{\hat\mu_0 - \mu_0}{1 - \hat e}\Bigr\}\Bigr],
+\]
+a sum of two products of the propensity error with the outcome errors (Exercise~\ref{ex:ch04:10}). Every term is a product, so no first order term remains. Cross fitting proceeds as before, with nuisances $\mu_1$, $\mu_0$ and $e$, and the rate condition becomes
+\[
+\|\hat\mu_t - \mu_t\|\,\|\hat e - e\| = o_p(n^{-1/2}), \qquad t = 0, 1,
+\]
+together with overlap\index{overlap}, which enters the constant through the inverse of the estimated propensity and of one minus it. Overlap matters more directly here than for the partially linear score, since the score divides by $e(X)$ and $1 - e(X)$. In practice propensity estimates are clipped, typically to $[0.01, 0.99]$. Clipping bounds the weights and leaves the target where it was, but where the true propensity lies outside the clipping range the clipped $\hat e$ cannot converge to it, the propensity factor of the remainder above stops shrinking, and the outcome regressions must carry the whole burden (Exercise~\ref{ex:ch04:10}). Trimming, which drops households, is what changes the target (Chapter~\ref{ch:ipw}). The AIPW score is the efficient influence function of the average effect, so under this rate condition, with each nuisance estimate consistent and the true and fitted propensities bounded away from zero and one, the cross fitted estimator attains the semiparametric efficiency bound of Hahn (1998).
+
+Applications often ask for the average effect on the treated\index{effect on the treated|textbf}\index{average effect on the treated|see{effect on the treated}}\index{ATT|see{effect on the treated}}, $\tau_T = \E\{\mu_1(X) - \mu_0(X) \mid T = 1\}$, as Chapter~\ref{ch:k401} does for the trainees of the LaLonde data. Its efficient score\index{augmented inverse probability weighting!for the effect on the treated|textbf}\index{double machine learning!for the effect on the treated|textbf} needs only $\mu_0$ and $e$, and the weight on the controls is the odds of treatment. With $p = \Prob(T = 1)$,
+\begin{equation}
+\psi_T = \frac{1}{p}\Bigl[T\{Y - \mu_0(X) - \tau_T\} - (1 - T)\,\frac{e(X)}{1 - e(X)}\{Y - \mu_0(X)\}\Bigr].
+\label{eq:aipw:att}
+\end{equation}
+It is doubly robust in the same way: at nuisance values $(\hat\mu_0, \hat e)$ and the true $\tau_T$ its mean is $p^{-1}\E[(\hat\mu_0 - \mu_0)(\hat e - e)/(1 - \hat e)]$, again a product of the two errors, so it vanishes if either is right (Exercises~\ref{ex:chlalonde:3} and~\ref{ex:chk401:3} derive it and put it to work). Overlap enters only through $e(X) < 1$: every treated unit needs comparable controls, but a control with no comparable treated unit simply receives weight near zero.
+
+The same partialling out extends to conditional effects. Nie and Wager's (2021) R learner\index{R learner|textbf} writes $Y - \ell(X) = \tau(X)\{T - m(X)\} + \varepsilon$ and chooses $\tau(\cdot)$ to minimize $\E\bigl[\{Y - \ell(X) - \tau(X)(T - m(X))\}^2\bigr]$ over functions, with cross fitted $\hat\ell$ and $\hat m$ plugged in and any regularized learner fitting $\tau(\cdot)$. Its error inherits the product structure above. The R loss is a useful objective; it is not a posterior, and Chapter~\ref{ch:bart} fits the response surface directly.
+
+\section{What DML delivers in practice}\label{sec:dml:practice}
+
+An applied economist with a large survey and a hundred controls used to pick variables by hand, run least squares and report the interval as if the selection had not happened. DML gave her a principled replacement\index{double machine learning!in practice|textbf}: an estimator that is $\sqrt{n}$ consistent and asymptotically normal under conditions far weaker than parametric models need. It is also cheap. A cross fitted lasso at $n = 300$ and $p = 400$ takes 1.0 seconds with five folds, averaged over ten simulated data sets on one processor core, in a timing run of our own (Chapter~\ref{ch:critique}). It needs no model for the nuisance functions and no convergence diagnostics, it accepts any learner, and anyone who can call a package can run it. DoubleML\index{software!DoubleML|textbf} and EconML\index{software!EconML|textbf} implement the estimators of this chapter in Python, and DoubleML also has an interface in R; in both the analyst makes the choices of the box in Section~\ref{sec:dml:cf}. Chapter~\ref{ch:critique} quotes simulations and real data comparisons from our working paper ``Orthogonality is not enough'' (Polson and Sokolov 2026b). Cheapness belongs to the learner as much as to the template: in the same run the score with a horseshoe posterior mean as the nuisance learner (Chapter~\ref{ch:horseshoe}) takes 19.1 seconds at five folds.
+
+The lasso can meet the rate condition under sparsity, random forests under smoothness and neural networks under compositional structure, but whether a given data set has the structure is something the data do not say.
+
+The simulations of that working paper, which we reran with our own code and ten times the replications, show both sides of the method. The baseline design has $n = 300$ and $p = 400$ independent standard normal covariates, of which the first $s$ enter the treatment equation with coefficient one and the outcome equation with coefficients drawn uniformly from 0.8 to 1.2 afresh in each replication, a true effect $\tau_0 = 1$, standard normal treatment noise, normal outcome noise with standard deviation 0.948, and cross validated lasso learners for both nuisance functions. A fourth design keeps $s = 15$ and weakens overlap by lowering the treatment noise standard deviation to 0.3. Each design has 5,000 replications, and Table~\ref{tab:dml:sims} reports the bias of the estimate and the coverage\index{coverage|textbf} of the nominal 95 percent interval\index{coverage!of DML intervals|textbf}. With five folds, coverage falls from 0.917 at $s = 5$ to 0.734 at $s = 30$, and to 0.557 under weak overlap, where the bias is 0.317. At $n = 1200$, $p = 200$ and $s = 15$ it recovers to 0.934, with bias 0.007. Moving from five folds to two lowers coverage in every design, from 0.826 to 0.694 at $s = 15$ and from 0.734 to 0.450 at $s = 30$, while the reported standard error hardly moves (from 0.0523 to 0.0513 at $s = 15$). Two folds also cut each fit's training share from 80 to 50 percent, so part of the loss is worse fits, and the cleaner reading is that the reported error does not respond to the fold count. The finding belongs to this design. In the 401(k) data, with $n = 9{,}915$, the partition to partition spread is small beside the standard error (Section~\ref{sec:dml:k401}).
+
+\begin{table}[ht]
+\centering
+\caption{DML with cross validated lasso learners in the designs of Section~\ref{sec:dml:practice}: $n = 300$, $p = 400$, $\tau_0 = 1$ and 5,000 replications a design. The weak overlap design has $s = 15$ and treatment noise standard deviation 0.3. Bias is that of the estimate from one partition into five folds. The coverage columns are for nominal 95 percent intervals from one partition into five folds, one partition into two folds, and the median over 20 partitions into five folds with the standard error of step 6 of the algorithm.}
+\label{tab:dml:sims}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Design & Bias & \multicolumn{3}{c}{Coverage} \\
+\cmidrule(lr){3-5}
+ & $K = 5$ & $K = 5$ & $K = 2$ & median, $S = 20$ \\
+\midrule
+$s = 5$ & 0.017 & 0.917 & 0.865 & 0.936 \\
+$s = 15$ & 0.037 & 0.826 & 0.694 & 0.870 \\
+$s = 30$ & 0.050 & 0.734 & 0.450 & 0.820 \\
+weak overlap, $s = 15$ & 0.317 & 0.557 & 0.235 & 0.603 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Selection with a theory driven penalty does better where its sparsity assumption holds. At $s = 5$ post double selection\index{double selection} (Belloni, Chernozhukov and Hansen 2014) covers 0.950 against 0.917 for DML, and at $s = 15$ it collapses to a coverage of 0.010, because the penalty is calibrated to a sparsity the design does not have. The median over 20 repeated splits\index{cross fitting!repeated splits|textbf} covered better than a single split in all four designs (the last column of Table~\ref{tab:dml:sims}), at 3 to 11 percent more width. DML is one good tool among several where sparsity holds, and the choice among them is itself something the data may not settle.
+
+What DML does not deliver is a posterior. It gives a point estimate and an interval for one functional, with a frequentist guarantee that holds as $n$ grows. It says nothing about the conditional effect at a particular $x$, the effect on the treated\index{effect on the treated}, quantile effects or the probability that treatment helped a given individual, unless each is separately derived. Nor does it say how much to trust the answer at the sample size in hand. Chapters~\ref{ch:horseshoe} and~\ref{ch:k401} report posteriors for the models of this chapter.
+
+\section{The 401(k) story}\label{sec:dml:k401}
+
+A 401(k) plan\index{401(k) plan|textbf} is an employer sponsored, tax advantaged retirement savings account, and a worker is eligible if her employer offers one. Whether eligibility raises savings, or only marks people who would have saved anyway, was argued through the 1990s. Poterba, Venti and Wise (1995) took the first view: conditional on income and a few other characteristics, eligibility is close to randomly assigned, because workers chose jobs mainly for their wages and other features. If that holds, adjusting for the observed covariates identifies the effect of eligibility on savings, which is the unconfoundedness that DML assumes.
+
+The data are the 1991 wave of the Survey of Income and Program Participation\index{401(k) plan!story of the data|textbf}: 9,915 households, 37 percent of them eligible. The outcome is net total financial assets in thousands of dollars. The nine characteristics of Section~\ref{sec:dml:question} are expanded into 54 standardized terms for the lasso, namely the characteristics, their squares and all pairwise interactions (the squares of the five binary characteristics repeat them, so the rank is 49).  We use five folds, the pooled estimator and the sandwich standard error of the algorithm box, with forests of 200 trees or a lasso whose penalty is chosen by cross validation.
+
+The raw difference in means is 19.56 thousand dollars. DML with random forests as learners gives 8.59, with a 95 percent interval from 6.05 to 11.12, and DML with the lasso on the 54 term basis gives 9.52, with an interval from 6.89 to 12.14. Both are less than half the raw difference, and they differ from each other by 0.93, less than one standard error (about 1.3). Least squares with the nine characteristics entered linearly gives 5.90 and with the 54 terms 9.84.
+
+Each figure is one random partition, and for both learners the partition reported above happens to give the lowest estimate we found. Over 20 partitions the lasso estimates run from 9.52 to 10.26, with median 9.84 and standard deviation 0.17, and over five partitions the forest estimates run from 8.59 to 9.05, with median 9.00 and standard deviation 0.21. The spread is small next to the standard error and not zero: two analysts with the same data and the same method, differing only in the seed, can report point estimates 0.7 thousand dollars apart.
+
+The sample is large, and the treatment nuisance is the probability of eligibility given nine characteristics. A logistic regression of eligibility on the 54 terms, fitted to the full sample, gives estimated probabilities from 0.02 to 0.89, which suggests that $J_0$ is not close to zero though the lower tail is thin. This is the regime in which one expects the rate condition to be credible, and the agreement of two very different learners is what one would see if it were. It is not a test of the condition, because two learners can share a bias. Nor does it say which effect has been estimated. The posterior analysis of Chapter~\ref{ch:k401} finds the effect rising from 1.41 thousand dollars in the lowest income quintile to 20.78 in the highest, a gap of about 19 thousand dollars that a single average hides. Agreement among estimators that share a score shows that, in these data, the choice between the two learners mattered little. It does not show that the score is the right one.
+
+\section{What DML assumes, in one list}\label{sec:dml:assume}
+
+An analyst assessing a DML interval\index{double machine learning!assumptions|textbf} faces six questions\index{double machine learning!six questions for the analyst|textbf}. The first four are hypotheses of Theorem~\ref{dml:thm:main} or its model; the last two concern how well its limit describes the sample in hand.
+
+\begin{enumerate}[label=(A\arabic*),leftmargin=*,itemsep=2pt]
+\item \emph{Unconfoundedness.} All confounders are in $X$ and the model \eqref{eq:plm1} and \eqref{eq:plm2} holds. DML does nothing about unmeasured confounding, a limitation shared with every method in Parts II and III and addressed in later parts.
+\item \emph{Overlap.} The treatment keeps variation given the covariates, $J_0 > 0$, and in the uniform theory $J_0$ stays above a constant fixed in advance. A histogram of the estimated propensities shows part of this; $\hat J_n$ is no substitute for it (Corollary~\ref{dml:cor:channels}). Proposition~\ref{crit:prop:dufour} says what no interval can do when $J_0$ is allowed to approach zero.
+\item \emph{A stated estimand.} If effects differ across households, the partially linear score estimates the variance weighted average of Proposition~\ref{dml:prop:wate}, and the average effect needs the augmented score and its stronger overlap. A different target, such as the effect on the treated or the effect at a given $x$, needs a new score, a new derivation and a new run.
+\item \emph{Nuisance rates.} The rate condition of Theorem~\ref{dml:thm:main}, including the square of the treatment error, holds for the chosen learners on this data set, and there is no diagnostic for it. A learner slowed by a rough regression function silently invalidates the interval. Theorem~\ref{crit:thm:sharp} writes the bias that the product bound only bounds, and Proposition~\ref{crit:prop:alignment} describes one mechanism by which the bound is attained.
+\item \emph{Asymptotic normality at the sample size in hand.} The guarantee is first order. In moderate samples the second order terms, which depend on the learners, can dominate, and a heavy tailed outcome slows the central limit theorem.
+\item \emph{Splitting is harmless.} Different random partitions give different estimates, and the standard error of one partition leaves out their spread. The spread vanishes at first order under Theorem~\ref{dml:thm:main} but not at the sample size in hand; Theorem~\ref{crit:thm:single} says what the standard error of a single split leaves out, and Proposition~\ref{crit:prop:cfvar} with the simulations that follow it shows how cross fitting changes the omitted part.
+\end{enumerate}
+
+\section{In practice}
+
+\paragraph{The target.} The partially linear $\tau$ is the coefficient of $T$ in the outcome model: draw that model's parameters from their posterior and read off $\tau^{(s)}$. If the model allows $\tau(x)$ to vary, then $\tau_Q^{(s)} = \int \tau^{(s)}(x)\,Q(dx)$ for any $Q$, including the overlap\index{overlap} weighted population that the partially linear score implicitly targets when effects vary (Proposition~\ref{dml:prop:wate}).
+
+\paragraph{What the analyst does differently.} An analyst who has read this chapter and still wants to run DML should do four things. State the estimand before choosing the model, because the partially linear score silently changes the target when effects vary (Exercise~\ref{ex:ch04:1}). Look at the distribution of the estimated propensities directly, and do not read $\hat J_n$ as a statement about overlap. Report the median and the spread of the estimate across random fold partitions, not one partition, since Table~\ref{tab:k401} depends on a seed. And treat the confidence interval as an asymptotic statement whose accuracy at the sample size in hand is unknown, since nothing in the method reports how close the normal approximation is at a given sample size. An analyst who fits the model instead reports a posterior that answers the same question and, from the same draws, the effect at any $x$ and in any subgroup.
+
+\paragraph{Against DML.} DML with the partially linear score is a sound choice when four conditions hold together. The treatment retains substantial variation given the covariates, so that $J_0$ is bounded away from zero. The effect is plausibly homogeneous, or the variance weighted average of Proposition~\ref{dml:prop:wate} is the estimand of interest. The nuisance functions are sparse or smooth enough for the dimension that the rate condition is credible and not merely invoked. And the analyst wants one number quickly and will not make a decision that depends on the width. In the design of Section~\ref{sec:dml:practice}, DML with five folds and a cross validated lasso is at its best with 5 relevant covariates, loses coverage as their number grows to 30 or as overlap weakens, and recovers at $n = 1200$ and $p = 200$ (Table~\ref{tab:dml:sims}). What we resist is the method used as a default, without asking whether the four conditions obtain and with its interval read as a description of uncertainty. Homogeneity the partially linear score cannot diagnose, since it averages over whatever heterogeneity is present. Overlap can be diagnosed, though not by $\hat J_n$. The rate condition cannot be verified from the data. The fourth condition is a statement about the analyst. When the first three fail, or when more than one number is wanted, the chapters that follow ask what a model based analysis offers and what it costs.
+
+\section*{Notes}
+
+Double machine learning is due to Chernozhukov, Chetverikov, Demirer, Duflo, Hansen, Newey and Robins (2018), who use the 401(k) question as their leading illustration. The exact decomposition of Section~\ref{sec:dml:exact} and its two channel form come from Polson and Sokolov (2026b), the working paper ``Orthogonality is not enough''. Chernozhukov, Escanciano, Ichimura, Newey and Robins (2022b) construct locally robust scores for functionals beyond those treated here.
+
+\begin{exercises}
+\item\label{ex:ch04:1} Show that when $\tau(x)$ varies but the partially linear model is fitted, the DML estimand is $\E\{\nu^2 \tau(X)\}/\E\nu^2$, an overlap weighted average of conditional effects.
+\item\label{ex:ch04:2} Verify that the AIPW score \eqref{eq:aipw} is Neyman orthogonal with respect to both $\mu_t$ and $e$.
+\item\label{ex:ch04:3} Prove the double robustness of \eqref{eq:aipw}: show its mean is zero if either $\mu_t$ or $e$ is correct.
+\item\label{ex:ch04:4} Give an example in which the rate condition of Theorem~\ref{dml:thm:main} holds although one nuisance is estimated at a rate slower than $n^{-1/4}$.
+\item\label{ex:ch04:5} Simulate the partially linear model of Section~\ref{sec:ricsim}: $n = 200$ observations, $p = 50$ independent standard normal covariates, five of which have coefficient one in both the treatment and the outcome equation, independent standard normal $\nu$ and $\varepsilon$, and $\tau = 1$. Run DML with lasso nuisance learners and five folds on ten different random splits of one data set and report the spread of the estimates. Compare with the posterior standard deviation of the coupled horseshoe of Chapter~\ref{ch:horseshoe} on the same data set.
+\item\label{ex:ch04:6} Let $X_1, \ldots, X_{50}$ be independent $N(0,1)$, $T = X_1 + \cdots + X_5 + \nu$ and $Y = \tau T + X_1 + \cdots + X_5 + \varepsilon$, with $\nu$ and $\varepsilon$ standard normal and $\tau = 1$. Let $\tau_\lambda$ be the coefficient of $T$ in the lasso of $Y$ on $(T, X)$ with objective $(2n)^{-1}\|Y - T\tau - Xb\|^2 + \lambda\|b\|_1$, so that $T$ is not penalized. Show that as $n$ grows with $\lambda$ fixed, $\tau_\lambda - \tau$ tends to $5\lambda$ for $\lambda \le 1/6$, and find the limit for larger $\lambda$.
+\item\label{ex:ch04:7} Derive Lemma~\ref{dml:lem:exact} without looking at its proof: start from $\hat V_{T,i} = \nu_i - \delta_{m,i}$ and $\hat V_{Y,i} = \tau_0\nu_i + \varepsilon_i - \delta_{\ell,i}$ and show that the numerator of $\hat\tau - \tau_0$ is $\sum_i \hat V_{T,i}(\hat V_{Y,i} - \tau_0\hat V_{T,i})$. State and prove the version for the ratio computed inside one fold, and use the two to show that DML2 is the average of the fold ratios weighted by their denominators.
+\item\label{ex:ch04:8} Suppose the outcome nuisance is exact, $\hat\ell = \ell$, so that $\|\delta_m\|\,\|\delta_\ell\| = 0$. Show that the bias of Corollary~\ref{dml:cor:channels} is $-\tau_0\|\delta_m\|^2/(J_0 + \|\delta_m\|^2)$, and conclude that $\|\delta_m\|\,\|\delta_\ell\| = o_p(n^{-1/2})$ alone does not give the central limit theorem. For which choices of $\hat\ell$ do the two channels cancel exactly?
+\item\label{ex:ch04:9} Reproduce the numbers of Table~\ref{tab:dml:strata}: the weights, the weighted effects, their totals and $\tau_*$. Check that $\tau_* - 1$ equals the covariance of $\tau_g$ and $w_g$ over the strata divided by the mean of $w_g$. Then reverse the order of the stratum effects, so that the largest effect sits where overlap is best, and find the new $\tau_*$.
+\item\label{ex:ch04:10} Show that the mean of the AIPW score at the true $\tau$ and nuisance values $(\hat\mu_1, \hat\mu_0, \hat e)$ equals $\E\bigl[(\hat e - e)\{(\hat\mu_1 - \mu_1)/\hat e + (\hat\mu_0 - \mu_0)/(1 - \hat e)\}\bigr]$, and deduce that the score is Neyman orthogonal in $(\mu_1, \mu_0, e)$. Where do overlap and the clipping of $\hat e$ enter a bound on this remainder?
+\item\label{ex:ch04:11} Using Table~\ref{tab:dml:six}, compute the two fold estimates, DML1, DML2 and the weights that DML2 gives to the folds. Then keep the six pairs of residuals but regroup the observations into the folds $\{1, 4, 5\}$ and $\{2, 3, 6\}$, and recompute both estimators. Which one changes, and why?
+\end{exercises}

@@ -1,0 +1,509 @@
+\chapter{Open Problems}\label{ch:open}\label{sec:open}
+% moved to Chapter~\ref{ch:computation} (mcomp, comp/s01 to comp/s10): the sections on sampler cost, data augmentation, approximations, amortization, diagnostics, the horseshoe Gibbs sampler and In practice, and exercises ex:ch14:1 to ex:ch14:5
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+Twenty problems that earlier chapters raise and leave open, each stated as a setting, what is known, and a conjecture or an open question. Simulations show what to expect: the coupled horseshoe posterior reaches the efficient standard deviation by $n = 1{,}600$, the coupled prior with an estimated propensity fails in our Robins and Ritov design where no estimator of the propensity is consistent, and a Student $t$ working model halves the error of DML in our design with infinite variance errors. Seventeen of the problems ask for a theorem; the others ask for a simulation study, software or a course. Table~\ref{tab:openlist} gives the chapter that raises each.
+\end{tcolorbox}
+
+We state each open problem\index{open problems|textbf} so that a reader could begin work on it with the samplers of Chapter~\ref{ch:computation}, which are in the repository of Appendix~\ref{app:code}.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{The twenty problems, the chapter that raises each, and the kind of answer sought.}
+\label{tab:openlist}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}rL{1.85in}L{0.95in}L{1.15in}@{}}
+\toprule
+No. & Problem & Chapter & Answer sought \\
+\midrule
+1 & Bernstein von Mises for the coupled horseshoe & \ref{ch:horseshoe} & Theorem \\
+2 & Coupling for nonlinear nuisances & \ref{ch:bart} & Theorem, simulation \\
+3 & Robins and Ritov with an unknown propensity & \ref{ch:ipw} & Theorem \\
+4 & Default priors for couplings & \ref{ch:gente}, \ref{ch:tianpearl} & Design, theorem \\
+5 & Combining experiments and observations across populations & \ref{ch:tianpearl} & Simulation \\
+6 & Calibration of amortized posteriors & \ref{ch:computation} & Theorem \\
+7 & Twins and the coupling & \ref{ch:mccullagh} & Theorem \\
+8 & Heavy tailed outcomes & \ref{ch:k401} & Theorem \\
+9 & Coupling that protects confounders but not instruments & \ref{ch:horseshoe} & Theorem \\
+10 & Teaching & whole book & Course, software \\
+11 & Rates for the triangular network posterior & \ref{ch:computation} & Theorem \\
+12 & Orthogonal summaries & \ref{ch:computation} & Theorem \\
+13 & Calibration of distorted values & \ref{ch:cdt} & Simulation, software \\
+14 & Time consistency of distortions & \ref{ch:cdt} & Theorem \\
+15 & Which flow an invariant transport selects & \ref{ch:groups} & Theorem, design \\
+16 & Choosing the scale and testing stability on one data set & \ref{ch:groups} & Design, theorem \\
+17 & A group effect with a nonparametric baseline & \ref{ch:groups} & Theorem \\
+18 & Stability on the affine group & \ref{ch:groups} & Theorem \\
+19 & An equivariant generator for a group effect & \ref{ch:groups}, \ref{ch:gente} & Theorem, design \\
+20 & Selection with weak instruments in the reparameterized model & \ref{ch:frameworks}, \ref{ch:iv} & Theorem, simulation \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Problem 1: Bernstein von Mises for the coupled horseshoe}
+
+\paragraph{Setting.} In the partially linear model $Y = \tau T + X^\top\beta + \varepsilon$, $T = X^\top\gamma + \nu$, place flat priors on $\tau$, an intercept and the coefficient of an estimated propensity $\hat m(X)$, and a horseshoe on $\beta$\index{coupled prior!Bernstein von Mises theorem for|textbf}.
+
+\paragraph{What is known.} Castillo and Rousseau give general conditions for semiparametric Bernstein von Mises theorems\index{Bernstein von Mises theorem!for the coupled horseshoe|textbf}; Ray and van der Vaart show that perturbing a Gaussian process prior in the inverse propensity direction yields efficient posteriors for the mean of a binary outcome missing at random. Van der Pas, Kleijn and van der Vaart give horseshoe contraction rates for sparse means.
+
+\paragraph{Evidence.} We fitted the coupled horseshoe to the design of Section~\ref{sec:ricsim}, five confounders of unit size among 50 covariates, at four sample sizes with 20 replications each, with $\hat m(X)$ the lasso fit of $T$ on $X$, tuned by five fold cross validation on the whole sample as in that section and held fixed in the outcome model. Table~\ref{tab:open1} reports the ratio of posterior to efficient standard deviation $\sigma/\{n\,\mathrm{Var}(\nu)\}^{1/2}$, which equals $n^{-1/2}$ here, and the coverage of 95\% intervals, alongside DML.
+
+\begin{table}[ht]
+\centering
+\caption{Coupled horseshoe and DML as $n$ grows, 20 replications per row. Efficiency ratio is posterior standard deviation, or DML standard error, divided by the efficient standard deviation.}
+\label{tab:open1}
+\small
+\begin{tabular}{rcccccc}
+\toprule
+& \multicolumn{3}{c}{Coupled horseshoe} & \multicolumn{3}{c}{DML} \\
+$n$ & RMSE & Coverage & Ratio & RMSE & Coverage & Ratio \\
+\midrule
+100 & 0.130 & 18/20 & 1.23 & 0.110 & 18/20 & 1.03 \\
+200 & 0.089 & 18/20 & 1.09 & 0.080 & 16/20 & 0.97 \\
+400 & 0.060 & 18/20 & 1.02 & 0.071 & 18/20 & 0.98 \\
+800 & 0.041 & 19/20 & 1.03 & 0.043 & 19/20 & 1.01 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The posterior standard deviation approaches the efficient value, its excess falling from 23\% at $n = 100$ to within 3\% from $n = 400$ on. With 20 replications per row the coverage figures are rough but consistent with nominal coverage in the limit, and the differences in root mean squared error, 0.060 against 0.071 at $n = 400$ and 0.041 against 0.043 at $n = 800$, are within Monte Carlo error, so the table does not rank them.
+
+\paragraph{Further evidence.} We pushed the experiment to $n = 3{,}200$ with 40 replications per sample size, in a fresh run, so the figures at $n = 400$ and 800 differ slightly from Table~\ref{tab:open1}. A Bernstein von Mises theorem speaks to two quantities: the ratio of the posterior standard deviation to the efficient one, and the law of $\sqrt{n}$ times the posterior mean's error, standard normal in the limit. Figure~\ref{fig:openbvm} shows the first with $\sqrt{n}$ times the root mean squared error beside it. The ratio is 1.030 at $n = 400$, 1.014 at 800, 0.999 at 1{,}600 and 1.000 at 3{,}200; DML's is 0.989, 0.993, 0.987 and 1.003. The standard deviation of $\sqrt{n}$ times the error across replications is 0.89, 1.03, 1.04 and 0.91, with means $-0.40$, 0.09, 0.05 and 0.01, so the centring bias is gone by $n = 800$ and the spread is the efficient one. Coverage is 37, 37, 38 and 39 of 40. A Shapiro test on 40 thinned posterior draws per fit gives a median $p$ value of about 0.5 at every sample size, a check with little power against small departures. Within what 40 replications can show, everything the theorem would imply is visible by $n = 1{,}600$ in a problem with $p = 50$.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{open_bvm.pdf}
+\caption{Problem 1 at larger sample sizes, 40 replications each. Left: posterior standard deviation of the coupled horseshoe, and DML's standard error, relative to the efficient standard deviation. Right: $\sqrt{n}$ times the root mean squared error; the efficient value is one.}
+\label{fig:openbvm}
+\end{figure}
+
+\paragraph{A sketch.} In the linear Gaussian model with known $\gamma$ and error standard deviation $\sigma$ and the propensity direction unpenalized, let $H$ be the projection onto the intercept and $X\gamma$, and let $r = (I - H)T = (I - H)\nu$. Integrating out the flat priors on the intercept and the coefficient of $X\gamma$ gives
+\[
+\tau \mid \beta, D \sim N\Big(\frac{r^\top(Y - X\beta)}{r^\top r}, \frac{\sigma^2}{r^\top r}\Big),
+\]
+whose centre at a draw of $\beta$ differs from its centre at the true $\beta_0$ by $-r^\top X(\beta - \beta_0)/r^\top r$. Since $r^\top r/n \to \mathrm{Var}(\nu)$, the variance is the efficient one, and a Bernstein von Mises theorem follows once the horseshoe posterior puts mass tending to one in probability on $|r^\top X(\beta - \beta_0)| \le \epsilon\sqrt{n}$, for every $\epsilon > 0$. The coupling proposition of Appendix~\ref{app:theory}, an argument to first order, says why this projected error should be small: $I - H$ removes the component of $X(\beta - \beta_0)$ along $X\gamma$, the direction in which shrinkage biases $\tau$. Showing that the horseshoe posterior meets the condition, which means controlling the mixture over its scales, is the open part.
+
+\paragraph{Conjecture.} With $\gamma$ estimated by a horseshoe regression of $T$ on $X$, and sparsities $s_\beta$, $s_\gamma$ satisfying $s_\beta s_\gamma\log^2 p = o(n)$, and conditions on the design and the horseshoe scales that give the corresponding contraction rates, the posterior of $\sqrt{n}(\tau - \hat\tau)$, with $\hat\tau$ an efficient estimator, converges in total variation to the efficient normal law. This is DML's product rate condition, transcribed to sparsity. The simulations above plug in a lasso fit of the propensity instead, so they bear on this conjecture only indirectly.
+
+\section{Problem 2: Coupling for nonlinear nuisances}
+
+\paragraph{Setting.} For nonlinear $g$ and $m$, the coupled prior\index{coupled prior!for nonlinear nuisances|textbf} must protect the directions of function space in which $m$ varies.
+
+\paragraph{Constructions.} There are three candidates. A Gaussian process prior\index{Gaussian process!for nonlinear nuisances|textbf} on $g$ with a kernel $k(x, x') + \lambda\,\hat m(x)\hat m(x')$, whose second term weakens the shrinkage in the estimated propensity direction and removes it as $\lambda \to \infty$, generalizes the propensity covariate. A Dirichlet additive regression tree prior shared between outcome and treatment forests, learning splitting probabilities jointly, generalizes shared local scales. A neural network passing a learned propensity embedding to the baseline but not the effect, as GenTE does, likewise generalizes the propensity covariate.
+
+
+
+\begin{proposition}
+Let $g \sim \mathrm{GP}(0, k + \lambda\,\hat m\hat m^\top)$ with $\hat m$ a fixed function, $\tau$ with a flat prior, Gaussian errors, and the sample vectors of $T$ and $\hat m(X)$ linearly independent. The posterior of $\tau$ equals the posterior under the prior $g = g_0 + \delta\,\hat m$ with $g_0 \sim \mathrm{GP}(0, k)$ and $\delta \sim N(0, \lambda)$ independent, and as $\lambda \to \infty$ it converges to the posterior under a flat prior on $\delta$, that is, to the model with $\hat m$ as an unpenalized covariate.
+\end{proposition}
+
+\begin{proof}
+A Gaussian process with kernel $k + \lambda\hat m\hat m^\top$ is the sum of independent processes with kernels $k$ and $\lambda\hat m\hat m^\top$, and the second is $\delta\hat m$ with $\delta \sim N(0, \lambda)$. Integrating $g_0$ out leaves a linear model in $(\tau, \delta)$ with covariance $K + \sigma^2 I$ ($K$ the matrix of $k$ at the sample points, $\sigma^2$ the error variance) and prior $N(0, \lambda)$ on $\delta$; letting $\lambda \to \infty$ gives the flat prior limit, which is generalized least squares of $Y$ on $(T, \hat m)$ with that covariance.
+\end{proof}
+
+The first order argument of Appendix~\ref{app:theory}, which treats the propensity as known, suggests that its conclusion still holds when $\hat m$ is only consistent.
+
+\paragraph{Evidence.} We simulated a partially linear model with $n = 300$ and five independent standard normal covariates,
+\[
+T = m(X) + \nu, \qquad Y = T + g(X) + \varepsilon,
+\]
+with standard normal $\nu$ and $\varepsilon$, a nonlinear treatment surface $m(x) = \sin(1.5x_1) + 0.5x_2^2 - 0.5 + 0.8x_3$ and an outcome surface $g = 2m + 0.5\cos x_4$, so that $\tau = 1$ and confounding runs through the whole shape of $m$. The propensity surface was estimated by a Gaussian process regression of $T$ on $X$ with a kernel tuned on the whole sample and predictions cross fitted in two folds so that they do not absorb the treatment noise; their correlation with the truth averaged 0.96.
+
+Table~\ref{tab:opengp} and Figure~\ref{fig:opengpcouple} compare a plain Gaussian process prior on $g$ with kernel
+\[
+k(x, x') = a\exp\Big\{-\frac{1}{2}\sum_{j=1}^{5}\frac{(x_j - x'_j)^2}{\ell_j^2}\Big\},
+\]
+the coupled kernel at $\lambda = 10$ and $10^3$, and the covariate construction, under three choices of the amplitude $a$, the length scales $\ell_j$ and the noise variance. Strong fixes $a = 1$, every $\ell_j = 1.5$ and the noise variance at its true value 1. Tuned estimates all of them by marginal likelihood in a regression of $Y$ on $X$ alone, whose residual $\nu + \varepsilon$ has variance 2, so the tuned noise variance also absorbs the treatment noise and the tuned prior differs from the strong one in its likelihood as well as in its kernel. True noise keeps the tuned amplitude and length scales and fixes the noise variance at 1, which separates the two.
+
+\begin{table}[ht]
+\centering
+\caption{Coupling a Gaussian process prior through the propensity direction, 40 replications. The truth is $\tau = 1$. Strong is the prior with fixed hyperparameters, Tuned the prior tuned by marginal likelihood, and True noise the tuned prior with the noise variance set to its true value. Monte Carlo standard errors are 0.011 to 0.013 for the biases and 0.007 to 0.012 for the root mean squared errors.}
+\label{tab:opengp}
+\small
+\begin{tabular}{lcccccc}
+\toprule
+& \multicolumn{2}{c}{Strong} & \multicolumn{2}{c}{Tuned} & \multicolumn{2}{c}{True noise} \\
+Construction & Bias & RMSE & Bias & RMSE & Bias & RMSE \\
+\midrule
+Plain Gaussian process & 0.528 & 0.534 & 0.029 & 0.077 & 0.016 & 0.072 \\
+Kernel $k + 10\,\hat m\hat m^\top$ & 0.186 & 0.203 & 0.037 & 0.080 & 0.021 & 0.071 \\
+Kernel $k + 10^3\,\hat m\hat m^\top$ & 0.185 & 0.203 & 0.038 & 0.080 & 0.021 & 0.071 \\
+Propensity covariate & 0.185 & 0.203 & 0.038 & 0.080 & 0.021 & 0.071 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{open_gpcouple.pdf}
+\caption{Error of four Gaussian process constructions of the partially linear model under a strong prior, a tuned prior and a tuned prior with the true noise variance on the outcome surface, 40 replications.}
+\label{fig:opengpcouple}
+\end{figure}
+
+Under the strong prior, regularization induced confounding\index{regularization induced confounding} is severe for the plain process, a bias of half the effect with no coverage. Coupling removes two thirds of it, although its intervals still cover in only 10 of 40 replications. The remainder comes from what the coupling leaves unprotected, which this simulation does not separate, most plausibly the error in $\hat m$, which leaves part of $2m$ outside the span of $\hat m$; the term $0.5\cos x_4$ does not involve the treatment surface. The kernel at $\lambda = 10^3$ and the covariate agree to three decimals, as the proposition says, and $\lambda = 10$ is already close.
+
+Under the tuned prior the plain process has almost no bias and coupling changes nothing, because a prior whose amplitude matches the signal barely shrinks, and regularization induced confounding is a consequence of shrinkage. Every tuned construction covers in 40 of 40 replications, but that is the work of the tuned noise variance, which absorbs the treatment noise and widens the intervals. With the true noise variance the bias stays small (0.016 for the plain process and 0.021 for the coupled constructions, each with Monte Carlo standard error 0.011), the intervals are about 30 percent narrower, and they cover in 37 and 36 of 40 replications, within sampling error of 95 percent. For Gaussian processes the problem therefore seems to live in the hyperparameters: a process tuned to the outcome did well at this dimension and sample size, and the coupling is insurance for the cases, high dimension or small samples, where the prior must shrink. Which cases those are is the open part.
+
+\paragraph{Conjecture.} The shared Dirichlet tree prior makes regularization induced confounding negligible at the root $n$ scale for tree ensembles under the sparsity conditions of Problem 1, with $s_\beta$ and $s_\gamma$ replaced by the numbers of relevant splitting variables, but, like shared horseshoe scales, also protects instruments (Problem 9).
+
+\section{Problem 3: Robins and Ritov with an unknown propensity}
+
+\paragraph{Setting.} In the cell model of Section~\ref{sec:rrw}, the selection probability $e$ is unknown and must be learned from $R$\index{Robins and Ritov example!with an unknown propensity|textbf}.
+
+\paragraph{What we expect.} Every unit informs $e$ through $R$, while only selected units inform $\vartheta$. Under a prior on $e$ smooth in a known feature of the cells, its posterior contracts at that model's rate, and the coupled prior of \eqref{eq:coupled} with $e$ replaced by its posterior draw should inherit root $n$ consistency when $e$ is estimated fast enough and the regression of $\logit\vartheta$ on $\logit e$ is correctly specified. How fast is part of the problem. An error in $e$ enters the fitted curve $q_\xi\{e(x)\}$ of Section~\ref{sec:rrw} at first order, so the $n^{-1/4}$ rate of the doubly robust product would be enough only if the coupled posterior cancels that first order term, as a doubly robust estimator does, and we have no proof that it does.
+
+\paragraph{Evidence.} We repeated the simulation of Section~\ref{sec:rrw}, $K = 20{,}000$ cells and $n = 2{,}000$ units, with a cell feature $z$ and the selection probability learned from $(z, R)$ on every unit by a logistic regression in $z$, fitted by maximum likelihood and plugged in as the simplest stand in for a smooth prior. The coupled estimate is the empirical Bayes version of Section~\ref{sec:rrw}, with the uncertainty in both fitted regressions ignored. The feature $z$ is uniform on $[-1, 1]$. In the first design $e = 0.05 + 0.9\expit(2.5z)$; in the second $e$ is uniform on $[0.05, 0.95]$ independently of $z$, as in Section~\ref{sec:rrw}, so $z$ says nothing about $e$, and with ten times as many cells as units most cells are never visited; in the regime $K/n \to \infty$ of that section no estimator of $e$ is consistent.
+
+Figure~\ref{fig:openrrwunknown} shows 100 replications of four estimators: Horvitz Thompson and the coupled prior, each with $e$ known and with $e$ estimated. When $e$ is smooth, the coupled prior with estimated $e$ has root mean squared error 0.0125, the same as with $e$ known and slightly better than Horvitz Thompson with known $e$ at 0.014. When $e$ is rough, the coupled prior and Horvitz Thompson with the same estimated $e$ are both biased by 0.134: they fail together, for the same reason.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{open_rrw_unknown.pdf}
+\caption{The Robins and Ritov example with the selection probability estimated from a cell feature, 100 replications. Left: the selection probability is smooth in the feature. Right: it is unrelated to the feature.}
+\label{fig:openrrwunknown}
+\end{figure}
+
+\paragraph{Conjecture.} No prior on $(e, \vartheta)$ that is a product of priors on $e$ and on $\vartheta$ given $e$ through a fixed link is uniformly root $n$ consistent over Robins and Ritov's class when $e$ is unrestricted. The simulation is what the conjecture predicts. In this design the boundary is the estimability of the propensity, and the simulation shows no boundary peculiar to Bayesian inference.
+
+\section{Problem 4: Default priors for couplings}
+
+\paragraph{Setting.} The copula of $(Y(0), Y(1))$ is unidentified; Section~\ref{sec:ot} used a Gaussian copula with a prior on $\rho$, and Chapter~\ref{ch:tianpearl} a $\mathrm{Beta}(1/2, 1/2)$ prior on the position within the bounds.
+
+\paragraph{A partial result.} Since the coupling question\index{coupling!default priors for|textbf} does not depend on the scale of measurement, a default prior\index{default prior|textbf} should be invariant under strictly increasing transformations of either outcome. Kendall's $\tau_K$\index{Kendall tau@Kendall's tau|textbf} and Spearman's $\rho_S$ are invariant, and within the Gaussian family $\tau_K = (2/\pi)\arcsin\rho$. A uniform prior on $\tau_K \in [-1, 1]$ is therefore invariant and induces the prior
+\[
+p(\rho) = \frac{1}{\pi\sqrt{1 - \rho^2}}, \qquad -1 < \rho < 1,
+\]
+the arcsine law\index{arcsine prior|textbf}. It puts more mass near the comonotone and countermonotone extremes than a uniform prior on $\rho$: the horseshoe shape that appeared for the position within the Tian and Pearl bounds.
+
+\paragraph{Why the reference prior criterion does not decide.} It is tempting to ask for a reference prior\index{reference prior|textbf} in Bernardo's sense, the prior that maximizes the expected Kullback and Leibler divergence between prior and posterior for the fraction helped. But with the marginals known the data carry no information about $\rho$, so the posterior for $\rho$ equals its prior, the divergence is zero for every prior, and the criterion is empty, as it is for any functional of an unidentified parameter. Invariance alone does not fix the prior either, since every prior on $\tau_K$ is invariant to monotone transformations. The case for the arcsine law is that it is uniform on the concordance probability, which is what Kendall's $\tau_K$ measures: a flat prior on the probability that two random individuals are ordered the same way under both treatments.
+
+\paragraph{What the choice costs.} Figure~\ref{fig:openarcsine} shows the prior it induces on the fraction helped for a mean shift of half a standard deviation, against the uniform prior on $\rho$. The arcsine prior gives mean 0.70 against 0.67 and puts 12\% of its mass above 0.9 against 4\%, because it allows near comonotone couplings. The two priors agree on the lower part of the range, where the data from a twin or crossover design can bite (Problem 7), and differ in a region that only an assumption can rule in or out. We recommend reporting the fraction helped under both, as a sensitivity analysis in the sense of Section~\ref{sec:sensitivity}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.9\linewidth]{open_arcsine.pdf}
+\caption{Priors induced on the fraction helped, $P\{Y(1) > Y(0)\}$, by a uniform prior on the Gaussian copula correlation and by the arcsine prior that is uniform on Kendall's $\tau_K$, for a mean shift of half a standard deviation.}
+\label{fig:openarcsine}
+\end{figure}
+
+\paragraph{Open question.} Find a design, short of observing both potential outcomes, whose likelihood depends on $\tau_K$ so that the reference criterion becomes nonvacuous; crossover trials with carryover are the natural candidate.
+
+\section{Problem 5: Combining experiments and observations across populations}
+
+\paragraph{Setting.} An experiment on population $A$ gives $\Prob_A(y_x)$ and $\Prob_A(y_{x'})$; an observational study on population $B$ gives the joint law of $(X, Y)$ there\index{open problems!combining experiments and observations|textbf}. The target is $\PN$ in $B$\index{probability of necessity}.
+
+\paragraph{A model.} Let conditional effects given covariates $W$ transport\index{transportability} up to a discrepancy: $\logit\Prob_B(y_x \mid w) = \logit\Prob_A(y_x \mid w) + \delta_x$ with $\delta_x \sim N(0, s^2)$, and similarly for $x'$. With $W$ measured in both populations, averaging over $B$'s covariate law gives the experimental arm probabilities in $B$, and substitution gives its Tian and Pearl bounds.
+
+\paragraph{What we expect.} As $s \to 0$ the posterior of the bounds on $\PN_B$ concentrates on the Tian and Pearl bounds evaluated at the transported margins; a posterior for $\PN_B$ itself also needs a prior on its position within the bounds, as in Chapter~\ref{ch:tianpearl}. As $s$ grows the posterior of the bounds spreads continuously toward the observational bounds, provided the transported arm probabilities stay compatible with $B$'s observational law, which puts $\Prob_B(y_{x'})$ between $\Prob_B(x', y)$ and $\Prob_B(x', y) + \Prob_B(x)$; the model above does not impose this, and the simulation below does, by restricting the prior on $\Prob_B(y_{x'})$ to that range. Every $s > 0$ then gives the whole range positive probability, and as $s \to \infty$ the prior tends to one uniform on the logit scale over the range, so even an infinite $s$ leaves a prior inside the observational bounds, not the bounds alone. The posterior interpolates between full transport and none, and the prior on $s$ states how far the experiment is believed to travel.
+
+\paragraph{Negative controls inform the transport scale.} A negative control outcome\index{negative control|textbf} is unaffected by treatment but differs between populations for the same reasons as the outcome of interest. With logit discrepancies also drawn from $N(0, s^2)$, each control observed in both populations supplies one observation on $s$; several give a posterior.
+
+With no covariates $W$, we simulated population $B$ from a structural model with a binary confounder $U$, with $\Prob(U = 1) = 0.5$, $\Prob(X = 1 \mid U = 1) = 0.6$, $\Prob(X = 1 \mid U = 0) = 0.2$ and $\Prob(Y = 1 \mid X, U) = 0.7$, $0.4$, $0.3$ and $0.1$ for $(X, U) = (1, 1)$, $(1, 0)$, $(0, 1)$ and $(0, 0)$, so that $\PN_B$ has true bounds $[0.60, 1]$, placed the experiment in a population $A$ whose arm probabilities differ by discrepancies with $s = 0.5$, and observed six negative controls, with standard normal baseline logits in $A$, in both populations with 2{,}000 units each. The arm probabilities of $A$ and the observational law of $B$ were treated as known, each negative control's probability in $A$ was fixed at its observed proportion (which leaves its sampling error out of the posterior for $s$), and the prior on $s$ was uniform on $(0, 2]$.
+
+Only $B$'s untreated arm probability enters the bounds, and $B$'s observational law confines it to $[\Prob_B(x', y), \Prob_B(x', y) + \Prob_B(x)] = [0.10, 0.50]$, so the prior on it is restricted to that interval, which removes almost nothing at $s \le 0.25$ and 3, 28 and 58 percent of the prior mass at $s = 0.5$, 1 and 2. The bounds are monotone in this one probability, so the quantiles below are exact.
+
+Figure~\ref{fig:opentransport} shows the result. Transporting $A$'s arm probabilities as if $s = 0$ gives a lower bound of 0.49, below the truth, with no uncertainty. The posterior for $s$ from the six controls has mean 0.37 and 95\% interval $[0.18, 0.76]$ around the true 0.5. At $s = 0.25$ the posterior 5\% quantile of the lower bound is 0.16; from $s = 0.5$ on it is zero, which is the observational bound. Integrating over the posterior for $s$ gives a lower bound whose median is 0.48 and whose 5\% quantile is zero: six negative controls say the experiment travels, but not well enough to rule out the observational bound.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{open_transport.pdf}
+\caption{Transporting an experiment. Left: posterior for the transport scale $s$ from six negative control outcomes, true value dashed. Right: bounds on the probability of necessity in population $B$ at fixed values of $s$ and integrated over its posterior (thick lines are posterior medians of the two bounds, light bars the 5\% and 95\% quantiles); the band between the dashed lines is the true bounds.}
+\label{fig:opentransport}
+\end{figure}
+
+\paragraph{Open question.} How many negative controls, with what prevalence, are needed for the posterior of $s$ to be useful, and when does the assumption that they share the outcome's transport scale fail in a detectable way?
+
+\section{Problem 6: Calibration of amortized posteriors}
+
+\paragraph{Setting.} An amortized posterior\index{amortized posterior|textbf} $G(s(D), U)$ can pass a calibration check that averages over the prior predictive and still be wrong at a particular data set. Section~\ref{comp:sec:checks} gives a local diagnostic, simulation based calibration\index{simulation based calibration!local|textbf} run near the observed data set, and a correction by importance reweighting that we expect to work and have not run.
+
+\paragraph{What is known.} On a network retrained with the design of the two arm trial of that chapter the diagnostic, with 400 local simulations and 19 draws each, finds a flat rank histogram at the observed trial, 18 of 50 and 27 of 50 successes (chi squared 24.0 on 19 degrees of freedom, $p = 0.20$), where the amortized posterior is within 0.003 of the exact one in Wasserstein distance. At an extreme trial, 1 of 50 and 49 of 50, the histogram piles up at the top ranks (chi squared 222, $p < 10^{-35}$, in the same run). At so extreme a summary the exact posterior's own local ranks tilt the same way, with a median chi squared of 244 over 200 repeats, and the network's counts agree with the exact posterior's (chi squared 28.4, $p = 0.08$), so the tilt is not by itself evidence against the network. The direct evidence is the comparison with the exact posterior: the network's posterior is shifted down and too wide, its 5\% and 95\% quantiles 0.834 and 0.984 against the exact 0.853 and 0.973, because few training simulations land near a risk difference of 0.9 (Figure~\ref{fig:openlocalsbc}). The diagnostic costs 400 forward passes and 400 simulated trials for each data set. A global calibration check passes; the local diagnostic flags the extreme trial but needs the exact reference to separate network error from the rank tilt caused by conditioning.
+
+\paragraph{Open question.} Bound local calibration error at $s(D)$ by a quantity computable from the training set, to replace the diagnostic with a certificate. Training density alone is insufficient: the extreme trial of Figure~\ref{fig:openlocalsbc} has about three times the error (Wasserstein distance 0.0088 against 0.0032), yet under uniform priors on the arm probabilities every pair of success counts has prior predictive probability $1/51^2$, giving both trials about 23 exact matches among 60{,}000 training simulations. The extreme summary lies at a corner, where the posterior sits near the boundary $\tau \le 1$ and few training effects are as large. Find what a certificate needs beyond training density.
+
+\paragraph{Evidence on mass and position.} To separate the two, we retrained the network of the two arm trial ten times, with different seeds, at each of 15{,}000, 60{,}000 and 240{,}000 training pairs, on summaries drawn either uniformly from the $51 \times 51$ grid of success counts or from a bell, $q(s) \propto \exp\{-8[(y_0 - 25)^2 + (y_1 - 25)^2]/2500\}$, with scale 12.5 in each count (standard deviation 11.1 on the grid). For each summary $p_0$ and $p_1$ were drawn from their exact beta posteriors and $p_1 - p_0$ was the target, so the posterior to be learned is the same in both designs and only the training mass differs. The error at a summary is the Wasserstein distance between the network's posterior and the exact one, computed as the mean absolute difference between the two quantile functions at 200 evenly spaced levels after sorting the network's curve, divided by the exact posterior standard deviation (Figure~\ref{fig:openlocalsbcdensity}). The network's curve is not monotone by construction, and without the sorting the error is larger, by 9 to 20 percent on average over the grid and by up to 50 percent at some summaries; all numbers below use the sorted curve.
+
+With uniform training, where the extreme trial has as much training mass as the typical one, its error at 60{,}000 pairs is 0.29 (standard error over seeds 0.03) against 0.033, nine times larger, and across the grid the error rises with the distance of the summary from the centre (rank correlation 0.61 to 0.84). Under the bell the extreme trial's expected number of training summaries falls from 23 to 1.7 at 60{,}000 pairs, and its error is 2.7 to 2.9 times the uniform value at every training size (0.81 at 60{,}000), while at the typical trial, which gains mass, the error falls by 10 to 14 percent. Position in the summary space accounts for most of the extreme trial's error and training mass for a further factor of about 2.8, so a certificate has to depend on position as well as on the training density.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{open_localsbc_density.pdf}
+\caption{Wasserstein distance between the network and the exact posterior, divided by the exact posterior standard deviation, at each of the $51 \times 51$ summaries $(y_0, y_1)$, averaged over ten networks trained on 60{,}000 pairs with summaries uniform on the grid (left) or drawn from a bell centred at $(25, 25)$ (right). The circle marks the typical trial and the square the extreme trial of Figure~\ref{fig:openlocalsbc}.}
+\label{fig:openlocalsbcdensity}
+\end{figure}
+
+\section{Problem 7: Twins and the coupling}
+
+\paragraph{Setting.} In a twin trial\index{twins|textbf} one twin of each pair is treated. Let potential outcomes decompose as $Y(t) = \mu_t + h + e_t$, where $h$ is shared within a pair, has variance $V_h$, and is independent of $(e_0, e_1)$, which are independent across twins with variances $\sigma_t^2 - V_h$.
+
+\begin{proposition}
+The covariance between the outcomes of the treated and untreated twins in a pair identifies $V_h$, and the correlation $\rho$ between one person's potential outcomes satisfies
+\[
+\frac{V_h - s_0s_1}{\sigma_0\sigma_1} \leq \rho \leq \frac{V_h + s_0s_1}{\sigma_0\sigma_1}, \qquad s_t = (\sigma_t^2 - V_h)^{1/2}.
+\]
+\end{proposition}
+
+\begin{proof}
+The twins' outcomes are $\mu_1 + h + e_1$ and $\mu_0 + h + e_0'$ with independent individual terms, so their covariance is $V_h$. For one person, $\mathrm{Cov}(Y(0), Y(1)) = V_h + \mathrm{Cov}(e_0, e_1)$, and the Cauchy and Schwarz inequality bounds the second term by $s_0s_1$ in absolute value.
+\end{proof}
+
+With equal unit variances the lower bound is $2V_h - 1$. An unpaired trial allows any $\rho \geq -1$; a twin trial sharing half the variance rules out negative correlation; one sharing 80\% forces $\rho \geq 0.6$. Figure~\ref{fig:opentwins} shows the consequence for the fraction helped\index{fraction helped!twin trials|textbf} when the treated mean is half a standard deviation higher, within the Gaussian copula family: the lower limit rises from 0.60 unpaired to 0.64 when half the variance is shared and 0.71 when 80\% is shared. Student's twins inform not only the average effect but the distribution of individual effects.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{open_twins.pdf}
+\caption{Range of the fraction helped implied by a twin trial, as a function of the share of outcome variance common to twins, for a mean shift of half a standard deviation under a Gaussian copula. Dotted lines mark the range without twins.}
+\label{fig:opentwins}
+\end{figure}
+
+\paragraph{Beyond the Gaussian copula.} The additive decomposition does more than bound $\rho$. Since $Y(1) - Y(0) = \delta + e_1 - e_0$ with $\delta = \mu_1 - \mu_0$, the shared component cancels from the individual effect, and the fraction helped depends only on the coupling of $(e_0, e_1)$, whose marginals have the identified variances $s_t^2 = \sigma_t^2 - V_h$. The variances do not fix the marginal distributions, but once those are given the Makarov bounds\index{Makarov bounds} of Appendix~\ref{app:theory} apply to them rather than to the full outcomes.
+
+\begin{proposition}
+Under the shared component model with Gaussian individual terms of common variance $s^2 = \sigma^2 - V_h$ and $\delta > 0$, for every coupling of $(e_0, e_1)$,
+\[
+P\{Y(1) > Y(0)\} \geq 2\Phi\Bigl(\frac{\delta}{2s}\Bigr) - 1,
+\]
+and the bound is sharp. It increases with $V_h$ and tends to one as $V_h \to \sigma^2$.
+\end{proposition}
+
+\begin{proof}
+The Makarov upper bound on $P(\delta + e_1 - e_0 \leq 0)$, applied to the laws of $\delta + e_1$ and $e_0$, is $1 - \sup_y\{\Phi(y/s) - \Phi((y - \delta)/s)\}$, and the supremum is attained at $y = \delta/2$ with value $2\Phi(\delta/2s) - 1$. Sharpness is Makarov's, and the bound increases with $V_h$ since $s$ decreases.
+\end{proof}
+
+With $\sigma = 1$ and $\delta = 0.5$ the Makarov lower bound is 0.20 without twins, 0.28 when half the variance is shared and 0.42 when 80\% is shared; the Gaussian copula range of Figure~\ref{fig:opentwins} sits inside it (Figure~\ref{fig:opentwins2}). The twin design narrows the Makarov range as well as the Gaussian one, by the same mechanism: what the twins share cannot contribute to the spread of individual effects.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.9\linewidth]{open_twins2.pdf}
+\caption{Range of the fraction helped implied by a twin trial under any coupling of the individual terms, with the Gaussian copula range inside it, for a mean shift of half a standard deviation.}
+\label{fig:opentwins2}
+\end{figure}
+
+\paragraph{The posterior when the share is estimated.} In a simulated trial of 100 twin pairs, with Gaussian $h$, $e_0$ and $e_1$, $\sigma = 1$, a true shared variance of 0.6 and $\delta = 0.5$, the weighted Bayesian bootstrap\index{Bayesian bootstrap} of the two marginal variances, the within pair covariance and the mean difference gives a posterior for the Makarov lower bound with mean 0.33 and 95\% interval $[0.21, 0.44]$, around a true value of 0.31. 
+
+\paragraph{Open question.} For known non Gaussian individual terms the Makarov theorem of Appendix~\ref{app:theory} already gives the sharp bound, with the supremum no longer at $\delta/2$. The open part is to identify and estimate the distributions of $e_0$ and $e_1$ from the joint law of the twins' outcomes, with honest uncertainty for the resulting bound, and to extend the analysis to covariate dependent shares $V_h(x)$.
+
+\section{Problem 8: Heavy tailed outcomes}
+
+\paragraph{Setting.} The 401(k) outcome\index{401(k) plan!heavy tailed outcome|textbf} has a maximum a thousand times its median, which makes Gaussian posteriors and squared error nuisance learners fragile\index{open problems!heavy tailed outcomes|textbf}.
+
+\paragraph{Evidence.} We simulated the partially linear model of Section~\ref{sec:ricsim} with $n = 300$, 30 standard normal covariates, five confounders with unit coefficients in both equations, standard normal treatment noise, and Student $t$ outcome errors on two degrees of freedom, with infinite variance. Over 30 replications we compared the coupled horseshoe with Gaussian errors, the same prior with Student $t$ errors\index{Student t errors} on three degrees of freedom as a scale mixture of normals, and DML with lasso nuisances.
+
+\begin{table}[ht]
+\centering
+\caption{Heavy tailed errors, 30 replications.}
+\label{tab:openheavy}
+\small
+\begin{tabular}{lccc}
+\toprule
+Method & RMSE & Coverage & Width \\
+\midrule
+Coupled horseshoe, Gaussian errors & 0.174 & 28/30 & 0.65 \\
+Coupled horseshoe, Student $t$ errors & 0.086 & 29/30 & 0.32 \\
+DML, lasso nuisances & 0.183 & 25/30 & 0.54 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{open_heavy.pdf}
+\caption{Error of three estimators of $\tau = 1$ with infinite variance errors, 30 replications.}
+\label{fig:openheavy}
+\end{figure}
+
+The Student $t$ model halves the error of both alternatives and the interval width of the Gaussian model, with coverage near nominal (Table~\ref{tab:openheavy} and Figure~\ref{fig:openheavy}). DML's intervals covered in only 25 of 30 replications. The larger study below, with errors on 2 degrees of freedom and 200 replications at each $n$, gives DML coverage of 92 percent at $n = 200$ and 95.5 percent at $n = 400$, so the shortfall here is probably in part a low draw from 30 replications.
+
+\paragraph{Rates.} The DML score is a sample average of terms with the same tail index as the errors, so for errors in the domain of attraction of a stable law with index $\alpha \in (1, 2)$ and nuisance errors small enough not to matter, its error is of order $n^{-(1 - 1/\alpha)}$ up to a slowly varying factor, slower than $n^{-1/2}$; the Student $t$ working model\index{Student t errors} gives an M estimator whose influence is bounded in the residual, though not in the covariates, and should keep the root $n$ rate.
+
+We simulated the design above at $n = 100$, 200, 400, 800, 1{,}600, 3{,}200 and 6{,}400 with 200 replications at each $n$, for errors that are $t$ on 1.5 degrees of freedom, where the predicted DML exponent is $-1/3$, $t$ on 2 degrees of freedom, and Gaussian. Besides the Student $t$ posterior mean, the posterior mean under Gaussian errors and DML, we computed an oracle: the DML score with the true nuisances in place of fitted ones, the sum of $\nu\varepsilon$ over the sum of $\nu^2$. Figure~\ref{fig:openrates} plots the median absolute error for errors on 1.5 degrees of freedom, with bootstrap intervals; the slopes below are least squares fits of log median error on log $n$ over $n \ge 400$, with 95\% bootstrap intervals. The Student $t$ posterior mean falls with slope $-0.55$ ($-0.63$ to $-0.49$), consistent with the root $n$ rate, and its intervals cover in 94 to 98 percent of replications at every $n$. DML's median error falls with slope $-0.31$ ($-0.38$ to $-0.23$), close to the predicted $-1/3$, and so do the oracle's ($-0.27$) and the Gaussian posterior mean's ($-0.31$): the slow rate belongs to the squared error score under heavy tails, not to the estimation of the nuisances. At $n = 1{,}600$ the median error of DML is 4.9 times that of the Student $t$ posterior mean, and at $n = 6{,}400$ it is 6.5 times. A few replications with extreme errors dominate the root mean squared error of DML, 2.03 at $n = 200$ and then 0.50, 0.35 and 0.30 at $n = 400$, 800 and 1{,}600, against 0.075, 0.049 and 0.034 for the Student $t$ posterior mean.
+
+With errors on 2 degrees of freedom the gap shrinks to a factor of about two and both slopes are close to $-1/2$ ($-0.50$ for the Student $t$ posterior mean and $-0.52$ for DML). This is the boundary case: the oracle score's error is of order $\sqrt{\log n/n}$, a logarithmic factor that slopes over this range of $n$ cannot detect. With Gaussian errors there is no gap. For errors on 1.5 degrees of freedom DML's Wald intervals covered 89 and 91.5 percent of replications at $n = 100$ and 200 and 95.5 to 97 percent at $n \ge 800$, where the Monte Carlo standard error of each coverage is about 1.5 percentage points.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.9\linewidth]{open_rates.pdf}
+\caption{Median absolute error of the Student $t$ posterior mean, DML and the oracle score as $n$ grows, with bootstrap 95\% intervals, for errors on 1.5 degrees of freedom and 200 replications at each $n$; reference lines for the $n^{-1/2}$ and $n^{-1/3}$ rates.}
+\label{fig:openrates}
+\end{figure}
+
+\paragraph{Conjecture.} For errors in the domain of attraction of a stable law with index $\alpha \in (1, 2)$, the posterior under a Student $t$ working model with fixed degrees of freedom contracts at the root $n$ rate and is asymptotically normal around the corresponding M estimator, with variance the inverse of the expected negative Hessian of the working log likelihood, not the sandwich variance of Section~\ref{sec:bg:large} that governs the sampling error of that estimator (Kleijn and van der Vaart 2012). Its credible intervals then have nominal coverage only if the two variances agree, and otherwise only after a sandwich correction. DML with squared error nuisances has error of order $n^{-(1 - 1/\alpha)}$, up to a slowly varying factor, and Wald intervals whose limiting coverage need not be the nominal one, since a self normalized sum is asymptotically normal only when its terms lie in the domain of attraction of the normal law (Gin\'e, G\"otze and Mason 1997). In the simulation above the departure from nominal coverage was too small to see for $n \ge 800$.
+
+\section{Problem 9: Coupling that protects confounders but not instruments}
+
+\paragraph{Setting.} Chapter~\ref{ch:horseshoe} showed that sharing local scales between outcome and treatment coefficients protects instruments along with confounders\index{coupled prior!protecting confounders but not instruments|textbf}.
+
+\paragraph{A construction.} Give each covariate a shared scale $\lambda_j$ and a private outcome scale $\eta_j$:
+\[
+\beta_j \sim N(0, \lambda_j^2\eta_j^2\tau_{\mathrm{g},Y}^2\sigma_Y^2), \quad \gamma_j \sim N(0, \lambda_j^2\tau_{\mathrm{g},T}^2\sigma_T^2), \quad \lambda_j, \eta_j \sim C^+(0,1).
+\]
+A large $\gamma_j$ makes $\lambda_j$ large, and the private scale $\eta_j$ was meant to keep $\beta_j$ shrunk unless the outcome model supplies evidence of its own; below we find that it does so only in part. With the auxiliary variables $\nu_j$ of the mixture of Section~\ref{sec:hsregression}, the full conditionals of the squared scales are inverse gamma; the square $\lambda_j^2$ of the shared scale has shape $3/2$ and rate $1/\nu_j + \beta_j^2/(2\eta_j^2\tau_{\mathrm{g},Y}^2\sigma_Y^2) + \gamma_j^2/(2\tau_{\mathrm{g},T}^2\sigma_T^2)$.
+
+\paragraph{Evidence.} We repeated the instrument design of Section~\ref{sec:sharedsim} with 40 fresh replications, so figures for independent and shared scales differ slightly from that section, and four priors: independent scales, shared scales, the product prior\index{coupled prior!product form}, and independent scales with the estimated propensity as an unpenalized covariate, all fitting treatment and outcome models jointly.
+
+\begin{table}[ht]
+\centering
+\caption{Four coupling strategies in a design with moderate confounders, instruments and prognostic covariates, 40 replications.}
+\label{tab:openprod}
+\small
+\begin{tabular}{lcccc}
+\toprule
+Prior & Bias & RMSE & Coverage & Width \\
+\midrule
+Independent scales & 0.018 & 0.038 & 38/40 & 0.17 \\
+Shared scales & 0.035 & 0.083 & 37/40 & 0.29 \\
+Product of shared and private & 0.021 & 0.050 & 38/40 & 0.21 \\
+Propensity covariate & $-$0.003 & 0.088 & 36/40 & 0.31 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{open_product.pdf}
+\caption{Error of four coupling strategies in the instrument design, 40 replications.}
+\label{fig:openproduct}
+\end{figure}
+
+The product prior recovers most of what shared scales lose, cutting error from 0.083 to 0.050 (Figure~\ref{fig:openproduct}) and interval width from 0.29 to 0.21 (Table~\ref{tab:openprod}). The propensity covariate is nearly unbiased but has the largest error: the five instruments dominate the estimated propensity, and adding it to the outcome model imports their variance. Here independent scales are best, which we attribute mainly to the instruments raising the variance of the treatment and so shrinking the bias of either prior (Exercise~\ref{ex:ch07:7} compares the design without instruments). In the design of Section~\ref{sec:ricsim}, with no instruments and confounders driving both models strongly, coupling to the whole sample propensity covariate cut the independent horseshoe's bias from 0.059 to $-0.023$, although DML had the smaller error. Every coupling device trades bias protection against variance from instruments.
+
+\paragraph{What the product prior does to an instrument.} The product prior does not shrink a pure instrument's outcome coefficient as the independent prior does. Conditional on the shared scale $\lambda_j$, the outcome coefficient $\beta_j$ has a horseshoe prior with global scale $c = \lambda_j\tau_{\mathrm{g},Y}$. For an instrument the treatment model makes $\lambda_j$ large, and a horseshoe with a large global scale shrinks little. Figure~\ref{fig:openproduct2} computes the posterior shrinkage weight $\E(\kappa_j \mid y)$ of a coefficient whose standardized estimate is $y$, as a function of $c$: at $y = 0$, pure noise, the weight is 0.67 at $c = 1$ but 0.33 at $c = 10$ and 0.24 at $c = 30$. The product prior therefore protects an instrument only partially, which is why its error in Table~\ref{tab:openprod} lies between the independent and shared priors.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.85\linewidth]{open_product2.pdf}
+\caption{Posterior shrinkage weight of an outcome coefficient under a horseshoe with global scale $c$, for standardized estimates $y = 0$, 1 and 2. Under the product prior an instrument's $c$ is large, so its coefficient is shrunk less.}
+\label{fig:openproduct2}
+\end{figure}
+
+\paragraph{A limit on coordinatewise coupling.} Any prior whose scale for $\beta_j$ increases with the evidence for $\gamma_j$ protects instruments along with confounders: the treatment model cannot distinguish them. Only the outcome model separates them, and the independent horseshoe already uses that evidence through tail robustness. Coupling that protects confounders without instruments must therefore use the outcome evidence as well, or act on directions rather than coordinates. The propensity covariate protects the single direction $X\gamma$, the confounding direction when the covariates driving treatment also drive the outcome and merely a noisy one when they are instruments, which is why it was unbiased but noisy in the table.
+
+\paragraph{Conjecture.} Among priors that are exchangeable across coordinates and depend on the treatment model only through the posterior of $\gamma$, none achieves both the independent prior's variance on instruments and the shared prior's bias protection on confounders. The propensity covariate attains the bias protection, and the residual variance it imports from instruments is the price of a coordinate free coupling.
+
+\section{Problem 10: Teaching}
+
+This problem is not technical\index{open problems!teaching|textbf}. Many courses in economics and epidemiology now teach causal inference with DML and its relatives at the centre, and the model first view, if at all, as an alternative for specialists.
+
+\paragraph{Open question.} Write the introductory course in which students fit a model, report its posterior and compute every causal summary as accounting, with the average treatment effect introduced as the first such summary rather than the object of inference.
+
+Table~\ref{tab:course} gives a ten week outline, with the data set, the computation and the comparison for each week. Every week fits one model, reads several accountings off it, and asks what DML or its relative would have reported and left out. The scripts in the repository of Appendix~\ref{app:code} carry out each week's analysis.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{A ten week course in model first causal inference.}
+\label{tab:course}
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{@{}cL{1.15in}L{0.85in}L{1.0in}L{0.85in}@{}}
+\toprule
+Week & Topic & Data & Computation & Compared with \\
+\midrule
+1, 2 & Potential outcomes, exchangeability, the average effect as accounting & Thornton & logistic model, Polya Gamma Gibbs & difference in proportions \\
+3 & Randomization and its failures & Lanarkshire, twins & paired model, posterior for the bias & Student's critique \\
+4 & Shrinkage priors and confounding & 401(k) & coupled horseshoe Gibbs & lasso plug in, DML \\
+5 & Trees and surfaces & NHEFS, LaLonde & BART, causal forest & matching, weighting \\
+6 & Inverse weighting and its critique & simulated cells & Horvitz Thompson, coupled prior & Robins and Ritov \\
+7 & Difference in differences & castle doctrine & horseshoe difference in differences & two way fixed effects \\
+8 & Instruments & Card & reduced form posterior & two stage least squares \\
+9 & Bounds and sensitivity & smoking & posterior inside the bounds & Cornfield, E value \\
+10 & The workflow on a project & the student's & all of the above & the student's choice \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+We hope this book is a step toward that course.
+
+\section{Problem 11: Rates for the triangular network posterior}
+
+\paragraph{Setting.} Chapter~\ref{ch:computation} learns the posterior of a parameter $\theta$ of dimension $d$ as a triangular map\index{triangular map!rates for the network posterior|textbf} from uniform noise, each coordinate through its quantile function given the earlier ones, fitted by minimizing the check loss on simulated pairs $(\theta, D)$. The network sees the data through a summary $S(D)$, and its accuracy at the observed summary $s$ is the Wasserstein distance between its posterior and the posterior given $S = s$.
+
+\paragraph{What is known.} By Proposition~\ref{gbc:prop:pinball} a trained network differs from the summary posterior only through finite training, and for that the theory is thin. Section~\ref{comp:sec:summaries} states what we have: rates at one fixed quantile level from Padilla, Tansey and Chen (2022), no rate for the randomly drawn levels our network trains on, and consistency for fully connected ReLU networks (Theorem A.4 of Polson and Sokolov 2026a), which covers neither the product architecture of Section~\ref{comp:sec:network} nor the optimization error. In one dimension the Wasserstein distance is the mean absolute error between the learned quantile function, sorted where it crosses, and the exact one, which is 0.004 for the two arm trial of Chapter~\ref{ch:computation} at its observed data set. That is a value at a chosen data set, not a rate, and Problem 6 shows why uniformity over the summary matters.
+
+\paragraph{Open question.} Give rates, uniform over the observed summary, for the Wasserstein error of the triangular quantile network posterior in $d$ dimensions, as a function of the number of training simulations, the network class and the smoothness of the posterior quantile functions. The posterior's own spread shrinks like $n^{-1/2}$, and rescaling by $\sqrt{n}$ multiplies a Wasserstein distance by $\sqrt{n}$, so a network error $e$ keeps a Bernstein von Mises limit that the exact summary posterior has in Wasserstein distance when $\sqrt{n}\,e \to 0$. The number of training simulations must grow with $n$ fast enough to give that.
+
+\section{Problem 12: Orthogonal summaries}
+
+\paragraph{Setting.} The network of Chapter~\ref{ch:computation} learns the posterior given a summary $S(D)$, which conditions on less than the data\index{open problems!orthogonal summaries|textbf}. For the average effect in the nonparametric model for the outcome regression and the propensity score, the efficiency of that posterior depends on what the summary contains, and we do not know what it must contain.
+
+\paragraph{What is known.} Proposition~\ref{blp:prop:bvm} of Chapter~\ref{ch:blp}, restated in Section~\ref{comp:sec:summaries}, centres the posterior given an asymptotically normal summary at the efficient minimum distance estimator built from it, and makes that posterior asymptotically at least as concentrated as any asymptotically normal estimator of the target that the summary contains. Both statements concern the exact summary posterior, not a trained network. In a correctly specified regular parametric model, summaries that are sufficient or contain an efficient estimator give a posterior that is efficient for that model (Section~\ref{comp:sec:core}).
+
+The nonparametric model is different. A prior that ignores the propensity score can bias the posterior for the average effect at the $\sqrt{n}$ scale. Ray and van der Vaart (2020) repair this by perturbing the prior in the inverse propensity direction (Problem 1), and a generative posterior inherits whatever its prior does. The fitted propensity in the summary of Chapter~\ref{ch:computation} changes what the posterior conditions on, not the prior: a propensity aware prior has to be built into the simulator, and we have no theorem saying which summaries are then enough.
+
+\paragraph{Open question.} Characterize the summaries $S$ for which the summary posterior of an average effect satisfies a semiparametric Bernstein von Mises theorem in the nonparametric model, extending Ray and van der Vaart (2020) from priors to summaries. We call such summaries orthogonal\index{summary statistics!orthogonal|textbf}, after the Neyman orthogonal score of Chapter~\ref{ch:dml}.
+
+\section{Problem 13: Calibration of distorted values}
+
+\paragraph{Setting.} The decision phase of Chapter~\ref{ch:cdt} turns the learned quantile function of utility into a distorted value\index{calibration!of distorted values|textbf}\index{risk sensitive decisions!calibration of distorted values|textbf} $\Vbeta(a)$ for each action $a$ and returns the action with the largest value. In the illustration of Section~\ref{gbc:sec:risk}, two programmes with means 1.00 and 1.08 have conditional value at risk at level 0.25 of 0.56 and $-0.02$, so the choice turns on the lower tail of utility, which no average effect expresses.
+
+\paragraph{What is known.} The checks of Chapter~\ref{ch:computation} are for a parameter: simulation based calibration near the observed data, with a proposed correction by importance reweighting (Section~\ref{comp:sec:checks}). The coverage studies of Chapter~\ref{ch:blp} concern parameters and means. For the action itself, Proposition~\ref{gbc:prop:regret} bounds the regret of the Bayes policy by twice the Lipschitz constant times the concentration of the posterior, for expected utility and under a Lipschitz condition, which holds for an infinite dimensional effect surface in the $L^1$ norm but then needs the posterior mean of that distance to shrink. A finite check in one conjugate design, the conditional value at risk of the risk difference in a two arm trial (Section~\ref{gbc:sec:normal}), finds the network's action different from the exact Bayes action in under 2.3 percent of trials but in 5 to 58 percent of close calls, at small cost.
+
+\paragraph{Open question.} Develop checks corresponding to these for $\Vbeta(a)$ and for the Bayes action itself. Part of the question is what there is to cover, since $\Vbeta(a)$ is a functional of the posterior predictive law of utility, random through $\theta$ as well as $Y(a)$, and not a function of $\theta$ alone.
+
+\section{Problem 14: Time consistency of distortions}
+
+\paragraph{Setting.} In the dynamic treatment regimes of Section~\ref{gbc:sec:dynamic} of Chapter~\ref{ch:cdt}, a policy that learns from the outcomes it generates solves a Bayes adaptive decision process: the value of an action in the first period averages the best second period value, computed from the posterior updated on the first period's outcome. Replacing the expectations in that recursion by distorted values at each stage gives a risk sensitive policy, the stagewise version; distorting the utility of the whole horizon at once gives the whole horizon version.
+
+\paragraph{What is known.}  For distorted values Section~\ref{gbc:sec:dynamic} observes that distorted criteria are not in general time consistent\index{risk sensitive decisions!time consistency|textbf}, so that the stagewise and whole horizon versions can differ. For CVaR at level one half the two versions can choose different first period actions (Exercise~\ref{ex:chgbc:5}), and no other row of Table~\ref{gbc:tab:distortions} is time consistent either, except the risk neutral one (CVaR at $\eta = 1$, Wang at $\eta = 0$ and CPW at $\eta = 1$ are that row). Kupper and Schachermayer (2009) show that a normalized, law invariant criterion that is time consistent, strictly monotone, continuous and has the Fatou property is the certainty equivalent of an expected utility, and that the only law invariant, time consistent and relevant dynamic risk measure is the entropic one. A distortion criterion shifts by $c$ when $c$ is added to the utility and scales by $k > 0$ when the utility is multiplied by $k$, and the only certainty equivalent that does both is the mean, which rules out the Wang, power and CPW rows. CVaR with $\eta < 1$ is not strictly monotone, but it is a relevant coherent risk measure and not the entropic one, so the second result rules it out. For every row except risk neutral, some two period problem therefore gives different stagewise and whole horizon values.
+
+\paragraph{Open question.} For each distortion of Table~\ref{gbc:tab:distortions} (the Wang distortion, the two power distortions, CPW and CVaR across its levels), find the problems of the dynamic setting of Section~\ref{gbc:sec:dynamic} in which the stagewise and whole horizon risk sensitive Bayes policies still choose the same actions, bound the whole horizon value the stagewise policy gives up when they do not, and find whether that loss shrinks as the posterior concentrates.
+
+\section{Problem 15: Which flow an invariant transport selects}
+
+\paragraph{Setting.} Proposition~\ref{gr:prop:transport} turns an invariant transport into a group\index{open problems!flow of an invariant transport|textbf}. When the treatment does the same thing in every covariate cell, the treated law of each cell is the control law pushed through one increasing map $M$ of the line, and the smallest group that contains $M$ is the cyclic group it generates. A dose interpretation of the effect, in which a fraction $s$ of the treatment acts as a group element $g^{s}$ with $g^{1}=M$, needs $M$ to sit inside a one parameter flow.
+
+\paragraph{What is known.} Fort (1955) proved that every increasing homeomorphism of the line embeds in a continuous flow of increasing homeomorphisms, so a flow through $M$ always exists. When $M$ is not the identity the flow is not unique: on each stretch of the line free of fixed points of $M$ it is built from a chart chosen freely on one fundamental domain, and any other choice gives another flow with the same $g^{1}$. The map $M$ therefore fixes the effect of one full dose and no other dose. A smooth flow is singled out under conditions on $M$ at its fixed points (Szekeres 1958; Kopell 1970).
+
+\paragraph{Open question.} For a translation $M$ in the logit chart on $(0,1)$, multiplying the shift by $s$ gives the unique flow smooth up to the fixed endpoints (Szekeres 1958; Kopell 1970), while many flows are smooth on the open interval. Give conditions under which the model or estimated cell laws select one flow through $M$, determining the dose interpretation $g^s$, and say when the choice can only be a convention.
+
+\section{Problem 16: Choosing the scale and testing stability on one data set}
+
+\paragraph{Setting.} Section~\ref{gr:sec:kidney} proposes a prior on the Aranda Ordaz index $\lambda$ for choosing the scale; Proposition~\ref{gr:prop:hstest} tests stability on a given scale with a horseshoe on stratum departures $\eta_j$ from a common effect\index{open problems!choosing the scale and testing stability|textbf}. Applied in sequence, they use the same data to choose the scale and test stability on it.
+
+\paragraph{What is known.} Theorem~\ref{gr:thm:select} gives the rate at which the posterior selects among a finite set of scales under smooth positive priors, with the information gap as the exponent. Proposition~\ref{gr:prop:hstest} gives the Bayes factor of stability on one scale, with different rates under two priors for the global scale $\gscale$. Neither covers a prior on $\lambda$ together with a horseshoe on the scale it selects, and we know of no result on what the test is worth when the scale was chosen from the same data.
+
+\paragraph{Open question.} Give a coherent joint prior on $(\lambda,\psi,\gscale)$ under which the choice of scale and the test of stability on the chosen scale are one posterior, and find its frequency properties: the size of the test of stability when the scale was chosen from the same data, and the rate at which the posterior over $\lambda$ moves towards the boundary of the family as $n$ grows.
+
+\section{Problem 17: A group effect with a nonparametric baseline}
+
+\paragraph{Setting.} Part (b) of Theorem~\ref{gr:thm:recon} gives credible sets for the group effect $g$ with exact coverage under the right Haar prior when the baselines are known\index{open problems!group effect with a nonparametric baseline|textbf}. With an unknown baseline map $\gamma(\cdot)$ under a BART or horseshoe prior the guarantee of exactness is lost (Remark~\ref{gr:rem:nuisance}).
+
+\paragraph{What is known.} A semiparametric Bernstein von Mises theorem for the marginal posterior of $g$ needs conditions on the prior for $\gamma$ that remove the bias from shrinkage of the baseline, the regularization induced confounding\index{regularization induced confounding} of Hahn, Carvalho, Puelz and He (2018) (Chapter~\ref{ch:ipw}). Ray and van der Vaart (2020) remove it for the mean of a binary outcome missing at random by perturbing the prior in the inverse propensity direction. We know of no first order result for the effect of a group action, with right Haar on $g$ and BART on $\gamma$.
+
+\paragraph{Open question.} First, find a prior for $\gamma(\cdot)$, perhaps a coupled prior in the sense of Problem 2, for which the marginal posterior of $g$ has first order correct frequentist coverage. Then ask for a semiparametric version, with right Haar on $g$ and that prior on $\gamma$, whose coverage is exact to second order.
+
+\section{Problem 18: Stability on the affine group}
+
+\paragraph{Setting.} Proposition~\ref{gr:prop:hstest} tests whether an effect is the same in every stratum when the effect is one number, an element of the additive group, with a horseshoe on the departures of the stratum effects from a common one\index{open problems!stability on the affine group|textbf}. On the affine group of Proposition~\ref{gr:prop:affine} the effect has two components, a scale $\sigma$ and a location $\mu$.
+
+\paragraph{What is known.} For one component and at least three strata, under a half Cauchy prior on the global scale in the units of the data, the Bayes factor for stability grows only like $\sqrt n$ when the effect is stable, and the Bayes factor against it grows exponentially in $n$ under a fixed departure (Proposition~\ref{gr:prop:hstest}). On the affine group the scale part of a composite of treatments is order free and the location part is not (Proposition~\ref{gr:prop:affine}), so the two components are stable in different senses, and a test of one departure does not cover both.
+
+\paragraph{Open question.} Extend Proposition~\ref{gr:prop:hstest} to the affine group, testing stability separately for the order free scale component and the order dependent location component, and find the rate of the Bayes factor for each, alone and together, under a horseshoe on the departures of each component.
+
+\section{Problem 19: An equivariant generator for a group effect}
+
+\paragraph{Setting.} For an element $h$ of a group $H$ acting on a response of any dimension, write $P_{x,t}$ for the law of $Y(t)$ given $X=x$ and $h_\#P$ for the law of $hY$ when $Y\sim P$. The structure of Proposition~\ref{gr:prop:transport}, stated there for a real outcome, is then $P_{x,1}=h_\#P_{x,0}$ for every $x$\index{open problems!equivariant generator|textbf}. The GenTE learner of Chapter~\ref{ch:gente} simulates the outcome from uniform noise $u$ through conditional quantile functions $q_t(u\mid x)$ fitted on data from both arms.
+
+\paragraph{What is known.} For a real outcome and increasing $h$ the quantile function of $hY(0)$ given $X=x$ is $h\{F^{-1}_{x,0}(u)\}$, so a generator with $G(u,x,1)=h\{G(u,x,0)\}$, which we call equivariant, needs one baseline generator and one group element in place of two separate generators. In higher dimensions too, if $B(U,x)$ has law $P_{x,0}$, then $hB(U,x)$ has law $h_\#P_{x,0}=P_{x,1}$, for any measurable action. Sharing the noise $u$ between the arms fixes a coupling of $Y(0)$ and $Y(1)$, the comonotone one for a real outcome, which the arm laws do not identify (Section~\ref{sec:ot}); it is a device for simulating the two arms and says nothing about individual effects. What the constraint saves in training cost, and what it does to the approximation error of the network, are open.
+
+\paragraph{Open question.} For a group $H$ indexed by a finite dimensional parameter, with $h$ estimated from the data, find when one baseline network and an estimated $h$ reach a given Wasserstein error in the arm laws with fewer training draws or network parameters than two unrestricted arm generators. Then bound the error the constraint adds when the group structure holds only approximately, with $P_{x,1}$ within $\delta$ of $h_\#P_{x,0}$ in Wasserstein distance uniformly in $x$.
+
+\section{Problem 20: Selection with weak instruments in the reparameterized model}
+
+\paragraph{Setting.} The bivariate normal selection model of Chapter~\ref{ch:frameworks}, the one behind \eqref{ss:eq:mills}, has a latent propensity $T^\ast=X^\top\kappa+Z^\top\eta+V$, a treatment $T=\one\{T^\ast>0\}$ and an outcome $Y=X^\top\beta+\tau T+U$ observed for every unit, with correlation $\rho$ between $U$ and $V$; the instruments in $Z$ enter the selection equation and not the outcome, and the target is $\tau$\index{open problems!selection model with weak instruments|textbf}. Chapter~\ref{ch:iv} sketches its Bayesian treatment by data augmentation and shows what weak instruments do to a posterior. The reparameterization of Chapter~\ref{ch:horseshoe} puts the shrinkage on coordinates in which the nuisance priors do not leak into the effect, for a treatment that is exogenous given $X$.
+
+\paragraph{What is known.} Neither result covers the selection model. With a horseshoe prior on the coefficients of the instruments in the selection equation, weak instruments are shrunk towards zero, and an instrument that is shrunk away leaves the effect identified only through the functional form and through the prior on $\rho$.
+
+\paragraph{Open question.} Extend the reparameterization to the selection model, with a horseshoe on the instrument coefficients and a prior on $\rho$, and determine when weak instruments make the posterior of the effect dominated by the prior. A first step is a simulation with a known $\rho$ and instruments of increasing strength, followed by a theorem on the rate at which the posterior moves from the prior to the data as the instrument strength grows with $n$.
+
+\section*{Notes}
+
+Problems 1, 2 and 9 rest on Castillo and Rousseau (2015), Ray and van der Vaart (2020) and van der Pas, Kleijn and van der Vaart (2014); Appendix~\ref{app:guarantees} states what is known about posterior contraction and Bernstein von Mises theorems. Breunig, Liu and Yu (2022) and Yiu, Fong, Holmes and Rousseau (2025) extend the propensity dependent prior, to double robustness and to one step posterior corrections. Regularization induced confounding is from Hahn, Carvalho, Puelz and He (2018), the propensity covariate from the Bayesian causal forest of Hahn, Murray and Carvalho (2020), and the Dirichlet additive regression tree prior of Problem 2 from Linero (2018). Kleijn and van der Vaart (2012) is the starting point for the misspecified working model of Problem 8. Problem 20 joins the selection correction of Heckman (1979), and the Gibbs sampler of Chib and Hamilton (2002) sketched in Chapter~\ref{ch:iv}, to the reparameterization of Chapter~\ref{ch:horseshoe}.
+
+Problem 3 is the example of Robins and Ritov (1997), with Horvitz and Thompson (1952) as the competing estimator. Wasserman (2004) popularized it, Sims (2012) replied, Ritov, Bickel, Gamst and Kleijn (2014) ask which Bayesian procedures are CODA, and Linero (2024) argues that ignorability is an informative prior. Chapter~\ref{ch:ipw} tells the story.
+
+For Problems 4, 5 and 7, the sources are Pearl (1999) and Tian and Pearl (2000) on probabilities of causation, Chickering and Pearl (1996) on posteriors within bounds, Pearl and Bareinboim (2014) on transport, Makarov (1981) on sharp bounds, Student (1931) on twins, Bernardo (1979) on reference priors, and Nelsen (2006) on rank correlations and the Gaussian copula.
+
+The scale family of Problem 16 is Aranda Ordaz (1981).
+
+For Problems 6, 11 and 12, see the Notes of Chapter~\ref{ch:computation}; the target of Problem 12 is the theorem of Ray and van der Vaart (2020), and orthogonality is Neyman's (1959). The sources for Problems 13 and 14 are Yaari (1987), Tversky and Kahneman (1992), Wang (2000), and Dabney, Ostrovski, Silver and Munos (2018) (Chapter~\ref{ch:cdt}).

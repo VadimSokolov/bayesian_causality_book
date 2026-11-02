@@ -1,0 +1,349 @@
+\chapter{Bounds and Sensitivity}\label{ch:tianpearl}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+The probabilities that a treatment was necessary, sufficient, or both depend on the joint law of potential outcomes and are bounded rather than identified. Combining experimental and observational data narrows the bounds, and a Bayesian posterior over the position inside them gives a court the probability it actually needs. The second half of the chapter turns to unmeasured confounding: Cornfield's inequality, Rosenbaum's parameter and the E value say how strong a hidden confounder must be to overturn a result, and a prior on the confounding parameters turns that threshold into a posterior probability that the effect is positive.
+\end{tcolorbox}
+
+A court hearing a claim against a tobacco company does not ask whether smoking raises the risk of lung cancer in the population. It asks whether this plaintiff's cancer was caused by smoking: a question about the joint behaviour of two potential outcomes for one person. Pearl\index{Pearl, Judea!probabilities of causation|textbf} (1999) defined the probabilities of necessity, sufficiency and both. Tian and Pearl (2000) showed that experimental and observational data bound them but, without further assumptions such as monotonicity, do not point identify them.
+
+\section{Three probabilities of causation}
+
+Let $X$ be a binary exposure and $Y$ a binary outcome. From Section~\ref{sec:sensitivity} on, treatment is $T$ and covariates are $X$; Cornfield's inequality and the E value use exposure $E$ and disease $D$. Write $y_x$ for $Y(x) = 1$, $y'_x$ for $Y(x) = 0$, $x$ for $X = 1$ and $x'$ for $X = 0$.
+
+\begin{definition}[Probabilities of causation]
+\begin{align*}
+\PN &= \Prob(y'_{x'} \mid x, y), && \text{probability of necessity,}\\
+\PS &= \Prob(y_x \mid x', y'), && \text{probability of sufficiency,}\\
+\PNS &= \Prob(y_x, y'_{x'}), && \text{probability of necessity and sufficiency.}
+\end{align*}
+\end{definition}
+
+$\PN$ asks: what fraction of the exposed who developed the outcome would not have developed it without exposure\index{probability of necessity|textbf}\index{PN|see{probability of necessity}}? $\PS$ asks the reverse: what fraction of the unexposed without the outcome would have developed it if exposed\index{probability of sufficiency|textbf}? $\PNS$ is the probability that a random person is one for whom exposure makes the difference both ways\index{probability of necessity and sufficiency|textbf}\index{PNS|see{probability of necessity and sufficiency}}.
+
+A court asks $\PN$, because the plaintiff was exposed and fell ill and the issue is whether the exposure was needed. A regulator deciding whether to permit an exposure asks $\PS$, because the people at issue are not yet exposed. A company choosing whom to target with an incentive asks $\PNS$ whenever a customer put off by the incentive costs it a different amount from what a converted customer earns (Section~\ref{sec:decisions}). None of the three is an average treatment effect. The average effect $\Prob(y_x) - \Prob(y_{x'})$ compares two margins; the probabilities of causation\index{probabilities of causation|textbf} ask how the two potential outcomes of one person sit together, the coupling of Section~\ref{sec:ot}. Two populations with the same margins can differ in that respect, one in which exposure harms some and protects others, another in which it only harms, and the probabilities of causation differ between them while every average agrees.
+
+For binary outcomes the coupling is a single number once the two margins are known. $\PN$ and $\PS$ also depend on who chose exposure, through the joint law of $(X, Y(0), Y(1))$, which leaves two such numbers once the experimental and observational margins are known. The data inform the margins, and the numbers that fix the coupling are seen by no one, because no person is observed both exposed and unexposed.
+
+\section{Bounds from experimental and observational data}
+
+\paragraph{Experimental data alone.} A randomized experiment gives $\Prob(y_x)$ and $\Prob(y_{x'})$. The joint law of $(Y(0), Y(1))$ is a $2 \times 2$ table with these margins and one free parameter.
+
+\begin{theorem}[Tian and Pearl]
+From experimental data alone\index{probabilities of causation!bounds on|textbf},
+\[
+\max\{0,\ \Prob(y_x) - \Prob(y_{x'})\} \leq \PNS \leq \min\{\Prob(y_x),\ \Prob(y'_{x'})\}.
+\]
+\end{theorem}
+
+\begin{proof}
+Write $p_{ab} = \Prob\{Y(1) = a, Y(0) = b\}$. Then $\PNS = p_{10} = \Prob(y_x) - \Prob(y_{x'}) + p_{01}$, so nonnegativity gives the lower bound. Also $p_{10} \leq \Prob(y_x)$ and $p_{10} \leq \Prob(y'_{x'})$, giving the upper bound.
+\end{proof}
+
+When $\Prob(y_x) \geq \Prob(y_{x'})$, the lower bound is attained when exposure prevents the outcome in no one, $p_{01} = 0$: monotonicity. Then $\PNS = \Prob(y_x) - \Prob(y_{x'})$, the risk difference. When the order is reversed the lower bound is zero, and the margins themselves rule monotonicity out. Section~\ref{gr:sec:margins} derives the same bounds as Fr\'echet bounds on the fraction helped in the urn of a randomized experiment, and says which other quantities the margins identify.
+
+\paragraph{Combining experimental and observational data.} Tian and Pearl's deeper result is that observational data, revealing who chose exposure and what followed, narrow the bounds\index{Tian and Pearl bounds|textbf} further.
+
+\begin{theorem}[Tian and Pearl]
+With both experimental quantities $\Prob(y_x), \Prob(y_{x'})$ and observational quantities $\Prob(x, y)$, $\Prob(x, y')$, $\Prob(x', y)$, $\Prob(x', y')$, measured on the same population, with $Y = Y(X)$ in the observational data, and writing $\Prob(y)$ for the observational outcome rate,
+\[
+\max\left\{0,\ \frac{\Prob(y) - \Prob(y_{x'})}{\Prob(x, y)}\right\} \leq \PN \leq \min\left\{1,\ \frac{\Prob(y'_{x'}) - \Prob(x', y')}{\Prob(x, y)}\right\},
+\]
+and $\PNS$ lies between
+\[
+\max\{0,\ \Prob(y_x) - \Prob(y_{x'}),\ \Prob(y) - \Prob(y_{x'}),\ \Prob(y_x) - \Prob(y)\}
+\]
+and
+\begin{multline*}
+\min\bigl\{\Prob(y_x),\ \Prob(y'_{x'}),\ \Prob(x, y) + \Prob(x', y'),\\
+\Prob(y_x) - \Prob(y_{x'}) + \Prob(x, y') + \Prob(x', y)\bigr\}.
+\end{multline*}
+\end{theorem}
+
+Tian and Pearl (2000) prove it by linear programming: the joint law of $(X, Y(0), Y(1))$ has eight cells, the data fix several linear combinations, and the bounds are the extremes of $\PN$ or $\PNS$ over the remaining polytope (Appendix~\ref{app:graphs} sketches the program).
+
+The bound on $\PN$ follows in a few lines from a single cell. Let $q_{111} = \Prob\{X = 1, Y(1) = 1, Y(0) = 1\}$, the exposed who fall ill and would have fallen ill anyway, and let $r = \Prob(y_{x'}) - \Prob(x', y)$, the share who are exposed and have $Y(0) = 1$, since the unexposed show $Y(0)$. The exposed who fall ill have $Y(1) = 1$, so $\PN = 1 - q_{111}/\Prob(x, y)$ when $\Prob(x, y) > 0$. The exposed with $Y(0) = 1$ either fall ill under exposure, and are counted in $q_{111}$, or are among the $\Prob(x, y')$ who stay well, so
+\[
+\max\{0,\ r - \Prob(x, y')\} \leq q_{111} \leq \min\{\Prob(x, y),\ r\}.
+\]
+The upper limit gives the lower bound on $\PN$ and the lower limit gives the upper bound.
+
+The same argument with the cell $\Prob\{X = 0, Y(1) = 1, Y(0) = 0\}$ bounds the probability of sufficiency, for $\Prob(x', y') > 0$:
+\[
+\max\left\{0,\ \frac{\Prob(y_x) - \Prob(y)}{\Prob(x', y')}\right\} \leq \PS \leq \min\left\{1,\ \frac{\Prob(y_x) - \Prob(x, y)}{\Prob(x', y')}\right\}.
+\]
+Splitting the people exposure helps by whether they chose it gives $\PNS = \Prob(x, y)\,\PN + \Prob(x', y')\,\PS$, an identity every joint posterior draw of the three must satisfy. Under monotonicity, with margins that allow it, all three are identified without exogeneity (Tian and Pearl 2000), each at its lower bound: $\PNS = \Prob(y_x) - \Prob(y_{x'})$, $\PN = \{\Prob(y) - \Prob(y_{x'})\}/\Prob(x, y)$ and $\PS = \{\Prob(y_x) - \Prob(y)\}/\Prob(x', y')$.
+
+
+
+\section{The Bayesian reading}
+
+The bounds are what the data say; a Bayesian adds what the analyst believes about the rest.
+
+This is not a departure from Pearl. Chapter 8 of \emph{Causality} (Pearl 2009) follows its linear programming bounds for noncompliance with finite sample inference by Gibbs sampling over response types, after Chickering and Pearl (1996), and shows how the posterior inside the bounds depends on the prior. We do the same for the probabilities of causation\index{probabilities of causation!Bayesian reading|textbf} of Pearl's Chapter 9.
+
+Parametrize the joint law by its identified margins and an unidentified $u \in [0,1]$ locating $\PNS$ within its bounds:
+\[
+\PNS = \PNS_{\mathrm{lo}} + u(\PNS_{\mathrm{hi}} - \PNS_{\mathrm{lo}}),
+\]
+where the bounds $\PNS_{\mathrm{lo}}$ and $\PNS_{\mathrm{hi}}$ are functions of the identified margins. Place a prior on $u$, independent of the margins. As $n$ grows the posterior for the margins concentrates; the posterior for $u$ equals its prior.
+
+\begin{proposition}\label{prop:partial}
+In a partially identified model with identified parameter $\phi$ and unidentified parameter $\xi$, a priori independent, where the likelihood depends on $\phi$ alone, the posterior of $\phi$ concentrates at $\phi_0$ and $h$ is continuous in $\phi$, the posterior of $\tau = h(\phi, \xi)$ converges weakly as $n \to \infty$ to the law of $h(\phi_0, \xi)$ with $\xi$ drawn from its prior.
+\end{proposition}
+
+Appendix~\ref{app:theory} proves it, allowing $\xi$ to depend on $\phi$ a priori. Here $\phi$ holds the identified margins, $\xi = u$ and $\tau = \PNS$, so the limiting posterior is the prior on $u$ spread between the limiting bounds.
+
+Figure~\ref{fig:pns} shows a hypothetical experiment with 500 units per arm, 150 events under exposure and 50 without, with uniform priors on the two arm risks and 20,000 posterior draws. The posteriors of the two bounds are centred near 0.20 and 0.30. We show two posteriors for $\PNS$: one with $u$ uniform, and one with $u \sim \mathrm{Beta}(1/2, 1/2)$, which puts most mass near the ends of the interval.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{pns.pdf}
+\caption{Posterior of $\PNS$ in a hypothetical experiment with 150 of 500 exposed and 50 of 500 unexposed developing the outcome, under two priors for its position within the bounds (dotted lines at the population bounds 0.20 and 0.30).}
+\label{fig:pns}
+\end{figure}
+
+The $\mathrm{Beta}(1/2, 1/2)$ prior is the law of the horseshoe\index{horseshoe prior} shrinkage coefficient from Chapter~\ref{ch:horseshoe} at unit global scale. It favours two cases: exposure essentially never prevents the outcome and $\PNS$ is near the lower bound, or it has substantial effects in both directions and $\PNS$ is near the upper bound. Firm belief in monotonicity puts a point mass at $u = 0$ and recovers the risk difference.
+
+The probabilities of causation also extend the accounting view. The average treatment effect is accounting over covariates; $\PNS$ is accounting over the unidentified coupling. Both are posterior functionals, but the second carries a prior no amount of data will overwhelm, and the honest report states it.
+
+\section{Individual decisions}\label{sec:decisions}
+
+Mueller, Li and Pearl (2022) used these bounds to choose whom to treat\index{individual decision|textbf}. A company offering customers an incentive wants to target those for whom it makes the difference, not those who would buy anyway or never buy. Within a covariate stratum, let $p_{10} = \PNS$ be the share the incentive converts and $p_{01}$ the share it deters. If a purchase earns $g$ and the incentive costs $c$, targeting a customer yields $g\{Y(1) - Y(0)\} - c$, where $Y = 1$ means a purchase. Its mean is $g(p_{10} - p_{01}) - c$, the gain times the risk difference, minus the cost. The experiment identifies the risk difference, so the coupling never enters and the prior on $u$ never decides.
+
+The coupling matters only when a deterred customer costs the company an amount $L$ that differs from the gain $g$ of a conversion, as when a customer put off for good costs more than a conversion's one-off margin. The mean payoff is then
+\[
+g p_{10} - L p_{01} - c = (g - L)\,\PNS + L(p_{10} - p_{01}) - c.
+\]
+A minimax rule\index{minimax rule|textbf} protects against the worst coupling consistent with the data: it targets a stratum only if the return at that coupling already pays for the incentive. The worst coupling puts $\PNS$ at its lower bound when $g > L$ and at its upper bound when $L > g$, and the rule gives up return wherever the bounds are wide. A Bayes rule\index{Bayes decision rule} averages the payoff over the posterior for the coupling, which puts the posterior mean of $\PNS$ in the formula, so a stratum whose bounds straddle the break even point is targeted or not according to where the prior places $u$.
+
+With the margins known, the payoffs the coupling allows fill an interval of width $|g - L|(\PNS_{\mathrm{hi}} - \PNS_{\mathrm{lo}})$, and the two rules disagree only in a stratum where that interval contains zero. Width alone does not determine how often they disagree across strata: even $\PNS$ bounds of $[0.49, 0.50]$, with experimental risks 0.99 and 0.50, can straddle the break even point, while a wide interval can lie entirely on one side.
+
+For any decision about an individual, such as whom to treat or whom to warn, the coupling enters only when changes in opposite directions have different values. An analyst should report, for each stratum, the bounds, the posterior under a stated prior on $u$, and the decision each implies. The strata where the two decisions differ are the ones where the prior is doing the work; label them as such rather than hide them inside a single targeting list.
+
+\section{Probabilities of causation in court}\label{sec:court}
+
+United States civil plaintiffs must prove causation\index{probabilities of causation!in court|textbf} by a preponderance of the evidence\index{preponderance of the evidence|textbf}, usually read as a probability above one half. Toxic tort plaintiffs typically have no direct evidence about their own case and rely on epidemiology. Several courts require a relative risk\index{risk ratio|textbf}\index{relative risk|see{risk ratio}} above two to support specific causation, on the ground that it implies more than half of exposed cases are attributable to the exposure. In \emph{Daubert v. Merrell Dow Pharmaceuticals}\index{Daubert v. Merrell Dow Pharmaceuticals|textbf} (1995), on remand from the Supreme Court, the Ninth Circuit required proof that the drug more than doubled the risk of the birth defect.
+
+Tian and Pearl show when that rule is justified. Under exogeneity and monotonicity, the probability of necessity\index{probability of necessity} equals the excess risk ratio $1 - 1/\mathrm{RR}$, which exceeds one half exactly when $\mathrm{RR} > 2$. Without monotonicity, $1 - 1/\mathrm{RR}$ is only a lower bound and the true probability may be higher. Without exogeneity, when those who chose exposure differ from those who did not, the bounds shift, and they can widen or narrow.
+
+The rule can therefore err both ways. A relative risk of 1.8 does not imply a probability of necessity below one half, because the lower bound is not the value. A relative risk of 3 in a confounded study does not imply one above one half, because exogeneity fails. A Bayesian posterior for the probability of necessity, with explicit priors on confounding and on the position within the bounds, gives the court the probability it needs, with the assumptions behind it.
+
+\paragraph{Heterogeneity and the probability of necessity.} Population risk ratios hide heterogeneity that matters for individuals. Suppose a drug raises the risk of a side effect fivefold in carriers of a genetic variant, a tenth of the population, and not at all in noncarriers. The population risk ratio may be well below two, while for a carrier who developed the side effect the probability of necessity is $1 - 1/5 = 0.8$ under exogeneity and monotonicity.
+
+In the accounting view, a plaintiff's probability of necessity is a functional of the conditional model at her covariate values, not the population average. A model of conditional risk ratios, shrunk across subgroups, gives plaintiff specific bounds; the population number accounts over the wrong population.
+
+\paragraph{A numerical illustration with observational data.} Return to the experiment of Figure~\ref{fig:pns}, with $\Prob(y_x) = 0.30$ and $\Prob(y_{x'}) = 0.10$. Suppose that the same population is also observed where people choose exposure, with 40\% exposed and observed outcome rates 0.33 among the exposed and 0.08 among the unexposed. Then $\Prob(x, y) = 0.132$, $\Prob(x', y) = 0.048$, $\Prob(y) = 0.18$, $\Prob(x, y') = 0.268$ and $\Prob(x', y') = 0.552$.
+
+The lower bound on $\PN$ is $\{\Prob(y) - \Prob(y_{x'})\}/\Prob(x, y) = 0.08/0.132 \approx 0.61$. The upper bound is $\{\Prob(y'_{x'}) - \Prob(x', y')\}/\Prob(x, y) = (0.90 - 0.552)/0.132 \approx 2.6$, truncated to one. So the probability of necessity lies between about 0.61 and 1, without assuming exogeneity. Assuming exogeneity and using the experiment alone, we would have reported the lower bound $1 - 0.10/0.30 \approx 0.67$. But the observational rates differ from the experimental rates in the same population, so exogeneity fails and 0.61 is the defensible lower bound. Had the two studies covered different populations, the difference would show only that the populations differ, and the bounds of the theorem would not apply. Combining the sources has replaced an assumption with a bound.
+
+\section{The joint law as the object of inference}
+
+For binary outcome and exposure, the full causal structure is the joint law\index{joint law of potential outcomes|textbf} of $(X, Y(0), Y(1))$, eight probabilities summing to one. Experiments identify some linear combinations, observational studies others, neither all eight. The Bayesian approach places a prior on the eight probabilities, for example a Dirichlet, and conditions on both sources. The posterior concentrates on the identified combinations and stays at its conditional prior in the two unidentified directions (Proposition~\ref{prop:partial}).
+
+The probability of necessity, the risk difference, the effect on the treated\index{effect on the treated} and every other quantity of the first half of this chapter are computed from a posterior over the joint law, as accounting. 
+
+The likelihood is the product of two binomials for the experimental arms and a multinomial for the observational $(X, Y)$ cells, whose probabilities are known linear functions of the eight cells. A sampler draws the eight probabilities from their posterior and computes $\PN$ from each draw. For the illustration above, the large sample posterior fills the interval from 0.61 to 1 with a shape set by the prior and a width that no larger sample will shrink.
+
+The parametrization of the Bayesian reading, by the two experimental margins and the position $u$, describes the law of $(Y(0), Y(1))$ that the experiment alone gives, with one unidentified coordinate; the eight cell law has two. A Dirichlet prior on the eight cells induces a prior on $u$ that is in general not uniform. It is uniform, and independent of the margins, when the two cells sharing each value of $(Y(1), Y(0))$ have parameters summing to one, as with $1/2$ on every cell, since the four cells of $(Y(1), Y(0))$ then have a $\mathrm{Dirichlet}(1, 1, 1, 1)$ prior. Even then each experimental risk has a $\mathrm{Beta}(2, 2)$ prior rather than the uniform of Figure~\ref{fig:pns}, so an analyst who compares the two parametrizations should match the prior on the margins as well as on $u$. The analyst should report the posterior for the identified margins beside that for the target, since a court or a regulator is entitled to see which part of the answer the data could have moved.
+
+\paragraph{The illustration with counts.} Attach sample sizes to the numerical illustration of Section~\ref{sec:court}: an experiment with 500 people in each arm, in which 150 of the exposed and 50 of the unexposed fall ill, and an observational study of 1,000 people, 400 of whom chose exposure; 132 of those fell ill, and 48 of the 600 who did not. Put a Dirichlet prior with $1/2$ on each of the eight cells, the choice under which the prior on $u$ is uniform. The sampler allocates each count to the cells it could have come from, in proportion to the current probabilities, and then draws the eight probabilities from their Dirichlet posterior.
+
+After a million iterations, following 100,000 of burn in, the posterior of $\PN$ has median 0.81 and 95\% interval $[0.45, 1.00]$, and its lower bound, the part the data identify, has median 0.60 and interval $[0.35, 0.81]$. The posterior probability that $\PN$ exceeds one half is 0.95, and about four in five for the lower bound. Multiply every count by ten (four million iterations, since the chain then mixes more slowly) and the interval for the lower bound shrinks to $[0.53, 0.68]$, while the interval for $\PN$ only moves to $[0.57, 1.00]$: more data pin down the bound, and the position within it stays with the prior.
+
+A Bayesian can also read the preponderance standard directly: the probability, given the prior and both studies, that exposure was necessary for the illness of a plaintiff who chose exposure and fell ill, about whom nothing else is known, is the posterior mean of $\PN$, 0.79. This is a probability about the plaintiff; the 0.95 above is a probability about the population share $\PN$.
+
+\paragraph{Amortizing the calculation.} The sampler has to be run again for every new set of counts. Generative Bayesian computation (Chapter~\ref{ch:computation}; Polson and Sokolov 2026a) does the work once: draw the eight cell probabilities from the Dirichlet prior, simulate both data sources at the stated sample sizes, and train a quantile network with the check loss on the simulated $\PN$ given the counts. The trained network then returns posterior quantiles of $\PN$ in one pass for any counts from the same design, for example one study per covariate stratum. It approximates the posterior under that prior and no other; a new prior or a new design needs new simulations. We have not trained such a network for this example; before relying on one, check that its quantiles for the counts above match the sampler's, and run the checks of Section~\ref{comp:sec:checks}.
+
+\section{Sensitivity to unmeasured confounding}\chlabel{ch:sensitivity}\label{sec:sensitivity}
+
+Most methods in this book assume all confounders are measured, an untestable assumption rarely fully believed in observational studies\index{ignorability!failure of}. Randomized experiments, instruments, regression discontinuity, the front door criterion, difference in differences and the bounds above replace it. Sensitivity analysis\index{sensitivity analysis|textbf} asks how strong unmeasured confounding\index{unmeasured confounding|textbf} would need to be to change the conclusion.
+
+Write the effect as a function of the data and the hidden confounder's strength. Frequentist analyses report the threshold that changes the conclusion, or an interval at each strength, leaving plausibility to a reader who usually has no scale for it. A prior calibrated against measured covariates and candidate confounders turns that threshold into a probability. As with the probabilities of causation, identification fails because part of the joint law is unseen: here, the confounder's prevalence and associations with treatment and outcome. The posterior has a part that concentrates and a part that stays at its prior given the first; report them separately. A sensitivity analysis\index{sensitivity analysis} states what the result assumes and belongs beside the estimate.
+
+\subsection{Cornfield's inequality}
+
+Fisher proposed that a common genetic constitution caused both smoking and lung cancer. Jerome Cornfield\index{Cornfield, Jerome|see{Cornfield's inequality}} and coauthors (1959) asked how strong such a factor would have to be\index{Cornfield inequality@Cornfield's inequality|textbf}.
+
+\begin{theorem}[Cornfield]
+Let $E$ be a binary exposure, $D$ a binary disease, and $U$ a binary factor, coded so that $U = 1$ raises the risk of $D$, such that, conditional on $U$, $E$ has no effect on $D$. If the observed risk ratio of $D$ for exposed versus unexposed is $\mathrm{RR}_{ED} > 1$ and $U$ is the sole explanation, then
+\[
+\frac{\Prob(U = 1 \mid E = 1)}{\Prob(U = 1 \mid E = 0)} \geq \mathrm{RR}_{ED}.
+\]
+\end{theorem}
+
+\begin{proof}
+Write $f_1 = \Prob(U=1 \mid E=1)$, $f_0 = \Prob(U=1 \mid E=0)$, and let $r_1$ and $r_0$ be the disease risks given $U = 1$ and $U = 0$, unaffected by $E$, with $R = r_1/r_0$. Then
+\[
+\mathrm{RR}_{ED} = \frac{f_1 r_1 + (1 - f_1)r_0}{f_0 r_1 + (1 - f_0)r_0} = \frac{1 + f_1(R - 1)}{1 + f_0(R - 1)}.
+\]
+Since $R > 1$, $\mathrm{RR}_{ED} > 1$ requires $f_1 > f_0$. Cross multiplication reduces $\mathrm{RR}_{ED} \leq f_1/f_0$ to $f_0 \leq f_1$.
+\end{proof}
+
+For smoking, the risk ratio for lung cancer was about 9 for smokers against nonsmokers and about 60 for smokers of more than two packs a day. By Cornfield's inequality a constitutional factor would have to be at least nine times as prevalent among smokers as among nonsmokers. No such factor was known, and dose response, the effect of quitting and consistency across populations made one implausible.
+
+\subsection{Rosenbaum's sensitivity parameter and the E value}
+
+Rosenbaum (2002) formalized sensitivity analysis for matched studies. Units in a matched pair share observed covariates but may differ in an unobserved $U$. Let $\pi_i$ be the probability that unit $i$ is treated, and let $\Gamma \geq 1$ bound the odds ratio of treatment between two matched units\index{Rosenbaum sensitivity parameter@Rosenbaum's sensitivity parameter|textbf}:
+\[
+\frac{1}{\Gamma} \leq \frac{\pi_i(1 - \pi_j)}{\pi_j(1 - \pi_i)} \leq \Gamma.
+\]
+At $\Gamma = 1$ the study is as good as randomized. Each $\Gamma$ gives a range of possible $p$ values for a test of no effect; the sensitivity value is the largest $\Gamma$ at which the upper end stays below 0.05.
+
+Hammond (1964) matched 36,975 men who smoked at least twenty cigarettes a day to nonsmokers on demographic, occupational and health characteristics. In 122 pairs exactly one man died of lung cancer, and in 110 of them it was the smoker. Rosenbaum (2002) analyses these pairs with McNemar's test, which counts the discordant pairs in which the smoker died. A hidden bias of at most $\Gamma$ lets the smoker's chance of being the one who died be as large as $\Gamma/(1 + \Gamma)$ in each pair, so under no effect the upper end of the range of one sided $p$ values is
+\[
+p_{\max}(\Gamma) = \Prob(B_\Gamma \geq 110), \qquad B_\Gamma \sim \mathrm{Binomial}\{122,\ \Gamma/(1 + \Gamma)\},
+\]
+which is, computed exactly, $2 \times 10^{-5}$ at $\Gamma = 3$, 0.002 at $\Gamma = 4$, 0.023 at $\Gamma = 5$ and 0.097 at $\Gamma = 6$. The sensitivity value is about 5.5. To explain the deaths away, an unmeasured factor would have to multiply the odds of smoking by five and a half between two men the matching treats as alike, and also predict almost perfectly which of them died.
+
+\paragraph{The E value.} VanderWeele and Ding (2017) defined a single number summarizing robustness for a risk ratio.
+
+\begin{definition}[E value]
+For an observed risk ratio $\mathrm{RR} > 1$, the E value\index{E value|textbf} is
+\[
+\text{E value} = \mathrm{RR} + \sqrt{\mathrm{RR}(\mathrm{RR} - 1)}.
+\]
+It is the minimum strength of association, on the risk ratio scale, that an unmeasured confounder would need with both treatment and outcome, conditional on measured covariates, to explain away the observed risk ratio.
+\end{definition}
+
+The formula comes from the bounding factor $\mathrm{RR}_{EU}\mathrm{RR}_{UD}/(\mathrm{RR}_{EU} + \mathrm{RR}_{UD} - 1)$ of Ding and VanderWeele (2016), the most by which a confounder can inflate an observed risk ratio. Here $\mathrm{RR}_{EU}$ is the largest ratio, over levels of $U$, of the share of the exposed at that level to the share of the unexposed, and $\mathrm{RR}_{UD}$ is the largest outcome risk ratio between two levels of $U$ within either exposure group. Setting the strengths equal and the factor equal to the observed risk ratio gives the E value: the smallest possible value of the larger strength. Both strengths must be at least the observed risk ratio to explain it away.
+
+Figure~\ref{fig:cornfield} compares Cornfield's bound with the E value. For a risk ratio of 9 the E value is about 17.5: a confounder whose risk ratios with smoking and with lung cancer are both below 17.5 cannot explain the association away, though one with risk ratios 9.5 and 153 can. The E value exceeds Cornfield's bound because that bound is reached only when the confounder's risk ratio with the outcome is infinite, while the E value asks for equal strength on both.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{cornfield.pdf}
+\caption{Strength of confounding needed to explain away an observed risk ratio: Cornfield's prevalence ratio and the E value, for observed risk ratios from 1 to 15; Cornfield's bound equals the observed risk ratio.}
+\label{fig:cornfield}
+\end{figure}
+
+\subsection{The Bayesian form}
+
+Take an unmeasured binary confounder $U$\index{sensitivity analysis!Bayesian form|textbf} with prevalence $\Prob(U = 1 \mid X, T) = \expit(a_0 + a_1 T + \ldots)$ and outcome model $\Prob(Y = 1 \mid T, U, X) = \expit(b_0 + \tau T + b_U U + \ldots)$. Data on $(X, T, Y)$ identify none of $a_0$, $a_1$ and $b_U$. Fixing $a_1$ and $b_U$ still leaves $\tau$ dependent on prevalence, so place informed priors on all three.
+
+Given $(a_0, a_1, b_U)$, the identified part of the posterior for $\tau$ concentrates as $n$ grows; the unidentified part retains their prior conditional on the identified parameters, equal to their marginal prior only under a priori independence. McCandless, Gustafson and Levy (2007) integrate out these bias parameters and report the effect's marginal posterior; since the data barely update them, the prior carries real weight, and the virtue of the approach is that the weight is visible. Gustafson (2015) shows the limiting posterior is a mixture, over this conditional prior at the limit of the identified parameters, of point masses at the value of $\tau$ each implies (Proposition~\ref{prop:partial} and Appendix~\ref{app:theory}).
+
+The Bayesian sensitivity analysis reports the posterior probability of a positive effect, given our beliefs about possible confounders. Cornfield's threshold becomes a statement about the prior: in the limit, the posterior probability of no positive effect is the prior probability, given the identified parameters at their limit, that $(a_0, a_1, b_U)$ lie where confounding explains the whole observed effect.
+
+\subsection{Calibrating the prior}
+
+The objection is that the prior is arbitrary. Three practices answer it\index{sensitivity analysis!calibrating the prior|textbf}.
+
+\paragraph{Benchmarking against measured covariates.} The strongest measured confounder gives a reference point: scale priors on $(a_1, b_U)$ by its observed strengths.
+
+\paragraph{Substantive knowledge.} Fisher's hypothesis named a specific candidate, a genetic factor. Twin studies, which Fisher himself cited, constrain how strongly genes could drive smoking; a prior on $a_1$ informed by them is not arbitrary.
+
+\paragraph{Reporting a family.} Report the posterior under several priors, from optimistic to sceptical. Cornfield did this informally, showing that only an implausibly strong confounder could explain the data; a family of Bayesian analyses makes the argument quantitatively.
+
+\paragraph{Lanarkshire revisited.} In the Lanarkshire milk experiment (Chapter~\ref{ch:mccullagh}), the hidden confounder is the teachers' judgement of poverty beyond recorded height and weight. Let $\hat\tau$ be the milk effect adjusted for initial size. Only the part of judged poverty unexplained by size can bias it, through its links to assignment and growth. Size supplies the benchmark: priors on $b_U$ centred at a fraction of the size coefficient, and on $a_1$ informed by how far the teachers' substitutions followed size, give a posterior for the milk effect reflecting both the data and the teachers.
+
+\subsection{A Bayesian sensitivity analysis in numbers}
+
+Take a simple linear setting\index{sensitivity analysis!worked example|textbf}. An adjusted analysis estimates an effect $\hat\tau = 0.30$ with standard error $0.05$. An unmeasured confounder $U$ with unit variance shifts the estimate by $a\,b_U$, where $a$ is the coefficient of $T$ in a regression of $U$ on $T$ given measured covariates and $b_U$ is the effect of $U$ on the outcome. Both are linear coefficients, the counterparts of the logit coefficients $a_1$ and $b_U$ used earlier.
+
+Give the adjusted effect $\tau_{\mathrm{adj}}$ the normal posterior centred at $\hat\tau$, place independent priors on the two bias parameters, and subtract the bias:
+\[
+\tau = \tau_{\mathrm{adj}} - a\,b_U, \qquad \tau_{\mathrm{adj}} \sim N(0.30, 0.05^2), \qquad a \sim N(0, s^2), \qquad b_U \sim N(0, s^2),
+\]
+all three independent. Figure~\ref{fig:sens} plots, for each prior scale $s$, the share of 200,000 Monte Carlo draws with $\tau > 0$.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{sensitivity.pdf}
+\caption{Posterior probability that the effect is positive, for an estimate of 0.30 with standard error 0.05, as the prior scale of both confounding parameters increases.}
+\label{fig:sens}
+\end{figure}
+
+Near $s = 0$ the posterior probability is essentially one: no confounding is believed possible, and the estimate is six standard errors from zero. At $s = 0.33$ it is 0.985, at $s = 0.66$ it falls to 0.84, and at $s = 1$, a prior standard deviation of one for both coefficients (a difference of one standard deviation of $U$ between the arms, one unit of outcome per standard deviation of $U$), it falls to 0.72.
+
+The curve is the Bayesian analogue of an E value\index{E value}: it reports confidence in a positive effect under each prior scale. A reader who finds strong confounders implausible reads the left of the curve, a sceptic the right.
+
+\paragraph{Lanarkshire in numbers.} The reanalysis sketched above for Lanarkshire can be run on the simulated trial of Section~\ref{sec:milk} in which the teachers went by an unrecorded nourishment score, with recorded size correlated 0.8 with it. In one such trial of 2,000 children the regression on treatment and size gives $\hat\tau = 0.35$ with standard error 0.025, and its interval, $[0.30, 0.40]$, misses the true 0.2.
+
+Size supplies the benchmarks: the milk group is 0.71 standard deviations smaller, $a_S = -0.71$, and the gain falls by 0.53 per standard deviation of size, $b_S = -0.53$. The story fixes the signs, since the teachers favoured children who looked poorly and such children grow more, so the priors are centred away from zero, $a \sim N(k a_S, k^2 a_S^2)$ and $b_U \sim N(k b_S, k^2 b_S^2)$: a hidden score $k$ times as strong as size in its links to assignment and to growth. As for Figure~\ref{fig:sens}, the posterior of the effect comes from 200,000 Monte Carlo draws of $\hat\tau - a\,b_U$ plus an independent normal estimation error with standard deviation 0.025.
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+$k$ & Posterior mean & 95\% interval & $\Prob(\tau > 0)$ \\
+\midrule
+$1/4$ & $0.33$ & $[0.22, 0.41]$ & $> 0.999$ \\
+$1/2$ & $0.26$ & $[-0.14, 0.52]$ & $0.93$ \\
+$1$ & $-0.02$ & $[-1.62, 1.00]$ & $0.59$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+With $k = 1/4$ the interval still misses the truth. In the simulation the hidden score is a little more than half as strong as size, $a = -0.39$ and $b_U = -0.3$, so the middle prior is the one centred near the truth; a real analysis does not know this, which is why it reports the family.
+
+\subsection{Benchmarking with observed covariates in practice}
+
+Cinelli and Hazlett (2020) proposed a widely used anchor for sensitivity parameters\index{sensitivity analysis!benchmarking with observed covariates|textbf}: express the strength of a hypothetical confounder as a multiple of the partial $R^2$ of an observed covariate with treatment and with outcome. A statement such as ``a confounder three times as strong as income would be needed to explain away the effect'' is then clear to anyone who knows how strong income is.
+
+The Bayesian version sets the scale of the prior on the confounding parameters from the observed covariates' strengths. Take the 9,915 households of the 401(k) analysis of Chapter~\ref{ch:k401} (later in the book) and least squares fits on the nine covariates. The partial $R^2$ of a covariate with net financial assets is the share of the residual variance that adding it removes, given eligibility and the other eight covariates; with eligibility it is the same share given the other eight. In the 54 term basis of that chapter a covariate brings every term that involves it.
+\begin{center}
+\begin{tabular}{llcc}
+\toprule
+Covariate & Related to & Linear & 54 term basis \\
+\midrule
+Income & assets & $0.088$ & $0.167$ \\
+Individual retirement account & assets & $0.039$ & $0.048$ \\
+Income & eligibility & $0.029$ & $0.043$ \\
+Defined benefit pension & eligibility & $0.044$ & $0.046$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Income is the observed covariate most strongly related to assets and one of the two most strongly related to eligibility; in the linear fits none of the remaining seven reaches 0.006 with eligibility. An unmeasured taste for saving might be as strongly related to assets as income is, but less to eligibility, which employers determine. A prior encoding that judgement gives a posterior combining the data with an explicit, checkable view of what is missing.
+
+Cinelli and Hazlett (2020) also give the exact link between partial $R^2$ and bias in least squares. Let $\hat\tau$ be the treatment coefficient in the regression of the outcome on treatment and the measured covariates, with conventional least squares standard error $\mathrm{se}(\hat\tau)$ (a robust standard error breaks the identity) and $\mathrm{df}$ residual degrees of freedom. Adding a scalar confounder $U$ to that regression would move the coefficient, in absolute value, by
+\[
+\mathrm{se}(\hat\tau)\sqrt{\mathrm{df}\,\frac{R^2_{Y\sim U\mid T,X}\,R^2_{T\sim U\mid X}}{1 - R^2_{T\sim U\mid X}}},
+\]
+where $R^2_{Y\sim U\mid T,X}$ is the partial $R^2$ of $U$ with the outcome given treatment and covariates and $R^2_{T\sim U\mid X}$ its partial $R^2$ with treatment given covariates. A prior on these two partial $R^2$ values and on the direction of the shift, scaled by benchmarks like those for income, is therefore a prior on the bias.
+
+In the linear setting of Figure~\ref{fig:sens}, the bias is $a\,b_U$. Income supplies the analogous coefficients $(a_{\mathrm{inc}}, b_{\mathrm{inc}})$: the coefficient of treatment in a regression of income on treatment, and income's coefficient in the outcome model. A zero centred prior on $(a, b_U)$ with scales a stated multiple of these benchmarks says the missing confounder is typically no stronger than that multiple of income; a firm upper limit needs bounded support. The scale then has a meaning: $s = 1$ can represent a confounder as strong as the strongest measured covariate.
+
+Both the benchmark and hidden confounder strengths must be conditional on the other covariates. The strongest observed confounder was measured because someone thought of it, weak evidence that what remains is weaker. The prior should allow stronger hidden confounders.
+
+\subsection{Sensitivity and partial identification}
+
+Sensitivity analysis and partial identification\index{partial identification|textbf}\index{identification!partial|textbf} are two views of one situation. Partial identification reports the effects consistent with the data under weak assumptions (Manski 2003; the Tian and Pearl bounds above). Sensitivity analysis shows how the estimate moves with a sensitivity parameter. A Bayesian puts a prior on that parameter; the limiting posterior is the prior pushed through the identified set (Proposition~\ref{prop:partial}).
+
+Manski's bounds\index{Manski bounds@Manski's bounds|textbf} without assumptions on selection are wide: for a binary outcome and treatment, the average effect lies in an interval of length one whatever the data. Monotone treatment response, monotone treatment selection and other shape restrictions narrow the bounds. Each corresponds to a restriction on the support of the prior, and a soft version, a prior putting most but not all mass on the restricted region, is often more honest than the hard restriction or none.
+
+\section{In practice}
+
+\paragraph{The target.} The targets are $\PN$, $\PS$ and $\PNS$. With observational data added, the position $u$ is not enough: two joint laws can share every margin and the value of $\PNS$ and still differ in $\PN$, as 0.68 and 0.99 do for the numbers of Section~\ref{sec:court}. Each posterior draw is then the eight cell probabilities $q_{xab} = \Prob\{X = x, Y(1) = a, Y(0) = b\}$, and
+\[
+\PN = \frac{q_{110}}{q_{110} + q_{111}}, \qquad \PS = \frac{q_{010}}{q_{000} + q_{010}}, \qquad \PNS = q_{010} + q_{110}.
+\]
+For the effect $\tau$ under unmeasured confounding, draw the identified parameters from their posterior and the sensitivity parameters from their prior conditional on them, then compute $\tau$. The conditional prior equals the marginal prior under a priori independence (Proposition~\ref{prop:partial}). The share of draws with $\tau > 0$ is the Bayesian answer to Cornfield's question.
+
+\paragraph{What the analyst does differently.} State which probability of causation is sought, compute its bounds within covariate strata, and report the posterior under a stated prior and at least one alternative. With the experiment alone, put the prior on $u$; with both sources, on the eight cell law. For $u$, Figure~\ref{fig:pns} uses uniform and $\mathrm{Beta}(1/2, 1/2)$ priors, and a point mass at $u = 0$ states monotonicity.
+
+Check agreement of observational and experimental margins beyond sampling error. For the same population, disagreement refutes exogeneity, so $1 - 1/\mathrm{RR}$ is not the number to report; agreement does not prove exogeneity. For different populations, the theorem's bounds do not apply.
+
+For sensitivity analysis, report the Cornfield or E value threshold, then put priors on the confounding parameters calibrated against measured covariates and candidate confounders. Report $\Prob(\tau > 0)$ under priors from optimistic to sceptical, as in Figure~\ref{fig:sens}.
+
+\paragraph{Against DML.} $\PN$, $\PS$ and $\PNS$ are not identified, so DML has no point to estimate. It can estimate their bounds, which are identified functionals. Kallus (2022) gives cross fitted, doubly robust estimators and confidence intervals for sharp bounds on the share a treatment harms, a quantity like $\PNS$, averaging bounds over covariate strata. The frequentist answer is an interval for each bound or a confidence set for the parameter. These bounds need no Bayesian machinery: reporting $\PN$ between 0.61 and 1 and leaving the decision to the court is honest work. When a verdict or a targeting rule with different values for conversion and deterrence requires a single number, a Bayesian combines the bounds with a prior and shows how much of the answer comes from it.
+
+For the sensitivity target, DML estimates the identified adjusted effect. Frequentist sensitivity tools include Cornfield's inequality, Rosenbaum's $\Gamma$, the E value and Cinelli and Hazlett's partial $R^2$ benchmarks. Chernozhukov, Cinelli, Newey, Sharma and Syrgkanis (2022a) extend those benchmarks to DML: bias is bounded by an identified scale times two factors measuring the confounder's additions to the outcome regression and to the Riesz representer (inverse propensity weights for a binary treatment). A reader able to judge these thresholds needs no prior. The Bayesian bias model gives a probability and shows how much of it comes from the confounding priors, which the data barely update. It adds nothing to the estimate of the adjusted effect, and it cannot say which prior is right; the probability is only as good as the stated beliefs about the confounder.
+
+\section*{Notes}
+
+Pearl (2009, Chapter 9) treats the probabilities of causation; see Balke and Pearl (1997) for the noncompliance bounds themselves. The $\mathrm{Beta}(1/2, 1/2)$ prior on the position inside the bounds is the horseshoe shrinkage coefficient law of Carvalho, Polson and Scott (2010).
+
+Sensitivity analysis begins with Cornfield and coauthors (1959), whose inequality answered Fisher's constitutional hypothesis on smoking (Chapter~\ref{ch:smoking}). For partial identification see Manski (1990, 2003), Gustafson (2015) and Moon and Schorfheide (2012). Conley, Hansen and Rossi (2012) apply the same logic to an instrument's exclusion restriction (Chapter~\ref{ch:iv}).
+
+\begin{exercises}
+\item\label{ex:ch11:1} Assuming that $X$ is independent of $(Y(0), Y(1))$, derive the experimental bounds on $\PN$ and $\PS$, analogous to those on $\PNS$.
+\item\label{ex:ch11:2} Show that under exogeneity, $\Prob(y_x) = \Prob(y \mid x)$ and $\Prob(y_{x'}) = \Prob(y \mid x')$, the lower bound on $\PN$ equals $\max\{0, 1 - 1/\mathrm{RR}\}$ with $\mathrm{RR} = \Prob(y \mid x)/\Prob(y \mid x')$, which is $1 - 1/\mathrm{RR}$ when $\mathrm{RR} \geq 1$.
+\item\label{ex:ch11:3} Set up the linear program whose solution gives the combined bounds on $\PNS$, and solve it for the hypothetical numbers of Figure~\ref{fig:pns} with observational rates of your choosing.
+\item\label{ex:ch11:4} Under the Gaussian copula of Section~\ref{sec:ot} applied to latent normal variables underlying $Y(0)$ and $Y(1)$, compute $\PNS$ as a function of $\rho$ and the margins.
+\item\label{ex:ch11:5} A plaintiff smoked and developed lung cancer, and the relevant risk ratio is 10. Compute the lower bound on $\PN$ under exogeneity and discuss what further assumptions would be needed to reach $\PN$ near one.
+\item\label{ex:ch11:6} For the targeting problem with gain $g$ for a conversion, loss $L$ for a customer put off and incentive cost $c$, show that the risk difference alone decides when $g = L$, then derive the Bayes rule under a uniform prior on $u$ when $g \neq L$ and compare it with the minimax rule.
+
+\item\label{ex:ch12:1} Show that, for fixed $f_1 > f_0$, the observed risk ratio in Cornfield's setup increases in $R = r_1/r_0$ and tends to $f_1/f_0$ as $R \to \infty$.
+\item\label{ex:ch12:2} Derive the E value formula from the bounding factor $\mathrm{RR}_{EU}\mathrm{RR}_{UD}/(\mathrm{RR}_{EU} + \mathrm{RR}_{UD} - 1)$.
+\item\label{ex:ch12:3} Compute the E value for risk ratios of 2, 9 and 20 and interpret each for the smoking literature.
+\item\label{ex:ch12:4} Show that the limiting posterior in Proposition~\ref{prop:partial} is a point mass if and only if $h(\phi_0, \xi)$ is constant for almost every $\xi$ under the prior, and that when $h(\phi_0, \cdot)$ is continuous this is the same as being constant on the support of the prior on $\xi$.
+\item\label{ex:ch12:5} For a Bayesian sensitivity analysis in the linear setting of Figure~\ref{fig:sens}, with $a \sim N(0, s_a^2)$ and $b_U \sim N(0, s_b^2)$, write the limiting posterior probability that $\tau > 0$ as a one-dimensional integral and show that it depends on the priors only through $\tau_0/(s_a s_b)$, where $\tau_0$ is the limit of the adjusted estimate.
+\item\label{ex:ch12:6} Design a benchmarking prior for the milk experiment using the observed coefficient of initial size.
+\end{exercises}

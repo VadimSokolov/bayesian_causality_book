@@ -1,0 +1,54 @@
+\begin{table}[ht]
+\centering
+\caption{Departures from parallel trends that go with adoption: 500 panels per block, effects growing with exposure (design (a)), the same five estimators on the same panels. In the first two blocks a unit departs with probability 0.3 if it adopts and never if it is never treated, so about 22 percent of all units depart; in the next two a unit departs with probability 0.1 if it adopts, so about 7.5 percent of units depart and all of them are treated; in the last two a unit departs with probability 0.3 if it is in the period 12 cohort and never otherwise. Bias and root mean squared error are for the average effect on the treated, coverage is for the 95 percent interval, and the last column is the mean of the squared error of the estimator minus that of the horseshoe on the same panel. Monte Carlo standard errors are in parentheses.}
+\label{tab:didsimdep}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Estimator & Bias & RMSE & Cover & Squared error minus HS \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Adopters depart with probability 0.3, 40 units}} \\
+Two way fixed effects & -0.222 (0.006) & 0.262 &  & 0.0479 (0.0040) \\
+Cohort by time & 0.228 (0.008) & 0.285 &  & 0.0608 (0.0035) \\
+Imputation & 0.259 (0.006) & 0.294 & 0.47 (0.02) & 0.0659 (0.0026) \\
+Imputation, unit trends & -0.016 (0.016) & 0.367 & 0.92 (0.01) & 0.1141 (0.0090) \\
+Horseshoe & 0.070 (0.006) & 0.144 & 0.93 (0.01) &  \\
+\addlinespace
+\multicolumn{5}{@{}l}{\emph{Adopters depart with probability 0.3, 200 units}} \\
+Two way fixed effects & -0.216 (0.003) & 0.224 &  & 0.0450 (0.0013) \\
+Cohort by time & 0.230 (0.003) & 0.243 &  & 0.0537 (0.0015) \\
+Imputation & 0.263 (0.003) & 0.269 & 0.00 (0.00) & 0.0673 (0.0012) \\
+Imputation, unit trends & -0.010 (0.007) & 0.157 & 0.94 (0.01) & 0.0194 (0.0018) \\
+Horseshoe & 0.056 (0.002) & 0.072 & 0.87 (0.02) &  \\
+\addlinespace
+\multicolumn{5}{@{}l}{\emph{Adopters depart with probability 0.1, 40 units}} \\
+Two way fixed effects & -0.335 (0.005) & 0.352 &  & 0.1151 (0.0034) \\
+Cohort by time & 0.088 (0.007) & 0.175 &  & 0.0221 (0.0018) \\
+Imputation & 0.090 (0.005) & 0.139 & 0.84 (0.02) & 0.0108 (0.0009) \\
+Imputation, unit trends & -0.003 (0.016) & 0.352 & 0.95 (0.01) & 0.1156 (0.0082) \\
+Horseshoe & 0.016 (0.004) & 0.092 & 0.97 (0.01) &  \\
+\addlinespace
+\multicolumn{5}{@{}l}{\emph{Adopters depart with probability 0.1, 200 units}} \\
+Two way fixed effects & -0.341 (0.002) & 0.345 &  & 0.1170 (0.0015) \\
+Cohort by time & 0.078 (0.003) & 0.107 &  & 0.0097 (0.0005) \\
+Imputation & 0.086 (0.002) & 0.098 & 0.58 (0.02) & 0.0079 (0.0004) \\
+Imputation, unit trends & -0.003 (0.007) & 0.164 & 0.94 (0.01) & 0.0251 (0.0017) \\
+Horseshoe & 0.010 (0.002) & 0.042 & 0.97 (0.01) &  \\
+\addlinespace
+\multicolumn{5}{@{}l}{\emph{Period 12 cohort departs with probability 0.3, 40 units}} \\
+Two way fixed effects & -0.353 (0.005) & 0.369 &  & 0.1285 (0.0034) \\
+Cohort by time & 0.015 (0.007) & 0.151 &  & 0.0153 (0.0012) \\
+Imputation & -0.014 (0.004) & 0.087 & 0.93 (0.01) & -0.0000 (0.0003) \\
+Imputation, unit trends & -0.008 (0.016) & 0.359 & 0.92 (0.01) & 0.1211 (0.0092) \\
+Horseshoe & -0.002 (0.004) & 0.087 & 0.98 (0.01) &  \\
+\addlinespace
+\multicolumn{5}{@{}l}{\emph{Period 12 cohort departs with probability 0.3, 200 units}} \\
+Two way fixed effects & -0.364 (0.002) & 0.367 &  & 0.1330 (0.0015) \\
+Cohort by time & 0.023 (0.003) & 0.070 &  & 0.0034 (0.0003) \\
+Imputation & -0.020 (0.002) & 0.041 & 0.93 (0.01) & 0.0002 (0.0001) \\
+Imputation, unit trends & 0.008 (0.007) & 0.153 & 0.96 (0.01) & 0.0220 (0.0014) \\
+Horseshoe & -0.001 (0.002) & 0.038 & 0.99 (0.00) &  \\
+\bottomrule
+\end{tabular}
+\end{table}

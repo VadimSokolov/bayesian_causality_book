@@ -1,0 +1,40 @@
+{
+ "dense": {
+  "boot": {
+   "bias": 0.7985377408654004,
+   "bias_mcse": 0.001301793733939054,
+   "coverage": 0.0,
+   "coverage_se": 0.0,
+   "se_over_sd": 0.4624409183176132,
+   "se_over_rmse": 0.052956842359425695,
+   "width": 0.1657988134895881,
+   "share_converged": null,
+   "n_converged": null,
+   "median_ess": null
+  },
+  "hs_K2": {
+   "bias": 0.7825964641083036,
+   "bias_mcse": 0.0011929485195976317,
+   "coverage": 0.0,
+   "coverage_se": 0.0,
+   "se_over_sd": 0.5440637024842618,
+   "se_over_rmse": 0.05830566656254334,
+   "width": 0.1799014004284719,
+   "share_converged": null,
+   "n_converged": null,
+   "median_ess": null
+  },
+  "hs_K5": {
+   "bias": 0.6768757579525271,
+   "bias_mcse": 0.0014809500177546096,
+   "coverage": 0.0,
+   "coverage_se": 0.0,
+   "se_over_sd": 0.5585592514286521,
+   "se_over_rmse": 0.08539855457434126,
+   "width": 0.22928346672884664,
+   "share_converged": null,
+   "n_converged": null,
+   "median_ess": null
+  }
+ }
+}

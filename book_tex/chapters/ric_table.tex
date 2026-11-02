@@ -1,0 +1,19 @@
+\begin{table}[ht]
+\centering
+\small
+\caption{Bias, root mean squared error (RMSE) and coverage of seven estimators of $\tau = 1$ over 500 simulated data sets with $n = 200$ and $p = 50$. Coverage is for nominal 95\% intervals: the classical $t$ interval for least squares, the sandwich interval for DML and the central 95\% posterior interval for each horseshoe. The lasso plug in has no interval. The oracle regression uses the five true confounders only and is not available in practice. Monte Carlo standard errors are at most 0.004 for the biases, 0.004 for the RMSEs and 0.019 for the coverages.}
+\label{tab:ric}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.3in}ccc@{}}
+\toprule
+Estimator & Bias & RMSE & Coverage \\
+\midrule
+Least squares, all covariates & $-$0.002 & 0.084 & 0.944 \\
+Least squares, five true confounders (oracle) & $-$0.002 & 0.076 & 0.934 \\
+Lasso plug in & 0.212 & 0.230 &  \\
+DML, lasso nuisances & 0.009 & 0.079 & 0.924 \\
+Horseshoe, independent prior & 0.059 & 0.103 & 0.868 \\
+Horseshoe, coupled to $\hat m(X)$ & $-$0.023 & 0.084 & 0.918 \\
+Horseshoe, coupled to cross fitted $\hat m(X)$ & 0.088 & 0.114 & 0.764 \\
+\bottomrule
+\end{tabular}
+\end{table}

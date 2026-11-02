@@ -1,0 +1,421 @@
+\chapter{Notation}\label{app:notation}
+
+\raggedbottom
+
+Symbols are grouped roughly by the chapters that introduce them; the last column locates each definition and fixes which meaning of a letter applies.
+
+\subsection*{General conventions}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+\toprule
+Symbol & Meaning & Introduced \\
+\midrule
+$\Prob$, $\E$, $\mathrm{Var}$, $\Cov$ & probability, expectation, variance and covariance & Section~\ref{sec:bg:conv} \\
+$A \indep B \mid C$ & conditional independence of $A$ and $B$ given $C$ & Section~\ref{sec:bg:conv} \\
+$\R$, $\R^d$ & the real line and $d$ dimensional real space & Section~\ref{sec:bg:conv} \\
+$N(\mu, \sigma^2)$, $\phi$, $\Phi$ & normal law, and density and distribution function of the standard normal & Section~\ref{sec:bg:conv} \\
+$C^+(0, 1)$ & standard half Cauchy law & Chapter~\ref{ch:horseshoe} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$\one\{A\}$ & indicator of the event $A$ & Chapter~\ref{ch:frameworks} \\
+$\logit$, $\expit$ & log odds function and its inverse, the logistic function & Chapter~\ref{ch:mccullagh} \\
+$F$, $F^{-1}$ & distribution function of a scalar variable and its quantile function, the generalized inverse & Section~\ref{sec:bg:conv} \\
+$\xrightarrow{p}$, $\xrightarrow{d}$ & convergence in probability and in distribution & Section~\ref{sec:bg:conv} \\
+$o_p$, $O_p$ & orders in probability: $Z_n = o_p(a_n)$ when $Z_n/a_n \xrightarrow{p} 0$, and $Z_n = O_p(a_n)$ when $Z_n/a_n$ is bounded in probability & Section~\ref{sec:bg:conv} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$W$ & one observation, for example $W = (Y, T, X)$ & Section~\ref{sec:bg:conv} \\
+$J_0$, $S_0$ & Jacobian and second moment of an estimating function at the truth; sandwich variance $J_0^{-1}S_0J_0^{-\top}$ & Section~\ref{sec:bg:large} \\
+$\varphi$, $\varphi^*$ & influence function and efficient influence function & Section~\ref{sec:bg:large} \\
+$Z$ & $n \times p$ design matrix of a regression & Section~\ref{sec:bg:cond} \\
+$\eta$ & penalty parameter of ridge and lasso regression & Section~\ref{sec:bg:ols} \\
+\bottomrule
+\end{tabular}\par}
+
+\subsection*{Potential outcomes, treatments and effects (Chapters~\ref{ch:predictive} to~\ref{ch:mccullagh})}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+\toprule
+Symbol & Meaning & Introduced \\
+\midrule
+$Y(t)$ & potential outcome under treatment $t$ & Section~\ref{sec:potential} \\
+$Y$ & observed outcome, $Y = Y(T)$ & Section~\ref{sec:potential} \\
+$T$, $X$ & treatment indicator, covariates & Section~\ref{sec:potential} \\
+$\tau$, $\ATE$ & average treatment effect $\E\{Y(1) - Y(0)\}$ & Section~\ref{sec:potential} \\
+$\tau(x)$ & conditional average treatment effect & Section~\ref{sec:potential} \\
+$\tau_i$, $\tau_{\mathrm{fp}}$ & unit level effect $Y_i(1) - Y_i(0)$ and finite population average effect & Section~\ref{sec:potential} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$\tau_Q$ & average treatment effect over covariate law $Q$ & Chapter~\ref{ch:mccullagh} \\
+$Q$ & covariate law of the population to which an effect or a policy applies & Section~\ref{sec:policyvalue} \\
+$Q_{SX}$ & law of smoking status $S$ and covariates $X$ in the population of interest, with covariate margin $Q$ & Exercise~\ref{ex:ch13:3} \\
+$P$ & law of $(X, Y(0), Y(1))$ in a superpopulation & Section~\ref{sec:potential} \\
+$F$, $\Pi$ & random law of an exchangeable sequence and its prior & Section~\ref{sec:exchangeability} \\
+$e(x)$ & propensity score $\Prob(T = 1 \mid X = x)$ & Section~\ref{sec:ignorability} \\
+$\mu_t(x)$ & outcome regression $\E(Y \mid X = x, T = t)$ & Section~\ref{sec:policyvalue} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$\delta$, $V(\delta)$ & treatment policy mapping covariates to treatment, and its value & Section~\ref{sec:policyvalue} \\
+$\theta$, $\pi(\theta)$ & model parameter and its prior & Chapter~\ref{ch:predictive} \\
+$F_T$ & Dawid's regime indicator, $\emptyset$ for the observational regime and $t$ when treatment is set to $t$, unrelated to $F_t$ & Section~\ref{sec:policyvalue} \\
+$\doint(T = t)$ & intervention that sets treatment to $t$ & Section~\ref{fw:sec:pearl} \\
+\bottomrule
+\end{tabular}\par}
+
+\subsection*{Groups, urns and information (Chapter~\ref{ch:groups})}
+
+
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+\toprule
+Symbol & Meaning & Introduced \\
+\midrule
+$\psi$ & effect of a treatment as an element of a group, written on the additive scale of a chart; on the logit group the conditional log odds ratio, the $\beta$ of Chapter~\ref{ch:mccullagh} & Section~\ref{gr:sec:group} \\
+$G$, $g$, $g_t$, $1_G$ & group acting on the baseline space, an element of it, the element for treatment level $t$, and the identity & Section~\ref{gr:sec:group} \\
+$\mathcal C$, $\gamma$ & baseline parameter space, and a baseline in it (the log odds under control in the logistic case) & Section~\ref{gr:sec:group} \\
+$P_\gamma$ & law of the response under control with baseline $\gamma$ & Section~\ref{gr:sec:group} \\
+$h$, $I$ & chart, an increasing homeomorphism of the outcome interval $I$ onto $\R$ in which $G$ acts by translation & Section~\ref{gr:sec:group} \\
+$F_{x,t}$ & law, and distribution function, of the response at covariate value $x$ under treatment $t$, the cell law & Section~\ref{gr:sec:group} \\
+$\tau_Q(\psi)$ & average effect of the stable effect $\psi$ over the baseline law $Q$, the case mix & Section~\ref{gr:sec:many} \\
+$\mu$, $s$ & mean and standard deviation of the normal baseline law $Q=N(\mu,s^2)$ of the log odds across units & Section~\ref{gr:sec:many} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$h_\lambda$, $\psi_\lambda$ & Aranda Ordaz chart with index $\lambda$, and the effect on that scale & Section~\ref{gr:sec:kidney} \\
+$M_x$, $M$, $g^{s}$ & map from control to treated law in cell $x$, its value if common across cells, and the flow through $M$ & Section~\ref{gr:sec:transform} \\
+$(\sigma, \mu)$ & element $y \mapsto \sigma y + \mu$ of the affine group, with scale $\sigma$ and location $\mu$ & Section~\ref{gr:sec:transform} \\
+$\psi^{\dagger}(x)$, $\Delta(x)$, $c$ & effect $\psi + c\,\Delta(x)$ that the regression of gain on treatment and recorded variables identifies, with $\Delta(x)$ the difference between milk and control groups in the mean unrecorded score at $x$ and $c$ its coefficient in the gain & Section~\ref{gr:sec:transform} \\
+$F$, $F_1$, $F_0$, $\mathcal F(F_1, F_0)$ & urn composition, the empirical law of the $n$ pairs of potential outcomes, its two margins, and the Fr\'echet class of joint laws with those margins & Section~\ref{gr:sec:margins} \\
+$p_{ab}$, $p_1$, $p_0$ & fraction of units with $(Y(1), Y(0)) = (a, b)$, and the margins $p_1 = p_{10} + p_{11}$ and $p_0 = p_{01} + p_{11}$ & Section~\ref{gr:sec:margins} \\
+$n_1$, $n_0$, $n_x$, $n_{x,t}$ & arm sizes, the size of stratum $x$, and the arm sizes within it & Sections~\ref{gr:sec:urn} and~\ref{gr:sec:margins} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$S_1^2$, $S_0^2$, $S_\tau^2$ & finite population variances, with divisor $n - 1$, of $Y(1)$, $Y(0)$ and the unit effects $\tau_i$ & Section~\ref{gr:sec:urn} \\
+$V_\tau$ & variance of the unit effects with divisor $n$, so that $S_\tau^2 = nV_\tau/(n - 1)$ & Section~\ref{gr:sec:margins} \\
+$\Psi$ & functional of the urn composition & Section~\ref{gr:sec:margins} \\
+$\KL$, $\KL_w$ & Kullback and Leibler divergence $\KL(P \,\|\, Q)$, and its sum over the cells weighted by the design fractions & Section~\ref{gr:sec:gap} \\
+$L_n$, $w_{x,t}$ & empirical cell laws, and the design fractions, the share of the sample in cell $(x, t)$ & Section~\ref{gr:sec:gap} \\
+$F^{\circ}$ & true cell laws $F^{\circ}_{x,t}$, the limit of the empirical cell laws $L_n$ & Section~\ref{gr:sec:gap} \\
+$\mathcal S_G$ & stability class of $G$, the laws under which the effect is the same group element in every stratum & Section~\ref{gr:sec:gap} \\
+$D_G$ & information gap of $G$ at the true cell laws $F^{\circ}$, $\KL_w(F^{\circ} \,\|\, \mathcal S_G)$, in nats per patient & Section~\ref{gr:sec:gap} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$d_G$, $d_{\mathrm{sat}}$ & numbers of free parameters of the stable model of $G$ and of the saturated model & Section~\ref{gr:sec:gap} \\
+$J$, $\eta_j$, $\lambda_j$, $\mathrm{BF}_{01}$ & number of strata, stratum $j$'s departure from the common effect, its local scale, and the Bayes factor of stability against the horseshoe alternative & Section~\ref{gr:sec:gap} \\
+$W_n$ & stability statistic $\KL_w(L_n \,\|\, \mathcal S_G) = \mathrm{dev}_G/(2n)$ & Section~\ref{gr:sec:ld} \\
+$J_G(\psi)$, $r(\psi)$ & profile rate function of the stable effect at the empirical law, zero at the stable estimate, and the signed root $\operatorname{sign}(\psi-\hat\psi)\sqrt{2nJ_G(\psi)}$ & Section~\ref{gr:sec:ld} \\
+$F^{*}$, $F^{\dagger}$ & maximum likelihood projection, and the I projection of a law on a convex set (the conditioning set of Proposition~\ref{gr:prop:ancillary}, the risk difference class) & Section~\ref{gr:sec:ld} \\
+$\psi_G(x)$, $\bar\psi_G(Q)$, $R_G$ & stratum effect on the scale of $G$, its average over the case mix $Q$, and the range $\max_x \psi_G(x) - \min_x \psi_G(x)$ of the stratum effects & Section~\ref{gr:sec:ld} \\
+$I(X;T)$ & mutual information of $X$ and $T$, and the other informations of the kidney stone table & Section~\ref{gr:sec:ld} \\
+\bottomrule
+\end{tabular}\par}
+
+\subsection*{Propensity, weighting and double machine learning (Chapters~\ref{ch:dml} to~\ref{ch:critique})}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+\toprule
+Symbol & Meaning & Introduced \\
+\midrule
+$g(x)$, $m(x)$ & nuisance functions of the partially linear model $Y = \tau T + g(X) + \varepsilon$, $T = m(X) + \nu$, with $m = e$ in the propensity case & Section~\ref{sec:dml:plm} \\
+$\varepsilon$, $\nu$ & errors of the outcome and treatment equations of the partially linear model & Section~\ref{sec:dml:plm} \\
+$\ell(x)$ & $\E(Y \mid X = x)$, the outcome regression that is partialled out, $\ell = \tau m + g$ & Section~\ref{sec:dml:plm} \\
+$\psi$ & a score function, or a target mean in Section~\ref{sec:rrw} & Section~\ref{sec:dml:score} \\
+$\tau_0$, $\eta_0$ & true values of the target and of the nuisance parameter & Sections~\ref{sec:dml:plm} and~\ref{sec:dml:score} \\
+$\tau_*$, $\tau_T$ & estimand of the partially linear score when the effect varies, and average effect on the treated & Section~\ref{sec:dml:wate} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$\eta$ & nuisance parameter of a score, such as the pair of regression functions $(\ell, m)$ & Section~\ref{sec:dml:score}, Chapter~\ref{ch:critique} \\
+$K$, $I_k$, $\hat\eta^{(-k)}$ & number of folds, the $k$th fold, and the nuisance fit that omits it & Section~\ref{sec:dml:cf} \\
+$\hat V_{T,i}$, $\hat V_{Y,i}$ & cross fitted residuals $T_i - \hat m^{(-k)}(X_i)$ and $Y_i - \hat\ell^{(-k)}(X_i)$ for $i \in I_k$ & Section~\ref{sec:dml:cf} \\
+$S_n$, $C_n$, $B_n$, $\hat J_n$ & terms and denominator of the exact decomposition $\hat\tau - \tau_0 = (S_n + C_n + B_n)/\hat J_n$, with $S_n = n^{-1}\sum_i \nu_i\varepsilon_i$ and $\hat J_n = n^{-1}\sum_i \hat V_{T,i}^2$ & Section~\ref{sec:dml:exact} \\
+$\rho_\delta$ & alignment coefficient, the cosine $\langle\delta_m, \delta_\ell\rangle/(\lVert\delta_m\rVert\,\lVert\delta_\ell\rVert)$ between the two nuisance errors & Section~\ref{sec:crit:channels} \\
+$n_E$ & size of the evaluation part of a split sample & Section~\ref{sec:crit:se} \\
+$\bar\Delta_n$, $U_n$ & fold weighted conditional bias of the cross fitted estimator, and the error left after it, $U_n = \hat\tau - \tau - \bar\Delta_n$ & Section~\ref{sec:crit:se} \\
+$\delta_m$, $\delta_\ell$ & errors $\hat m - m$ and $\hat\ell - \ell$ of the fitted nuisance functions & Section~\ref{sec:dml:score} \\
+$J_0$ & $\E\,\mathrm{Var}(T \mid X)$, the variance of the treatment residual that measures overlap in the partially linear model, written $J$ in Chapter~\ref{ch:critique} & Section~\ref{sec:dml:plm}, Chapter~\ref{ch:critique} \\
+$\zeta(x)$ & $\E(Z \mid X = x)$, the regression of the instrument on the covariates in the instrumental score & Section~\ref{sec:dml:score} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$\pi_i$, $R_i$ & inclusion probability and sampling indicator of unit $i$ & Chapter~\ref{ch:ipw} \\
+$\mathcal{X}_\alpha$ & trimmed covariate set $\{x : \alpha \le e(x) \le 1 - \alpha\}$ & Chapter~\ref{ch:ipw} \\
+$\vartheta(x)$ & unknown outcome probability in cell $x$, with target $\psi = \E\,\vartheta(X)$ & Section~\ref{sec:rrw} \\
+$\hat\psi_{\mathrm{HT}}$, $\hat\psi_{\mathrm{H}}$ & Horvitz Thompson and H\'ajek estimators of the mean $\psi$ & Sections~\ref{sec:rrw} and~\ref{sec:weak} \\
+\bottomrule
+\end{tabular}\par}
+
+\subsection*{Priors, the horseshoe and shrinkage (Chapter~\ref{ch:horseshoe})}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+\toprule
+Symbol & Meaning & Introduced \\
+\midrule
+$\beta_j$, $\gamma_j$ & outcome and treatment coefficients of covariate $j$ & Chapters~\ref{ch:critique} and~\ref{ch:horseshoe} \\
+$\lambda_j$, $\gscale$ & horseshoe local and global scales & Chapter~\ref{ch:horseshoe} \\
+$\kappa_j$ & shrinkage coefficient $1/(1 + \lambda_j^2\gscale^2)$ & Chapter~\ref{ch:horseshoe} \\
+$\tau_{\mathrm{g},Y}$, $\tau_{\mathrm{g},T}$ & global scales of the outcome and treatment coefficients when the two equations share local scales & Chapter~\ref{ch:horseshoe} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$\eta_j$ & private local scale of coefficient $j$ in the product prior $\beta_j \sim N(0, \lambda_j^2\eta_j^2\tau_{\mathrm{g},Y}^2)$ & Chapter~\ref{ch:horseshoe} \\
+$\zeta_i$ & linear predictor $z_i^\top\beta$ of a logistic regression & Chapter~\ref{ch:horseshoe} \\
+$\omega_i$, $\tilde y_i$ & Polya Gamma variable $\omega_i \sim \mathrm{PG}(1, \zeta_i)$ and offset $\tilde y_i = y_i - 1/2$ of the logistic sampler & Chapter~\ref{ch:horseshoe} \\
+\bottomrule
+\end{tabular}\par}
+
+\subsection*{Generative computation and quantiles (Chapter~\ref{ch:computation})}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+\toprule
+Symbol & Meaning & Introduced \\
+\midrule
+$U$ & uniform noise on $(0, 1)$ in $Y = G(U, X)$; the structural noises of Chapter~\ref{ch:cdt} are $U_X$, $U_W$, $U_Y$ & Section~\ref{comp:sec:noise} \\
+$u$ & quantile level in $(0, 1)$ & Section~\ref{comp:sec:network} \\
+$G(u, x)$ & generator, the map from noise $u$ and conditioning value $x$ to the outcome; for real $Y$ the conditional quantile function $F^{-1}(u \mid x)$ & Section~\ref{comp:sec:noise} \\
+$D$, $D^{\mathrm{obs}}$ & a data set, simulated or observed & Section~\ref{comp:sec:network} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$S$, $s$ & network's data summary $S(D)$ and its realized value & Section~\ref{comp:sec:summaries} \\
+$f_\phi(u, s)$ & quantile neural network with weights $\phi$, at level $u$ and summary value $s$ & Section~\ref{comp:sec:network} \\
+$\rho_u$ & check loss $\rho_u(r) = r\{u - \one(r < 0)\}$ & Section~\ref{comp:sec:network} \\
+$\mathcal{L}(\phi)$ & training loss, the mean check loss over $J$ simulated pairs $(\theta^{(j)}, s^{(j)})$ & Section~\ref{comp:sec:network} \\
+$\psi(\theta)$ & estimand whose posterior the network learns, such as the model based average effect & Section~\ref{comp:sec:core} \\
+\bottomrule
+\end{tabular}\par}
+
+\subsection*{Distributional effects, BART and Gaussian processes (Chapters~\ref{ch:gente} and~\ref{ch:bart})}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+\toprule
+Symbol & Meaning & Introduced \\
+\midrule
+$F_t$, $q_t$ & distribution and quantile functions of $Y(t)$ & Chapter~\ref{ch:gente} \\
+$\Delta(u \mid x)$ & quantile indexed treatment effect $q_1(u \mid x) - q_0(u \mid x)$ & Chapter~\ref{ch:gente} \\
+$k$, $\mathcal{U}(y)$ & cost of treatment and utility of outcome $y$ in an individualized decision & Chapter~\ref{ch:gente} \\
+$C$, $\rho$ & copula of $(Y(0), Y(1))$ and its correlation parameter & Section~\ref{sec:ot} \\
+$\eta$, $F_\eta$ & individual gain $Y(1) - Y(0)$ and its distribution function & Section~\ref{sec:ot} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$s$ & shift of the treated marginal in the normal example of the fraction helped & Section~\ref{sec:ot} \\
+$W_r(F_0, F_1)$ & $r$ Wasserstein distance between the treated and untreated laws & Section~\ref{sec:ot} \\
+$\varphi$ & convex function whose gradient pushes $\mu$ forward to $\nu$, in Brenier's theorem & Section~\ref{sec:ot} \\
+$\mathcal{T}_j$, $M_j$ & structure and leaf values of the $j$th BART tree & Chapter~\ref{ch:bart} \\
+$m$ & number of trees in the BART sum & Chapter~\ref{ch:bart} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$\alpha$, $\beta$ & BART tree depth prior parameters & Chapter~\ref{ch:bart} \\
+$\mu(x, \hat e(x))$, $\tau(x)$ & prognostic function, with the estimated propensity as a covariate, and effect function of the Bayesian causal forest & Chapter~\ref{ch:bart} \\
+$\zeta$ & H\"older smoothness exponent of the true regression function $f_0$, in the contraction theorem & Chapter~\ref{ch:bart} \\
+$\mathrm{GP}(m, k)$ & Gaussian process with mean function $m$ and covariance kernel $k$ & Section~\ref{sec:bart:gp} \\
+$\ell$ & scale of the squared exponential kernel $k(x, x') = \exp\{-\|x - x'\|^2/(2\ell^2)\}$ & Section~\ref{sec:bart:gp} \\
+\bottomrule
+\end{tabular}\par}
+
+\subsection*{Instruments, bounds and sensitivity (Chapters~\ref{ch:iv} to~\ref{ch:smoking})}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+\toprule
+Symbol & Meaning & Introduced \\
+\midrule
+$Z$ & instrument & Chapter~\ref{ch:iv} \\
+$U$ & unmeasured confounder & Chapter~\ref{ch:iv} \\
+$\pi$ & coefficient of the instrument in the first stage $T = \pi Z + \gamma U + \nu$ & Chapter~\ref{ch:iv} \\
+$\delta$, $\gamma$ & effects of $U$ on the outcome and on the treatment in $Y = \tau T + \delta U + \varepsilon$ and $T = \pi Z + \gamma U + \nu$ & Chapter~\ref{ch:iv} \\
+$T(z)$ & potential treatment under instrument value $z$ & Section~\ref{iv:sec:late} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$\LATE$ & local average treatment effect, the ratio of the effects of the instrument on the outcome and on the treatment & Section~\ref{fw:sec:econ} \\
+$\PN$, $\PS$, $\PNS$ & probabilities of necessity, sufficiency, both & Chapter~\ref{ch:tianpearl} \\
+$y_x$, $y'_x$ & events $Y(x) = 1$ and $Y(x) = 0$; the chapter writes $X$ for a binary exposure until Section~\ref{sec:sensitivity} & Chapter~\ref{ch:tianpearl} \\
+$\PNS_{\mathrm{lo}}$, $\PNS_{\mathrm{hi}}$, $u$ & bounds on $\PNS$ and the unidentified position $u \in [0, 1]$ of $\PNS$ between them & Chapter~\ref{ch:tianpearl} \\
+$\phi$, $\xi$ & identified and unidentified parameters of a partially identified model & Chapter~\ref{ch:tianpearl} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$\Gamma$, $\pi_i$ & bound on the odds ratio of treatment between two matched units, and the probability that unit $i$ is treated & Section~\ref{sec:sensitivity} \\
+$f_1$, $f_0$, $R$ & prevalence of an unmeasured binary factor $U$ among the exposed and the unexposed, and its risk ratio $R = r_1/r_0$ for the disease & Section~\ref{sec:sensitivity} \\
+$B$ & factor by which an unmeasured factor inflates the observed risk ratio, $\{1 + f_1(R - 1)\}/\{1 + f_0(R - 1)\}$ & Chapter~\ref{ch:smoking} \\
+\bottomrule
+\end{tabular}\par}
+
+\subsection*{Designs and applications (Chapters~\ref{ch:did} to~\ref{ch:workflow})}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+\toprule
+Symbol & Meaning & Introduced \\
+\midrule
+$Y_{it}$, $G_i$ & outcome of unit $i$ in period $t$, and its adoption period, with $G_i = \infty$ for units that never adopt & Chapter~\ref{ch:did} \\
+$g$, $e$ & adoption cohort and event time $e = t - g$, the time since adoption & Chapter~\ref{ch:did} \\
+$\tau_{g,e}$ & effect of cohort $g$ at event time $e$ & Chapter~\ref{ch:did} \\
+$D_{it}$ & post adoption indicator, the treatment indicator of the chapter, written $T$ elsewhere & Chapter~\ref{ch:did} \\
+$\alpha_i$, $\gamma_t$ & unit and period effects of the untreated outcome & Chapter~\ref{ch:did} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$\delta_i$, $\tilde t$ & unit specific departure from parallel trends and standardized time & Chapter~\ref{ch:did} \\
+$\theta_e$, $u_{g,e}$ & common event time path and cohort deviations, $\tau_{g,e} = \theta_e + u_{g,e}$ & Chapter~\ref{ch:did} \\
+$\ell_k$ & lead coefficient on the indicator of event time $-k$, shared across cohorts & Chapter~\ref{ch:did} \\
+$\tau_{\mathrm{g},u}$, $\tau_{\mathrm{g},\delta}$, $\tau_{\mathrm{g},\ell}$ & global scales of the horseshoes on the cohort deviations, the trend departures and the pre adoption leads & Chapter~\ref{ch:did} \\
+$a$, $p(a)$ & incentive amount and the probability of learning one's result at amount $a$, averaged over the sample & Section~\ref{sec:thornton} \\
+\bottomrule
+\end{tabular}\par}
+
+\subsection*{Decisions (Chapter~\ref{ch:cdt})}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+\toprule
+Symbol & Meaning & Introduced \\
+\midrule
+$A$, $\omega$, $\mathcal{U}$ & act, state of the world and utility $\mathcal{U}(A, \omega)$ & Section~\ref{cdt:sec:core} \\
+$\cA$, $a$ & set of actions and an action in it, with utility $\mathcal{U}(a, \theta, Y(a))$ & Section~\ref{gbc:sec:intro} \\
+$D_N$, $\pi_N$ & data of $N$ observations and the posterior $\pi_N = \pi(\theta \mid D_N)$ & Section~\ref{gbc:sec:intro} \\
+$\EU(a \mid D_N)$ & posterior expected utility of action $a$, maximized by the Bayes action $a^*$ & Section~\ref{gbc:sec:intro} \\
+$W$ & treatment of the structural causal model of the chapter & Section~\ref{gbc:sec:intro} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$U_X$, $U_W$, $U_Y$ & exogenous noises of the covariates, the treatment and the outcome in the structural causal model & Section~\ref{gbc:sec:intro} \\
+$Z(a)$, $\Qz$ & utility of action $a$ as a random variable, and its quantile function & Section~\ref{gbc:sec:intro} \\
+$\beta$, $\Vbeta(a)$ & distortion of quantile levels and distorted value $\Vbeta(a) = \E[\Qz(\beta(V))]$ & Section~\ref{gbc:sec:risk} \\
+$V$ & uniform variable on $(0, 1)$ in the distorted value & Section~\ref{gbc:sec:risk} \\
+$G_\beta$ & distribution function of $\beta(V)$ & Section~\ref{gbc:sec:risk} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$\eta$, CVaR & parameter of a distortion; for CVaR, $\beta(u) = \eta u$, the mean of the worst fraction $\eta$ of outcomes & Section~\ref{gbc:sec:risk} \\
+$L_a(p)$, $G(a)$ & Lorenz curve and Gini coefficient of the benefit of action $a$ & Section~\ref{gbc:sec:risk} \\
+$\Pi$, $\pi$, $V_\theta(\pi)$ & class of policies, a policy in it, and its value $\E_\theta[\mathcal{U}(\pi, \theta, Y(\pi))]$ under parameter $\theta$ & Section~\ref{gbc:sec:asymptotics} \\
+$\hat\pi_N$, $\pi_0^*$ & Bayes policy and oracle policy & Section~\ref{gbc:sec:asymptotics} \\
+\bottomrule
+\end{tabular}\par}
+
+\subsection*{Symbols of Chapter~\ref{ch:blp}}
+
+
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+\toprule
+Symbol & Meaning & Introduced \\
+\midrule
+$T$ & number of markets, indexed by $t = 1, \dots, T$ & Section~\ref{blp:sec:causal} \\
+$t$ & market index & Section~\ref{blp:sec:causal} \\
+$J$ & number of products in a market, indexed by $j$ & Section~\ref{blp:sec:causal} \\
+$\bm p_t$, $\bm c_t$, $\bm\xi_t$ & prices, marginal costs and demand shocks (product quality the econometrician does not see) in market $t$ & Section~\ref{blp:sec:causal} \\
+$\theta_2$ & nonlinear demand parameters $(\alpha, \sigma_p, \sigma_x)$ & Section~\ref{blp:sec:model} \\
+$\sigma_p$, $\sigma_x$ & scale of the demographic $\nu_i$ in the price coefficient $\alpha_i = \alpha e^{-\sigma_p\nu_i}$, and of the unobserved taste $\eta_i$ for $x_1$ & Section~\ref{blp:sec:model} \\
+$H$, $H_{jk}$ & conduct (form of competition); $H_{jk} = 1$ when pricing $j$ takes account of profit on $k$ & Sections~\ref{blp:sec:causal} and~\ref{blp:sec:model} \\
+$\omega$ & cost shock in the marginal cost equation & Section~\ref{blp:sec:causal} \\
+$\beta$ & linear demand coefficients of the product characteristics, $\delta_t = \bm x_t^\top\beta + \bm\xi_t$ & Section~\ref{blp:sec:causal} \\
+$\gamma$ & cost coefficients, $\bm c_t = \bm w_t^\top\gamma + \bm\omega_t$ & Section~\ref{blp:sec:causal} \\
+$W_t$ & data $(\bm s_t, \bm p_t, \bm x_t, Z_t)$ of market $t$, the argument of the score in the notation of Chapter~\ref{ch:dml} & Section~\ref{blp:sec:dml} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$e$ & the estimand $e = g(\theta_2, H)$, for example the merger price effect & Section~\ref{blp:sec:why} \\
+$r$ & harm threshold for the percentage price rise, in $\Prob(\Delta p/p > r \mid \mathcal{D})$ & Section~\ref{blp:sec:why} \\
+$\alpha$ & price coefficient, the scale of the lognormal $\alpha_i = \alpha e^{-\sigma_p\nu_i}$ & Section~\ref{blp:sec:model} \\
+$F$ & joint law of the demographic $\nu_i$ and the unobserved taste $\eta_i$, in $s_{jt} = \int s_{ijt}\,dF(\nu_i, \eta_i)$ & Section~\ref{blp:sec:model} \\
+$n$ & partner firm in a merger of firms $f$ and $n$ & Section~\ref{blp:sec:markups} \\
+$\mathrm{DR}_{jk}$ & diversion ratio from $j$ to $k$, $-(\partial s_k/\partial p_j)/(\partial s_j/\partial p_j)$, which is $s_k/(1 - s_j)$ under logit demand & Section~\ref{blp:sec:markups} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$\ell_1$, $\ell_2$ & losses of a wrongful challenge and of a wrongful clearance & Section~\ref{blp:sec:markups} \\
+$\mu_H$, $\hat\mu_H$ & posterior mean $\E[e \mid \mathcal{D}, H]$ of the estimand under conduct $H$, and its neural regression on the summaries & Sections~\ref{blp:sec:markups} and~\ref{blp:sec:gbc} \\
+$\varpi_H$ & posterior probability $\Prob(H \mid \mathcal{D})$ of conduct $H$ & Section~\ref{blp:sec:markups} \\
+$\chi$ & coefficients of the reduced form price equation $p_{jt} = \bm z_{jt}^\top\chi + v_{jt}$ & Section~\ref{blp:sec:existing} \\
+$\bm\mu^{\mathrm{mic}}$ & micro moments, part of the summary statistics & Section~\ref{blp:sec:gbc} \\
+$\hat q$ & trained classifier $\hat q(H \mid S)$ of conduct from the summaries & Section~\ref{blp:sec:gbc} \\
+\end{tabular}\par}
+
+{\noindent\small\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.0in}>{\raggedright\arraybackslash}p{2.15in}>{\raggedright\arraybackslash}p{0.95in}}
+$u_{ijt}$ & utility of consumer $i$ for product $j$ in market $t$ & Section~\ref{blp:sec:model} \\
+$\delta_{jt}$, $\delta_t$ & mean utility of product $j$ in market $t$, and its vector & Section~\ref{blp:sec:causal} \\
+$\bm s_t$, $s_{jt}$, $s_{ijt}$ & market shares and individual choice probabilities & Section~\ref{blp:sec:model} \\
+$\bm m$, $m_j$ & markups $\bm p - \bm c$ & Section~\ref{blp:sec:model} \\
+$g$, $g_H$ & map from $(\theta_2, H)$ to the estimand, and the logit markup share function under conduct $H$ & Sections~\ref{blp:sec:why} and~\ref{blp:sec:markups} \\
+$\varepsilon_{ijt}$, $\nu_i$, $\eta_i$ & extreme value taste shock, observed demographic and unobserved taste for $x_1$ & Section~\ref{blp:sec:model} \\
+$\zeta_j$ & characteristic carrying a random coefficient, in Proposition~\ref{blp:prop:flat} & Section~\ref{blp:sec:markups} \\
+$\Lambda$, $\Gamma$ & diagonal and cross terms of the demand Jacobian, $D_p^\top = -\Lambda + \Gamma$ & Section~\ref{blp:sec:model} \\
+$\dot b$ & Jacobian $\nabla b(\theta_0)$ of the limit $b(\theta)$ of the summary statistics & Section~\ref{blp:sec:gbc} \\
+$\kappa$ & common ownership weight, $H_{jk} = \kappa$ for rival products & Chapter~\ref{ch:blp}, Discussion \\
+$\mathcal{W}$ & weighting matrix of the BLP GMM criterion & Exercise~\ref{blp:ex:dml} \\
+\bottomrule
+\end{tabular}\par}
+
+\clearpage\flushbottom

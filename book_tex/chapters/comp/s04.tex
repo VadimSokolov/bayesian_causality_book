@@ -1,0 +1,78 @@
+% comp section 04 (comp:sec:network, gbc:sec:qnn), phase 2 rewrite; "The proposition is exact" is in comp/s06, "A check that can be run" in comp/s09
+\section{Learning the map: the check loss and the quantile network}\label{gbc:sec:qnn}\label{comp:sec:network}
+
+We cannot write $G$ down, but regression on simulated pairs of parameter and summary learns a conditional mean under squared error and a conditional quantile under the check loss\index{check loss|textbf}; give the network the level as an input and it learns every quantile at once.
+
+\subsection{The quantile neural network}
+
+A quantile neural network\index{quantile neural network|textbf} is a function $f_\phi(u,s)$ of a level $u\in(0,1)$ and a value $s$ of the summary. We train it on simulations from the prior predictive distribution: draw $\theta^{(j)}\sim\pi$ and $D^{(j)}$ from the model, set $s^{(j)}=S(D^{(j)})$, draw a level $u_j$ uniformly, and minimize the check loss\index{quantile neural network!training by check loss|textbf}
+\begin{equation}\label{gbc:eq:pinball}
+\mathcal L(\phi) = \frac1J\sum_{j=1}^J \rho_{u_j}\bigl(\theta^{(j)} - f_\phi(u_j, s^{(j)})\bigr),\qquad \rho_u(r) = r\{u - \one(r<0)\}.
+\end{equation}
+At inference $f_\phi(V,s)$ with $V$ uniform and $s=S(D^{\mathrm{obs}})$ is an approximate posterior draw. For a vector $\theta$ the loss is applied coordinate by coordinate in the triangular order, with the earlier coordinates added to the inputs.
+
+\begin{proposition}[What the check loss learns]\label{gbc:prop:pinball}
+Let $(\theta, S)$ have the joint law induced by the prior and the model, with $\E\lvert\theta\rvert<\infty$, and let $U$ be uniform and independent of them. Among measurable functions $f(u,s)$ with $\E\lvert f(U,S)\rvert<\infty$, the expected check loss $\E\,\rho_U(\theta - f(U,S))$ is minimized by $f^\ast(u,s) = Q(u\mid s)$, the conditional quantile function of $\theta$ given $S=s$, and the minimizer is unique for almost every $(u,s)$ at which the conditional distribution function is strictly increasing.
+\end{proposition}
+\begin{proof}
+Conditioning on $(U,S)$, it suffices to minimize $g(q) = \E[\rho_u(\theta - q)\mid S=s]$ over $q$. The function $g$ is convex with right derivative $F(q\mid s) - u$, which is nonnegative exactly when $q\ge Q(u\mid s)$, so the minimum is attained at the conditional $u$ quantile, uniquely where $F(\cdot\mid s)$ is strictly increasing. Integrating over $(u,s)$ gives the result.
+\end{proof}
+
+The proposition is about the population minimizer. For a trained network the evidence is the checks of Section~\ref{comp:sec:checks}. Integrated over $u$, the check loss of a curve that increases in $u$ is half the continuous ranked probability score\index{continuous ranked probability score|textbf}\index{CRPS|see{continuous ranked probability score}} of the law the curve describes, a strictly proper score (Gneiting and Raftery 2007). 
+
+\subsection{Quantile neural networks explained}\label{gbc:sec:qnnexplained}
+
+The check, or pinball\index{pinball loss|see{check loss}}, loss charges $u$ per unit when the target lies above the guess and $1 - u$ when below, so the guess that balances the two expected charges is the $u$ quantile (Figure~\ref{fig:qnnloss}). Classical quantile regression fits one level at a time (Koenker and Bassett 1978). The implicit quantile network of Dabney, Ostrovski, Silver and Munos (2018), introduced for distributional reinforcement learning, takes the level as an input, so one network\index{quantile neural network} represents the whole quantile function $u \mapsto Q(u \mid s)$.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{qnn_loss.pdf}
+\caption{Left: the check loss for levels 0.1, 0.5 and 0.9. Right: expected check loss for a Gamma(2) target; the minimizers, marked by vertical lines, are the 0.1, 0.5 and 0.9 quantiles.}
+\label{fig:qnnloss}
+\end{figure}
+
+\paragraph{The architecture.} In Figure~\ref{fig:qnnarch} the level enters through a cosine embedding, $\cos(i\pi u)$ for $i = 1, \ldots, K$ with $K = 32$, followed by one layer, and the summary passes through two layers. The two embeddings, each of width 64, are multiplied coordinate by coordinate, so that the shape of the posterior, not only its location, can change with $s$, and a two layer head returns the quantile. The two examples of this section train on the check loss alone, with inputs and outputs on their own scales. The worked example of Section~\ref{comp:sec:core} also uses the check loss alone but standardizes inputs and targets by their training means and standard deviations. The horseshoe networks of Section~\ref{comp:sec:horseshoe} use the defaults of the \texttt{gbc} package (Polson and Sokolov 2023), which add an L1 location anchor and a soft penalty on crossing quantiles to the check loss and normalize inputs and outputs.
+
+\begin{figure}[ht]
+\centering
+\resizebox{\linewidth}{!}{\begin{tikzpicture}[node distance=5mm and 7mm, box/.style={draw,rounded corners=2pt,minimum height=7mm,inner sep=3pt,font=\small,align=center}, ar/.style={-{Stealth[length=2mm]}}]
+\node[box] (tau) {$u \sim U(0,1)$};
+\node[box, right=of tau] (cos) {cosine\\ embedding};
+\node[box, right=of cos] (lt) {layer};
+\node[box, below=9mm of tau] (h) {summary $S(D)$};
+\node[box, right=of h] (lh1) {layer};
+\node[box, right=of lh1] (lh2) {layer};
+\node[circle,draw,inner sep=1pt, right=12mm of $(lt)!0.5!(lh2)$] (prod) {$\odot$};
+\node[box, right=7mm of prod] (head) {head};
+\node[box, right=7mm of head] (q) {$\theta = f_\phi(u, s)$};
+\draw[ar] (tau) -- (cos); \draw[ar] (cos) -- (lt); \draw[ar] (lt) -| (prod);
+\draw[ar] (h) -- (lh1); \draw[ar] (lh1) -- (lh2); \draw[ar] (lh2) -| (prod);
+\draw[ar] (prod) -- (head); \draw[ar] (head) -- (q);
+\end{tikzpicture}}
+\caption{The quantile neural network. The quantile level and the data summary are embedded separately, combined by a coordinatewise product $\odot$, and mapped to a quantile of the posterior.}
+\label{fig:qnnarch}
+\end{figure}
+
+\paragraph{Training and sampling.}  Each pass pairs every simulated summary with four fresh uniform levels, in minibatches of 512 simulations, and takes Adam steps on \eqref{gbc:eq:pinball} at learning rate $0.002$ with a cosine decay, for 60 passes. Averaging the network over a grid of levels gives the posterior mean by \eqref{comp:eq:quantileidentity}. Reweighted averages give the distorted values and risk criteria of Section~\ref{gbc:sec:risk} when the utility increases in $\theta$; otherwise they reweight the sorted utilities of the draws.
+
+\paragraph{Crossing and rearrangement.} Nothing forces $f_\phi(u,s)$ to increase in $u$, so a curve read off a grid of levels can cross. Sorting it costs nothing: by the rearrangement inequality\index{rearrangement inequality|textbf} of Hardy, Littlewood and P\'olya (1952) it never raises the integrated check loss at any outcome, nor, by Chernozhukov, Fern\'andez Val and Galichon (2010), the error in estimating a monotone function. Draws $f_\phi(V,s)$ with $V$ uniform already follow the sorted curve, since the law of $f(V)$ has the increasing rearrangement of $f$ as its quantile function, so quantities computed from draws are unaffected. The curves of Figure~\ref{fig:qnnnormal} and the errors reported below are for the raw network output, so sorting could not raise them. 
+
+\paragraph{Normal learning, learned.} Take $\theta \sim N(0, 1)$ and ten observations $y_i \mid \theta \sim N(\theta, 1)$, with the sufficient summary $S = \bar y$. The exact posterior is normal with mean $10\bar y/11$ and standard deviation $1/\sqrt{11} \approx 0.302$. We trained the network on 40{,}000 prior simulations. Figure~\ref{fig:qnnnormal} compares the learned and exact quantile functions at three values of $\bar y$: the mean absolute error over a grid of 99 levels from 0.01 to 0.99, which approximates the Wasserstein distance between learned and exact posteriors, is between 0.007 and 0.013. At $\bar y = 1.5$, 20{,}000 draws from the network have mean 1.359 and standard deviation 0.300, against exact values of 1.364 and 0.302.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{qnn_normal.pdf}
+\caption{Normal learning with a quantile neural network. Left: learned quantile functions (thin lines) and exact posterior quantile functions (thick grey lines) at $\bar y = -1.5$, $0$ and $1.5$. Centre: network draws at $\bar y = 1.5$ against the exact posterior density. Right: the training loss.}
+\label{fig:qnnnormal}
+\end{figure}
+
+\paragraph{A randomized trial, learned.} Take a two arm trial with 50 patients per arm, success probabilities $p_0$ and $p_1$ with independent uniform priors, and target the risk difference $\tau = p_1 - p_0$. The summary is the pair of observed success rates. We trained on 60{,}000 simulated trials and evaluated the network at 18 control and 27 treated successes. The exact posterior is a difference of two beta variables. The network gives a posterior median of 0.172 and a 90\% interval of $[0.019, 0.332]$; the exact values are 0.174 and $[0.014, 0.328]$. The posterior probability that treatment helps is 0.967 from the network and 0.963 exactly. Figure~\ref{fig:qnntrial} shows both posteriors and a simulation based calibration over 500 simulated trials with 19 draws each; in the saved run, which used two threads, the rank histogram is consistent with uniformity, with a chi squared statistic of 22.2 on 19 degrees of freedom, a value that changes with the thread count.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{qnn_trial.pdf}
+\caption{A two arm trial. Left: network draws of the risk difference at 18 of 50 and 27 of 50 successes, against the exact posterior. Right: ranks of the true risk difference among 19 network draws, over 500 simulated trials; the line is the count expected under perfect calibration.}
+\label{fig:qnntrial}
+\end{figure}
+
+

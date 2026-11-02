@@ -1,0 +1,240 @@
+\chapter{Two Benchmarks}\label{ch:k401}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+On the 401(k) data the flexible methods that report one effect for everyone, DML and the horseshoe, put it between 8.6 and 9.8 thousand dollars, while least squares with nine covariates gives 5.9. The posterior adds what that one effect hides: effects of one or two thousand dollars at low incomes and about 21 thousand at the top, and an effect on the untreated 40 percent smaller than on the treated. On the LaLonde benchmark the experiment gives 1.79; the raw difference with survey controls is $-8.50$, least squares gives 1.07, and the flexible methods give 1.39 to 1.68.
+\end{tcolorbox}
+
+We compare DML and Bayesian estimates of the effect of 401(k) eligibility\index{401(k) plan} on household net financial assets, using the 1991 wave of the Survey of Income and Program Participation, the leading empirical example of Chernozhukov et al. (2018). All estimates come from our own analysis; the scripts are in the repository of Appendix~\ref{app:code}.
+
+\section{The question and the data}
+
+A worker is eligible for a 401(k) plan\index{401(k) plan!eligibility and participation|textbf} if her employer offers one. Following Poterba, Venti and Wise (1995), we assume eligibility is close to randomly assigned given the covariates (Section~\ref{sec:dml:k401}).
+
+The sample has 9,915 households. The outcome is net total financial assets, in thousands of dollars. The treatment is eligibility, held by 37\% of households. The covariates are age, income, years of education, family size, and indicators for marriage, two earner households, a defined benefit pension, an individual retirement account and home ownership. We expand the nine covariates into 54 standardized terms: the covariates, their squares and pairwise interactions. The five binary squares are affine in their indicators, leaving 49 effective terms.
+
+The outcome is highly skewed, with median about 1.5 thousand dollars and maximum over 1.5 million. 
+
+\section{Estimates of the average effect}
+
+Table~\ref{tab:k401} collects the estimates. Least squares with nine covariates and DML with forests use the covariates as they are, and the other adjusted rows use the 54 term basis. The lasso plug in regresses assets on eligibility and the 54 terms with one lasso penalty on every coefficient, eligibility included, chosen by five fold cross validation. The horseshoe rows keep 2,000 Gibbs draws, and the coupled prior takes its propensity from a cross validated logistic regression on the basis. The DML rows show one random partition of the data.
+
+\begin{table}[ht]
+\centering
+\caption{Estimates of the effect of 401(k) eligibility on net financial assets, thousands of dollars. Intervals are 95\% confidence intervals for DML and 95\% posterior intervals for the Bayesian methods. The DML rows use the partially linear score and the regression and horseshoe rows assume a constant effect, so with flexible adjustment and varying effects each estimates the average of $\tau(x)$ weighted by $e(x)\{1 - e(x)\}$.}
+\label{tab:k401}
+\small
+\begin{tabular}{lcc}
+\toprule
+Method & Estimate & Interval \\
+\midrule
+Difference in means & 19.56 & \\
+Least squares, nine covariates & 5.90 & \\
+Least squares, 54 term basis & 9.84 & \\
+Lasso plug in, 54 term basis & 8.89 & \\
+DML, random forests & 8.59 & [6.05, 11.12] \\
+DML, lasso on 54 term basis & 9.52 & [6.89, 12.14] \\
+Horseshoe, independent prior & 9.79 & [7.45, 12.07] \\
+Horseshoe, coupled to propensity & 9.82 & [7.42, 12.11] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Adjustment matters a great deal. The raw difference of 19.6 thousand dollars is driven by eligible households having higher incomes, and higher income households saving more. Every adjusted estimate is about half of it or less.
+
+Functional form matters too. Least squares with the nine covariates entering linearly gives 5.9; with the 54 term basis, 9.8. Income and assets are strongly nonlinearly related, and a linear adjustment leaves confounding behind.
+
+With flexible enough adjustment the methods that report one effect for everyone agree: DML with forests or the lasso and both horseshoes\index{horseshoe prior} give 8.6 to 9.8 thousand dollars, with intervals about 5 thousand dollars wide. Posterior standard deviations, about 1.2, are close to the DML standard errors, about 1.3.
+
+Regularization induced confounding\index{regularization induced confounding} did not bite: the independent and coupled horseshoe posteriors are nearly identical. With almost ten thousand observations and 54 basis terms, the likelihood dominates the prior for the important coefficients, and tail robustness\index{tail robustness} should leave the large coefficients lightly shrunk. The simulation of Section~\ref{sec:ricsim}, with $n = 200$ and $p = 50$, found that coupling cut the independent horseshoe's bias from 0.059 to $-0.023$; here $n$ is large relative to $p$, and the priors coincide. 
+
+\paragraph{Sample splitting variability.} Over 20 random partitions\index{cross fitting!variance from the random split}, lasso DML estimates range from 9.52 to 10.26 (median 9.84, standard deviation 0.17); over 5 partitions, forest estimates range from 8.59 to 9.05 (median 9.00, standard deviation 0.21). The table's partition happens to give the lowest estimate for both learners; Chernozhukov et al. (2018) recommend reporting the median. These ranges are small relative to the standard errors but not zero: two analysts with the same data and method, differing only in a random seed, report estimates up to 0.7 thousand dollars apart. The posterior has a spread of its own, the Monte Carlo error of the Gibbs sampler. For the independent horseshoe the 2,000 draws of the treatment coefficient are nearly independent (Section~\ref{comp:sec:cost}), so with posterior standard deviation 1.19 the error is about $1.19/\sqrt{2{,}000} \approx 0.03$ thousand dollars. It shrinks with the number of draws, whereas the partition spread is fixed by the design and invisible in any single run. An analyst should report the spread across partitions with a DML estimate and the Monte Carlo error with a posterior mean.
+
+\section{Heterogeneity and accounting}\label{sec:k401acc}
+
+The average hides large differences by income\index{401(k) plan!heterogeneity by income|textbf}\index{heterogeneous treatment effects!by income|textbf}. We let the effect of eligibility in the coupled horseshoe model differ across income quintiles\index{income quintile|textbf}, with the five quintile specific effects unpenalized and the rest unchanged. Figure~\ref{fig:k401} shows the posteriors.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{k401.pdf}
+\caption{Left: posteriors of the average effect under the independent and coupled horseshoe priors; the dashed line is the DML forest estimate. Right: posterior means and 95\% intervals for the effect of eligibility by income quintile.}
+\label{fig:k401}
+\end{figure}
+
+\begin{table}[ht]
+\centering
+\caption{Posterior effect of eligibility by income quintile, thousands of dollars.}
+\label{tab:k401q}
+\small
+\begin{tabular}{lccc}
+\toprule
+Income quintile & Mean & Standard deviation & 95\% interval \\
+\midrule
+1 (lowest) & 1.41 & 3.39 & [$-5.04$, 7.87] \\
+2 & 1.45 & 2.44 & [$-3.14$, 6.22] \\
+3 & 6.76 & 2.08 & [2.59, 10.89] \\
+4 & 12.80 & 2.01 & [8.87, 16.68] \\
+5 (highest) & 20.78 & 2.23 & [16.39, 25.34] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The effect rises steeply with income, from about 1.4 thousand dollars in the bottom two quintiles, with intervals including zero, to about 21 thousand at the top. Small low income effects could reflect low take up of the plan or substitution for other saving; an analysis of eligibility alone cannot distinguish them.
+
+Weighting the quintile effects by each quintile's share in a chosen population, the same posterior draws give three averages:
+\begin{itemize}
+\item Over all households: 8.64, with 95\% interval [6.21, 11.17].
+\item Over eligible households, the effect on the treated: 11.65, with interval [9.27, 14.16].
+\item Over ineligible households, the effect on the untreated\index{effect on the treated!and untreated|textbf}: 6.86, with interval [4.12, 9.62].
+\end{itemize}
+The effect on the treated\index{effect on the treated} is larger because eligible households are richer. A policymaker considering extending eligibility to ineligible workers needs the third number, about 40\% smaller than the effect on the treated. All three come from one fit.
+
+Each accounting is a weighted average of the five quintile means of Table~\ref{tab:k401q}. The weights are 0.2 for every quintile over all households; 0.07, 0.14, 0.21, 0.26 and 0.32 over eligible households; and 0.28, 0.23, 0.20, 0.16 and 0.13 over ineligible households. The last two vectors are the shares of each group in the five income quintiles, which follow from eligibility rates of 13, 26, 38, 49 and 59 percent by quintile. Because the weights are rounded, a hand computation reproduces 8.64 exactly but moves 11.65 and 6.86 by up to 0.05.
+
+The $e(x)\{1 - e(x)\}$ weights in the caption of Table~\ref{tab:k401} favour households where eligibility is closest to a coin flip. Their means in the five income quintiles are 0.135, 0.183, 0.213, 0.233 and 0.230, so the lowest two quintiles, with the smallest effects, count less. Applied to the means of Table~\ref{tab:k401q}, these weights give 9.71, close to the 9.5 to 9.8 of lasso DML and the horseshoes, against 8.64 with equal weights. The gap of about 1.1 thousand dollars is a difference of estimand. The forest estimate, 8.59, targets the same weighted average with different nuisance fits.
+
+DML can also report the quintile effects. Averaging the augmented inverse propensity weighted score over the households of each quintile, with the two outcome regressions and the propensity fitted once per partition (five folds, the 54 term basis for the lasso and the nine covariates for the forests, propensities clipped at 0.01 and 0.99) and the median taken over 100 random partitions, gives 3.86, 1.27, 5.55, 10.43 and 21.04 thousand dollars with the lasso, with 95\% intervals [2.33, 5.39], [$-1.87$, 4.40], [3.01, 8.10], [5.84, 15.02] and [10.78, 31.30], and 4.36, 0.83, 5.05, 10.62 and 19.63 with forests. Every estimate lies inside the matching horseshoe interval of Table~\ref{tab:k401q}, the second quintile interval contains zero for both learners, and the same score averaged over all households gives 8.42 with the lasso and 8.08 with forests, against the posterior's 8.64. The DML intervals are narrower than the posterior's in the three lowest quintiles and wider in the two highest, most of all at the top, where the standard error is 5.2 against a posterior standard deviation of 2.2. Clipping touched at most 2 households in a partition with the lasso, in the first, second and fifth quintiles, and at most 66 with forests, all in the lowest quintile.
+
+\section{A tree based check: Bayesian causal forest}
+
+We tried a Bayesian causal forest\index{Bayesian causal forest}\index{Bayesian causal forest!in the 401(k) data|textbf} to check the horseshoe's chosen basis and income quintiles. It learns functional form and heterogeneity from the nine raw covariates, with the estimated propensity in its prognostic forest. Eight chains of 50,000 retained draws each did not converge: for the average effect, split $\hat R$ is 1.19 and effective sample size 27; in the top income decile, 1.64 and 13, with chain means from 13 to 25 thousand dollars. Draws from chains that disagree this much are not a posterior, so we report no forest estimates; the income profile check by a second model class remains to be done.
+
+\section{Overlap and the outcome distribution}\label{sec:k401overlap}
+
+Estimated eligibility propensities range from 0.02 to 0.89. Overlap\index{overlap!in the 401(k) data|textbf}\index{401(k) plan!overlap|textbf} is adequate but thin at low incomes, where eligible households are scarce. Weighting estimators give those households large weights; the outcome model pools across nearby incomes. The bottom quintile interval of Section~\ref{sec:k401acc}, $-5.04$ to 7.87, is nearly one and a half times as wide as the top quintile's: the posterior reports the scarcity as uncertainty, whereas a few large weights inflate the variance of the average without saying where the thinness is.
+
+Skewness of the outcome\index{401(k) plan!outcome distribution|textbf} is more serious for every method: a few wealthy households strongly influence both the Gaussian horseshoe fit and DML's squared error nuisance regressions. Student $t$ errors, a scale mixture of normals, slot into the Gibbs sampler of Chapter~\ref{ch:horseshoe}; quantile models address the distribution directly (Chapter~\ref{ch:gente}). Chernozhukov and Hansen's (2004) instrumental quantile analysis of these data, estimating the effect of participation instrumented by eligibility, found the effect concentrated in the upper part of the asset distribution, consistent with the income pattern above. DML has no error model to check.
+
+Figure~\ref{fig:ppc401k} gives a posterior predictive check of the coupled horseshoe of Table~\ref{tab:k401} on 9,915 households, fitted once with Gaussian errors and once with Student $t$ errors\index{Student t errors|textbf} on three degrees of freedom (3,000 sweeps each, 1,000 discarded). From each fit we take 1,000 posterior draws and replicate the outcome once per draw at the observed covariates and eligibility, with the draw's error scale and, for the $t$ model, latent weights drawn afresh from their prior. Neither model passes. The Gaussian replicates match the mean and standard deviation of net financial assets but are far too symmetric: the observed 5th percentile is $-9$ thousand dollars and the median 1.5 thousand, against replicated values of $-77$ (95\% range $-80$ to $-74$) and 15 (13 to 17), and the observed skewness is 10.6 against 0.9. The $t$ replicates are closer in the lower tail and the centre, with a 5th percentile of $-19$ and a median of 5.6, but their upper tail is far too light (95th percentile 53 against 92, 99th 87 against 220), and their mean, 9.6 against the observed 18.1, shows that the $t$ model describes the centre of the distribution and not its average. For both models the observed quantile lies outside the 95\% range at 95 of the 99 levels from 0.01 to 0.99. Assets are also more dispersed among eligible households than among ineligible ones (standard deviations 74.8 and 54.5 thousand dollars), which one error scale for everyone cannot reproduce.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{ppc401k_post.pdf}
+\caption{Posterior predictive check of the coupled horseshoe for the 401(k) data, 1,000 posterior draws and one replicated data set from each. Left and middle: 95\% ranges of replicated quantiles (levels 0.01 to 0.99) against observed quantiles, on a symmetric log scale, for eligible and ineligible households, with Gaussian errors (left) and Student $t$ errors on three degrees of freedom (middle). Right: observed mean assets by income quintile (eligible solid, ineligible dashed) with replicated means and 95\% ranges (squares Gaussian, triangles $t$; eligible dark, ineligible light).}
+\label{fig:ppc401k}
+\end{figure}
+
+The Student $t$ refit uses three degrees of freedom and a sampled scale. Each household has a latent weight $w_i \sim \mathrm{Gamma}(3/2, 3/2)$ and error variance $\sigma^2/w_i$, and each Gibbs sweep adds a draw of the weights given the residuals to the sampler of Table~\ref{tab:k401} (3,000 sweeps, the first 1,000 discarded; split $\hat R$ of 1.002 over four chains). The common effect falls from 9.82 to 4.22, with 95\% interval [3.68, 4.73], and the equal weight average of the five quintile effects falls from 8.64 to 4.83. The $t$ model has not found that eligibility raises mean assets by less. It measures a different location. Net financial assets are strongly skewed to the right, and a likelihood that discounts large residuals fits a line nearer the centre of the conditional distribution than its mean; with symmetric errors the two fits would agree (Exercise~\ref{ex:chk401:1}). In a typical draw 9 percent of households carry a weight below 0.1, a tenth of the prior mean, so the wealthy households that dominate the mean barely enter the fit, and the effect becomes a shift of the bulk of the conditional distribution. Changing the degrees of freedom shows the drift directly. One run for each value gives 2.05 at one degree of freedom, 3.36 at two, 5.28 at five, 6.47 at ten and 7.85 at thirty, against 9.82 in the Gaussian limit. Quantile regressions of assets on eligibility, an intercept, the propensity and the 54 terms give eligibility coefficients of 2.00 at the lower quartile, 2.92 at the median and 13.19 at the ninetieth percentile, the increasing pattern Chernozhukov and Hansen found for participation instrumented by eligibility: the less a fit listens to the right tail, the smaller the effect it reports. At the lower quartile, the median and the ninetieth percentile the 95\% intervals from 2,000 bootstrap resamples of the households (percentile intervals, with the propensity refitted in each resample and the same resamples used for every quantile) are 1.64 to 2.39, 2.44 to 3.48 and 9.99 to 15.95, and they do not overlap. The differences are 0.93 (0.50 to 1.42) from the lower quartile to the median and 10.27 (7.17 to 12.92) from the median to the ninetieth percentile, and both are positive in all 2,000 resamples.
+
+For the average effect, the quantity of Table~\ref{tab:k401} and of DML, the Gaussian working model remains the right device despite its wrong error law. Its posterior mean tracks least squares on the basis, and thus the conditional mean as far as the basis represents it, whatever the errors, provided they have finite variance. The check rules out its intervals for tail quantities and its predictions for individual households. It also questions its intervals for the mean: it suggests different error variances between eligibility groups, and then least squares has a sandwich sampling variance, not the model variance the Gaussian posterior reports, and credible interval coverage depends on the ratio of the two (Corollary~\ref{pg:cor:sandwich}). The intervals of Table~\ref{tab:k401} should be checked against a heteroskedasticity robust standard error. The $t$ fit, though it too fails the check, adds something the Gaussian fit cannot see.
+
+In the two lowest income quintiles, where the Gaussian intervals of Table~\ref{tab:k401q} straddle zero, the $t$ quintile effects are 2.23 [1.02, 3.45] and 1.82 [0.90, 2.80]. In the $t$ fit, eligibility moves the centre of the conditional distribution of assets in those quintiles up by about two thousand dollars, which is a statement about the distribution and not about each household. It does not settle the sign of the small mean effects of Table~\ref{tab:k401q}: the mean also carries the right tail, and the tail is what makes their intervals wide.
+
+\section{The LaLonde benchmark}\chlabel{ch:lalonde}\label{sec:lalonde}
+
+LaLonde (1986) took a randomized evaluation of a job training programme, replaced the randomized control group with people drawn from national surveys, and asked whether the econometric methods of the day could recover the experimental answer. Mostly they could not: estimates ranged widely and often had the wrong sign. The study became the standard benchmark for observational causal methods\index{LaLonde benchmark|textbf}, and it is the one setting in this part with an experimental answer to compare against.
+
+Here the randomized control group supplies an unbiased estimate of the effect, 1.79 thousand dollars with standard error 0.67, and the question is whether BART, the Bayesian causal forest and DML, each adjusting for the same ten covariates, land near it when the controls are replaced by a survey sample. With a standard error that large the benchmark can expose a method that fails badly, but it cannot rank methods that come close. The target throughout is the effect on the treated, since the experiment concerned the participants. Section~\ref{sec:crit:real} runs a harder comparison, against the PSID, with placebo checks.
+
+\subsection{The National Supported Work demonstration}
+
+The National Supported Work demonstration\index{LaLonde benchmark!National Supported Work demonstration|textbf} of the mid 1970s offered disadvantaged workers, including former addicts, former offenders and young school dropouts, nine to eighteen months of work experience in a supportive setting. Eligible applicants were randomly assigned to the programme or a control group, and their earnings followed. Our outcome is earnings in 1978, after the programme, in thousands of 1978 dollars.
+
+Dehejia and Wahba (1999) used 185 treated and 260 controls from LaLonde's male participants with 1974 earnings available. Their carefully applied propensity score\index{propensity score} methods came close to the experimental benchmark when Current Population Survey controls replaced experimental controls. Smith and Todd (2005) replied that this success was fragile and depended on the subsample.
+
+We use the Dehejia and Wahba subsample and a CPS comparison group\index{LaLonde benchmark!CPS comparison group|textbf} of 15,992 people, as distributed with Cunningham's (2021) \emph{Causal Inference: The Mixtape}. The covariates are age, years of education, indicators for being Black, Hispanic, married and without a high school degree, earnings in 1974 and 1975, and indicators for zero earnings in each of those years.
+
+\paragraph{The experimental benchmark.} In the randomized subsample the treated minus control difference in mean 1978 earnings is 1.79 thousand dollars. A BART\index{Bayesian additive regression trees} fit to the experimental data, imputing each treated participant's control outcome, gives a posterior for the effect on the treated\index{effect on the treated} with mean 1.55 and 95\% interval 0.74 to 2.32. The two differ because BART adjusts for small chance covariate imbalances and earnings are highly variable; both are compatible with an effect of roughly one and a half to two thousand dollars a year.
+
+\subsection{The observational problem}
+
+Now replace the 260 experimental controls with the 15,992 CPS respondents, a broad cross section of American workers that looks nothing like the NSW participants. The raw difference in mean 1978 earnings, treated minus CPS, is $-8.50$ thousand dollars: the trainees, selected for disadvantage, earned far less than the average worker. A naive comparison says the programme cost each participant eight and a half thousand dollars a year.
+
+Least squares with the ten covariates entering linearly gives 1.07, with a heteroskedasticity robust standard error of 0.63 and a 95\% interval from $-0.16$ to 2.29: below the experimental 1.79 by about one standard error, and far from the raw $-8.50$.
+
+The difficulty is overlap\index{overlap}. Figure~\ref{fig:lalonde_ps} shows the estimated propensity of being an NSW trainee on a log density scale. Half the CPS controls have estimated propensity below one in a thousand, and 99\% are below 0.18. The treated have median propensity 0.32. Most of the CPS sample is irrelevant; the relevant part is a thin tail.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{lalonde_ps.pdf}
+\caption{Estimated propensity of NSW treatment among NSW treated and CPS controls, log density scale.}
+\label{fig:lalonde_ps}
+\end{figure}
+
+\subsection{Results}
+
+We estimate the effect on the treated, the natural target since the experimental benchmark concerns NSW participants. Table~\ref{tab:lalonde} and Figure~\ref{fig:lalonde_att} collect the estimates\index{LaLonde benchmark!results|textbf}. Hill's (2011) BART takes treatment as one more covariate and imputes each treated participant's control earnings; the next BART row adds the estimated propensity as a covariate, and the Bayesian causal forest takes it as an input. Every adjusted row uses the ten covariates. The propensity of Figure~\ref{fig:lalonde_ps}, which BART and the causal forest use, is a logistic regression on them; DML fits random forests for both the control outcome and its own propensity, with five folds and one random partition. The BART and causal forest\index{causal forest} posteriors keep 1,000 draws.
+
+\begin{table}[ht]
+\centering
+\caption{Effect of NSW training on 1978 earnings of the treated, thousands of dollars, using CPS controls. Intervals are 95\% confidence intervals for least squares (heteroskedasticity robust) and DML, and posterior intervals otherwise. The experimental benchmark is 1.79. The BART rows average observed minus imputed earnings over the treated, so their intervals hold the treated outcomes fixed; the DML and causal forest intervals do not.}
+\label{tab:lalonde}
+\small
+\begin{tabular}{p{2.5in}cc}
+\toprule
+Method & Estimate & Interval \\
+\midrule
+Difference in means & $-8.50$ & \\
+Least squares & 1.07 & [$-0.16$, 2.29] \\
+DML, augmented weighting for the treated, forests & 1.51 & [0.07, 2.95] \\
+Hill's BART & 1.54 & [0.85, 2.16] \\
+BART with estimated propensity & 1.51 & [0.77, 2.28] \\
+BART after common support check & 1.39 & [0.70, 2.03] \\
+Bayesian causal forest & 1.68 & [0.41, 2.88] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{lalonde_att.pdf}
+\caption{Estimates of the effect on the treated with CPS controls. The shaded band is the 95\% posterior interval from BART on the experimental data; the dashed line is the experimental difference in means.}
+\label{fig:lalonde_att}
+\end{figure}
+
+Every flexible method lands within the experimental posterior band, and so does least squares at 1.07, so on these 185 treated participants the band does not tell the methods apart.  The tree based estimates move with the random seed and the machine: four independent chains of 2,000 draws gave means of 1.52 to 1.65 for BART with the estimated propensity and 1.68 to 1.74 for the causal forest, so differences of a tenth or two among the rows carry no information. The chains agree (split $\hat R$ at most 1.017), but the effective sample size of the effect for BART with the propensity is only 124 of the 8,000 draws. The common support\index{overlap} check (Chapter~\ref{ch:bart}) drops treated participants whose imputed control outcome has posterior standard deviation above the 99th percentile of the controls' standard deviations. It flagged 6 of the 185 treated as having poorly predicted counterfactuals, and the effect for the remaining 179 is 1.39.
+
+The intervals differ more than the point estimates. Hill's BART is tightest, about 1.3 thousand dollars wide; DML's is widest, nearly 2.9. Most of the gap is a difference of estimand. The BART rows average observed minus imputed earnings over the 185 treated, so their posteriors hold the treated participants' earnings fixed and carry only the uncertainty about the mean control earnings at their covariates, not the variation of individual earnings around that mean. The DML interval is for the population effect on the treated and includes the sampling variability of their earnings. The treated term of its score alone has standard error 0.62, which already gives an interval wider than any BART row, and the reweighted controls have a standard error of 0.39; the two parts together give the reported 0.73. Those controls enter with the odds $e/(1 - e)$, which reached 8 for the most treated like controls. The experiment shows the same gap: the experimental difference in means\index{difference in means} has standard error 0.67, a half width of 1.32, while the BART interval from the same data has half width 0.79. The Bayesian causal forest is nearly as wide as DML. It averages draws of the effect function $\tau(x)$ over the treated, so its posterior carries uncertainty about the treated participants' mean earnings as well as their control earnings, where the BART rows use the observed earnings instead. Putting the BART rows on the causal forest's target, by averaging each draw of $\tau(x)$ over the treated, moves no point estimate by more than 0.19 and widens the intervals: Hill's BART gives 1.54 [0.41, 2.63], BART with the propensity 1.49 [0.27, 2.69] and the support checked fit 1.57 [0.44, 2.65], each about 2.2 to 2.4 thousand dollars wide, and the experimental BART interval widens from 1.58 to 2.32 around 1.37. That closes 58 percent of the width gap between Hill's BART and DML. We have not split the remaining 0.66 thousand dollars into comparable parts; BART already carries uncertainty about the control means, so the DML control term does not account for it by itself.
+
+\paragraph{Conditional effects.} Figure~\ref{fig:lalonde_cate} plots the Bayesian causal forest's posterior for the conditional average effect $\tau(x)$ at each treated participant's covariates. These are effects for people like each participant, not the participant's own difference $Y_i(1) - Y_i(0)$, whose distribution depends on the joint law of the potential outcomes (Chapter~\ref{ch:gente}). The intervals are wide, as they must be with 185 treated units, and most overlap zero. There is little evidence of strong heterogeneity in 1975 earnings, though this is weak evidence of homogeneity: the prior holds the effect forest near a constant and the data have not pulled it far.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{lalonde_cate.pdf}
+\caption{Bayesian causal forest posterior of the conditional average effect at each NSW participant's covariates, against 1975 earnings: posterior means with approximate 95\% intervals (plus or minus 1.96 posterior standard deviations).}
+\label{fig:lalonde_cate}
+\end{figure}
+
+\paragraph{Sensitivity to unmeasured confounding.} Figure~\ref{fig:lalonde_sens} applies the Bayesian sensitivity analysis\index{sensitivity analysis} of Section~\ref{sec:sensitivity} to the BART\index{Bayesian additive regression trees} posterior for the effect on the treated. That posterior has mean 1.54 and standard deviation 0.33 thousand dollars, and it holds the treated outcomes fixed, as the caption of Table~\ref{tab:lalonde} says. We approximate it by a normal distribution with those two moments and subtract the bias $a\,b_U$ of the linear example of that section: $a$ is the difference between trainees and controls, given the ten covariates, in an unmeasured confounder $U$ of unit variance, and $b_U$ is the change in 1978 earnings, in thousands of dollars, per standard deviation of $U$. Both get independent $N(0, s^2)$ priors, and the curve gives the probability of a positive effect at 60 values of $s$ from 0.01 to 1.5, each from 200,000 Monte Carlo draws. Near $s = 0.5$ the posterior probability of a positive effect is still 0.999; near $s = 1$ it is 0.94; at $s = 1.5$, 0.84. Because both priors are centred at zero, the bias is as likely to raise the estimate as to lower it, so the posterior mean stays at 1.54 and only the spread grows. Even a prior allowing confounding comparable to the full effect leaves that probability at 0.84.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{lalonde_sens.pdf}
+\caption{Posterior probability that the NSW programme raised earnings, against the common prior scale $s$ of the two confounding parameters $a$ and $b_U$ of Section~\ref{sec:sensitivity}, starting from a normal approximation to the BART posterior for the effect on the treated (200,000 Monte Carlo draws at each of 60 values of $s$).}
+\label{fig:lalonde_sens}
+\end{figure}
+
+\subsection{What the benchmark shows}
+
+With 185 treated participants, this sample does not separate rigid from flexible adjustment\index{LaLonde benchmark!what it shows|textbf}. Least squares with linear covariates gives 1.07, with standard error 0.63, and the flexible methods give 1.39 to 1.68. The flexible estimates are closer to the experimental 1.79 and to the BART estimate from the experimental data, 1.55, but gaps of 0.3 to 0.6, about one standard error, cannot say that they are better. LaLonde's original estimates, built on similar parametric specifications, scattered widely, and earlier in this chapter the move from nine covariates to the 54 term basis changed least squares from 5.90 to 9.84, a change that no benchmark checks but that every flexible method shares.
+
+Flexible adjustment lands near the experimental benchmark on this sample, whether through trees in a Bayesian model or forests inside DML, consistent with Dehejia and Wahba's conclusion and subject to Smith and Todd's warning that the subsample matters. We have not repeated the analysis on LaLonde's harder full sample, and readers should not generalize beyond these data.
+
+\section{In practice}
+
+\paragraph{The target.} In the 401(k) analysis the targets are the average effect, the effects on the treated and untreated, and the effect by income quintile. Each Gibbs draw of the coupled horseshoe model gives the five quintile effects, and weighting them by quintile shares in the chosen population gives a draw of each average, so the accountings and their intervals come from one set of draws. In the LaLonde analysis the target is the effect on the treated: each posterior draw of the response surface imputes each treated participant's control earnings, and averaging observed minus imputed earnings over them gives a draw of the target. Restricting the average to participants with common support, or any subgroup, is another accounting of the same draws.
+
+\paragraph{What the analyst does differently.} The analyst states the population before fitting: a policymaker extending eligibility needs the effect on the untreated, 6.86, not the effect on the treated, 11.65. She expands the nine covariates to the 54 term basis, places the horseshoe on it with the propensity coupled into the prior, and fits a second model class, here the Bayesian causal forest; because its chains do not mix, she reports no estimates from it and says that the check remains to be done. She runs the predictive check of Figure~\ref{fig:ppc401k}, finds the Gaussian error model too symmetric, refits with Student $t$ errors, and reports the mean effect from the Gaussian working model and the shift of the bulk from the $t$ fit, labelled as different quantities. She reports Table~\ref{tab:k401q} and the three accountings together, because the decision depends on them. In the LaLonde analysis she looks at the propensity of Figure~\ref{fig:lalonde_ps} before fitting anything, which shows that most of the CPS sample is irrelevant. She checks common support unit by unit and reports the effect for all 185 treated (1.54) and for the 179 with support (1.39), and she presents the sensitivity of the sign to unmeasured confounding as the curve of Figure~\ref{fig:lalonde_sens}.
+
+\paragraph{Against DML.} On the single weighted average that the partially linear DML score and the constant effect horseshoe both estimate, DML is adequate: 8.59 with forests and 9.52 with the lasso, intervals about 5 thousand dollars wide, against 9.82 and an interval of the same width from the horseshoe. Nothing in Table~\ref{tab:k401} separates the two on that question. Beyond that one number the lasso estimate moves from 9.52 to 10.26 across random partitions, each new accounting needs a new score, and DML recovers the quintile effects that turned out to be the finding of the 401(k) analysis, with an interval much wider than the posterior's in the top quintile. Stacking the five scores gives joint inference and intervals for differences between quintiles (Chernozhukov et al. 2018); what DML does not give is a probability for a statement such as the effect rising from each quintile to the next. On the LaLonde sample DML is adequate in the same way: 1.51 with forests and the augmented score, against 1.54 for Hill's BART and 1.68 for the Bayesian causal forest, inside the experimental band. It has no counterpart to the conditional effect posteriors of Figure~\ref{fig:lalonde_cate} or to the unit level check that found 6 treated participants without support.
+
+\section*{Notes}
+
+The 401(k) data are Chernozhukov and Hansen's (2004) extract of the 1991 Survey of Income and Program Participation. Regularization induced confounding is from Hahn, Carvalho, Puelz and He (2018). The $e(x)\{1 - e(x)\}$ weights are Li, Morgan and Zaslavsky's (2018) overlap weights (Chapter~\ref{ch:ipw}), and that a regression coefficient estimates a weighted average of this form is classical (Angrist 1998; Aronow and Samii 2016).
+
+BART as a causal method is Hill's (2011), the Bayesian causal forest is Hahn, Murray and Carvalho's (2020), and the common support rule is Hill and Su's (2013); Chapter~\ref{ch:bart} describes all three.
+
+
+
+\begin{exercises}
+\item\label{ex:chk401:1} Derive the Gibbs step for the weights $w_i$ of the Student $t$ refit in Section~\ref{sec:k401overlap}, and explain why the common effect falls as the degrees of freedom fall.
+\item\label{ex:chk401:2} Replace the income quintile interactions with a horseshoe on interactions of eligibility with every basis term, and report the posterior of $\tau(x)$ along a grid of incomes.
+\item\label{ex:chk401:3} Compute the DML estimate of the effect on the treated using the appropriate orthogonal score, and compare it with the accounting value 11.65.
+\item\label{ex:chk401:4} Using the propensity estimates, trim households with propensity below 0.05 and recompute the effect for the trimmed population, both by DML and as an accounting of the posterior.
+\item\label{ex:chk401:5} Discuss whether the Poterba, Venti and Wise argument for unconfoundedness is credible, and design a Bayesian sensitivity analysis for an unmeasured taste for saving.
+
+\item\label{ex:chlalonde:1} Repeat the analysis of Section~\ref{sec:lalonde} with LaLonde's PSID comparison group, which Dehejia distributes with the Dehejia and Wahba samples and which is in the book's data folder, and compare the spread of estimates with Table~\ref{tab:lalonde}.
+\item\label{ex:chlalonde:2} Fit the coupled horseshoe of Chapter~\ref{ch:horseshoe} with a spline basis in 1974 and 1975 earnings, and compare with the BART estimates.
+\item\label{ex:chlalonde:3} With $\mu_0(x) = \E(Y \mid T = 0, X = x)$ and $\tau_T$ the effect on the treated, the augmented score for $\tau_T$ is $\psi = \{T(Y - \mu_0(X) - \tau_T) - (1 - T)\,e(X)\{Y - \mu_0(X)\}/(1 - e(X))\}/\Prob(T = 1)$. Show that controls enter with weight $e(x)/\{1 - e(x)\}$, the weight that removes the error of $\mu_0$ on the treated, and explain why this places heavy weight on the few CPS controls that resemble the trainees.
+\item\label{ex:chlalonde:4} Using the posterior draws, compute the posterior probability that the effect on the treated exceeds one thousand dollars under each Bayesian method.
+\item\label{ex:chlalonde:5} Smith and Todd argue that matching estimates on these data are sensitive to the subsample. Design a Bayesian analysis that makes the dependence on the subsample explicit.
+\end{exercises}

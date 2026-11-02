@@ -1,0 +1,37 @@
+% comp section 03 (comp:sec:noise), phase 2 rewrite; Knothe, Rosenblatt, Brenier and ordering advice kept from m14, generator display now the triangular map, amortization sentence in comp/s05; figure by book_scripts/comp_figs.py
+\section{A posterior is a map from noise}\label{comp:sec:noise}
+
+Every first course in simulation teaches one trick\index{inverse transform sampling|textbf}. To draw from a distribution with distribution function $F$, draw $U$ uniform on $(0,1)$ and return $F^{-1}(U)$: the result is at most $z$ exactly when $U\le F(z)$, which has probability $F(z)$. A posterior is no different, except that nobody hands us the inverse. Yet a function of this kind always exists. That is noise outsourcing\index{noise outsourcing|textbf}: one random object can be generated from another by feeding it, with an independent uniform number, to one fixed function.
+
+\begin{theorem}[Noise outsourcing]\label{comp:thm:outsourcing}
+Let $X$ and $Y$ be random elements of standard Borel spaces. On a possibly enlarged probability space there are a random variable $U$, uniform on $(0,1)$ and independent of $X$, and a measurable function $G$ such that $Y = G(U,X)$ almost surely\index{noise outsourcing}.
+\end{theorem}
+
+This is the transfer theorem\index{Kallenberg transfer theorem|see{noise outsourcing}}\index{transfer theorem|see{noise outsourcing}} of Kallenberg (2002). For real $Y$ one can take $G(u,x)=F^{-1}(u\mid x)$, the conditional quantile function\index{quantile function|textbf}, with $F^{-1}(u\mid x)=\inf\{y:F(y\mid x)\ge u\}$ the generalized inverse, so that atoms are covered: at a jump of $F$ the level $U$ is spread uniformly over the jump by an extra independent uniform variable, which is why the space may have to be enlarged (Exercise~\ref{ex:ch08:1}; the proof is in Appendix~\ref{app:theory}). Other standard Borel spaces reduce to the real case by a Borel isomorphism. With $Y=\theta$ and $X=S(D)$ for a data summary $S$, $G(U,s)$ has law $\pi(\theta\mid S=s)$ for almost every $s$, the full posterior when $S$ is sufficient (Section~\ref{comp:sec:summaries}).
+
+The theorem is an existence statement. $G$ changes when the prior or the model does, and outside conjugate cases it has no formula. It is not unique either, since any measure preserving shuffle of the levels gives another function with the same output law, but only one choice increases in $u$, the quantile function\index{quantile function!posterior|textbf}, which for scalar $\theta$ is the one we learn. A posterior is then fully described by a single increasing function on $(0,1)$ (Figure~\ref{comp:fig:inverse}). Its slope is the reciprocal of the posterior density, shallowest at a mode and steep in the gap between two.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{comp_inverse.pdf}
+\caption{One bimodal posterior, the mixture $0.4\,N(-1.5,0.45^2)+0.6\,N(1.5,0.6^2)$. Left: its distribution function, with six uniform draws carried across to the curve and down to draws of $\theta$. Centre: the quantile function. Right: 5{,}000 draws $Q(U)$ and the exact density.}
+\label{comp:fig:inverse}
+\end{figure}
+
+For a vector $\theta=(\theta_1,\ldots,\theta_d)$ we apply the scalar statement one coordinate at a time, with independent uniforms $U_1,\ldots,U_d$:
+\[
+\theta_1 = G_1(U_1,s),\qquad \theta_j = G_j(U_j,s,\theta_1,\ldots,\theta_{j-1}),\quad j=2,\ldots,d,
+\]
+where $G_j$ is the quantile function of $\theta_j$ given $s$ and the earlier coordinates. The map is triangular\index{triangular map|textbf}. It is the factorization $p(\theta_1\mid s)\,p(\theta_2\mid s,\theta_1)\cdots$ turned into a sampler, which transport theory calls the Knothe and Rosenblatt map\index{Knothe Rosenblatt map|textbf} (Rosenblatt 1952; Knothe 1957). Brenier's theorem (Brenier 1991) gives a different map, the gradient of a convex function; the two generally differ, coinciding when the coordinates are independent. For computation any map with the right output law will do, and the triangular one reduces a vector problem to $d$ scalar quantile regressions.
+
+Every coordinate order gives an exact generator, but early errors pass to later coordinates. We put the quantity of interest first, learning the treatment effect from its marginal posterior given the summary before the nuisances. No ordering repairs bias from a prior that ignores the propensity score (Section~\ref{comp:sec:core}).
+
+The theorem allows atoms. A spike and slab posterior puts positive probability on a coefficient being exactly zero, and its quantile function has a flat piece at zero whose length on the level axis is that probability. The horseshoe posterior has a density, so its quantile function has no flat piece.
+
+Pushing several coordinates through their own marginal quantile functions with one shared $U$ gives the right margins and the wrong joint law: the coordinates become comonotone, perfectly rank correlated whatever the posterior says. Driving the treated and control quantile functions with one uniform is the same mistake in causal dress, and it assumes rank preservation\index{rank preservation} (Section~\ref{sec:ot}).
+
+One map serves every question through an identity. As $G(U,s)$ with $U$ uniform on $(0,1)^d$ has the posterior law, for any $h$ with $\E\lvert h(\theta)\rvert<\infty$
+\begin{equation}\label{comp:eq:quantileidentity}
+\E\{h(\theta)\mid s\} = \int_{(0,1)^d} h\bigl(G(u,s)\bigr)\,du.
+\end{equation}
+For $d=1$, $h(\theta)=\theta$ gives the posterior mean as the area under the quantile function\index{quantile function}, and $h(\theta)=\one(\theta>c)$ gives the posterior probability of $\theta>c$ as the share of levels at which the quantile function exceeds $c$. The Wasserstein-1 distance between two scalar posteriors is the area between their quantile functions. A utility is another $h$. A risk criterion reweights the levels of the utility's own quantile function (Chapter~\ref{ch:cdt}): for scalar $\theta$ that is the utility of the quantile function of $\theta$ only when the utility increases in $\theta$, and in general the utilities of the draws are sorted first. Once $G$ is learned a new question costs an integral, not a new fit: the learned map is the model, and each integral is accounting (Chapter~\ref{ch:mccullagh}).

@@ -1,0 +1,69 @@
+% comp s09 (W6, phase 2); log misc/work-orders/comp-phase2-W6.applied.md
+\section{Checks and failure modes}\label{comp:sec:checks}
+
+A failing sampler leaves traces in its output; a trained network returns a smooth quantile function whatever it has learned, so it needs outside checks\index{generative Bayesian computation!checks and failure modes|textbf}.
+
+Split $\hat R$\index{split R hat@split $\hat R$} and the effective sample size say whether a chain has settled, and are read for the effect, not only for the nuisance parameters. The posterior predictive check\index{posterior predictive check|textbf} asks whether the model could have produced the data on the summaries the effect depends on: outcome means by arm within propensity strata, residual variance by arm, and the tails.
+
+For split $\hat R$, cut each chain in half. With $m$ draws per half, let $W$ be the mean variance within halves and $B$ be $m$ times the variance of half chain means. The posterior variance estimate and diagnostic are
+\[
+\widehat{\mathrm{var}}^{+}=\frac{(m-1)W+B}{m},\qquad \hat R=\sqrt{\frac{\widehat{\mathrm{var}}^{+}}{W}}.
+\]
+Values near 1 say the halves agree. The effective sample size is the number of draws divided by $1+2\sum_{k\ge1}\rho_k$, where $\rho_k$ is the autocorrelation at lag $k$ and the sum is truncated as in Geyer's initial positive sequence. The Monte Carlo error of a posterior mean is about the posterior standard deviation over the square root of the effective sample size. For a probability of benefit, apply the same to $h=\one(\tau>0)$, which can mix differently from $\tau$, so a fixed number of sweeps does not fix the precision of a tail quantity.
+
+Vehtari and coauthors (2021) replace the classical $\hat R$ by the larger of a rank normalized split $\hat R$ and its folded version, flag values above 1.01, and add a tail effective sample size from the indicators at the 5th and 95th percentiles; the checks of Section~\ref{sec:hsgibbs} used the classical versions. No diagnostic proves that every mode was visited.
+
+Simulated pairs also test a network, in four checks (Figure~\ref{comp:fig:checks}).
+
+\begin{figure}[ht]
+\centering
+\resizebox{\linewidth}{!}{\begin{tikzpicture}[node distance=7mm,box/.style={draw,rounded corners=2pt,minimum height=7mm,text width=2.3cm,inner sep=3pt,font=\small,align=center},ar/.style={-{Stealth[length=2mm]}}]
+\node[box](a){held out loss};
+\node[box,right=of a](b){global ranks};
+\node[box,right=of b](c){local ranks at $s$};
+\node[box,right=of c](d){reference};
+\draw[ar](a)--(b);\draw[ar](b)--(c);\draw[ar](c)--(d);
+\end{tikzpicture}}
+\caption{The four checks of a trained network, in the order we run them.}
+\label{comp:fig:checks}
+\end{figure}
+
+\paragraph{Held out check loss.} The first check meters the amortization\index{amortization|textbf} error, the distance at a summary $s$ between the network's posterior and the exact one. For a network that increases in $u$ (sorting, which never raises the loss, makes it so: Exercise~\ref{ex:chcomp:4}), averaging over the prior predictive\index{amortization} gives
+\begin{equation}\label{comp:eq:amortization}
+\E\int \{F_\phi(t \mid S) - F(t \mid S)\}^2\,dt = 2\{\bar{\mathcal L}(\phi) - \bar{\mathcal L}^\ast\}.
+\end{equation}
+Here $F_\phi(\cdot\mid s)$ is the distribution function of the draws $f_\phi(U,s)$, $\bar{\mathcal L}(\phi)=\E\,\rho_U\{\theta-f_\phi(U,S)\}$ is the expected check loss and $\bar{\mathcal L}^\ast$ its minimum, reached by the exact posterior. Held out pairs estimate $\bar{\mathcal L}(\phi)$ and so rank networks without a reference posterior, though an average can hide a large error at one summary.
+
+\paragraph{Rank histograms.} The second check, the global ranks, ranks the true $\theta$ among $L$ draws from the network's posterior at $S(D)$: simulation based calibration\index{simulation based calibration|textbf}.
+
+\begin{proposition}[Rank uniformity]\label{comp:prop:ranks}
+Let $(\theta, D)$ come from the prior and the model\index{simulation based calibration}, with $\theta$ real valued, and let $S$ be any function of $D$. If the law of $\theta$ given $S$ has no atoms and, given $S$, the $L$ draws are independent of $\theta$ and of each other with that law, then the number $B$ of draws below $\theta$\index{rank statistic|textbf} is uniform on $\{0, \dots, L\}$.
+\end{proposition}
+\begin{proof}
+Given $S$, $\theta$ and the $L$ draws are $L + 1$ independent draws from one law, hence exchangeable and almost surely distinct, so each of the $L + 1$ places $\theta$ can take in their order is equally likely: $\Prob(B = b \mid S) = 1/(L + 1)$ for every $b$.
+\end{proof}
+
+Even a network returning the prior has flat ranks and nominal held out coverage (Exercise~\ref{ex:chcomp:1}). The check certifies calibration\index{calibration|textbf} over the prior predictive, not sharpness or accuracy at the observed data. U shaped histograms mean draws too narrow; humped, too wide; tilted, shifted.
+
+\paragraph{Local ranks.} The third check repeats the test at the observed summary $s$, for $M$ simulations and $M$ evaluations of the network: draw $M$ parameters from its posterior at $s$, simulate a data set from each, recompute the posterior, and rank the generating value. The test is not the same, however, because the parameters come from the posterior at $s$ and not from the prior: Proposition~\ref{comp:prop:ranks} does not apply, the local ranks of the exact posterior are not flat in general (in the normal example of Section~\ref{comp:sec:network} at $\bar y = 1.5$ about two thirds of them fall in the upper half), and those of a network that returns the prior are exactly flat at every $s$ (Exercise~\ref{ex:chcomp:1}). The check is informative when the prior is weak relative to the data, and with an informative prior it can pass a useless network and fail the exact posterior. In the trial, each draw of the risk difference $\tau$ is paired with $p_0$ from its conditional posterior given $\tau$ and the data, and $p_1 = p_0 + \tau$, with no clipping; a draw of $\tau$ outside $(-1, 1)$ has no valid pair and is redrawn. Importance weights proportional to likelihood times prior over network density target the exact posterior, provided these quantities are evaluable and the network density is positive on the posterior support; we have not tried this correction. 
+
+\paragraph{Evidence.} We ran the local check with $M = 400$ and 19 draws each, at two threads, for a network retrained with the same design, at the observed trial of Section~\ref{gbc:sec:qnnexplained}, 18 of 50 and 27 of 50 successes, and at an extreme trial, 1 of 50 and 49 of 50. Against the exact posterior's expected counts under the same protocol, the network's counts give chi squared 21.1 on 19 degrees of freedom ($p = 0.33$) at the typical trial and 28.4 ($p = 0.08$) at the extreme one, so neither rejects agreement with the exact reference.
+
+Against a flat histogram they give 24.0 ($p = 0.20$) and 222 ($p < 10^{-35}$). The extreme histogram piles up at the top ranks, but at so extreme a summary the exact posterior's own local ranks do so too, for the reason given above: with the exact posterior in place of the network, 200 repeats of the protocol give a chi squared statistic with median 20 at the typical trial and 244 at the extreme one. A direct comparison of the posteriors finds what the ranks miss. At the typical trial the network's posterior is within 0.003 of the exact one in Wasserstein distance; at the extreme trial it is shifted down and too wide, its 5\% quantile 0.834 against the exact 0.853 and its Wasserstein distance 0.009, because few training simulations land near a risk difference of 0.9 (Figure~\ref{fig:openlocalsbc})\index{simulation based calibration!local}. The global ranks of the network of Section~\ref{gbc:sec:qnnexplained} passed (chi squared 22.2 at two threads, Figure~\ref{fig:qnntrial}), since a risk difference above 0.9 has prior probability 0.005. Problem 6 of Chapter~\ref{ch:open} asks for a bound on such local error.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{open_localsbc.pdf}
+\caption{Local simulation based calibration of the trial posterior at a typical and an extreme data set: rank histograms of the network ($M = 400$ simulations, 19 draws each, network trained on 60{,}000 trials) per 400 draws, with the rank histogram of the exact posterior under the same protocol (black steps) and the flat count (dotted line).}
+\label{fig:openlocalsbc}
+\end{figure}
+
+\paragraph{Reference.} Compare with a trusted posterior: the trial's beta difference, the normal posterior (Section~\ref{comp:sec:core}) or the horseshoe Gibbs sampler (Section~\ref{sec:hsgibbs}). The distance is local amortization error; the reference loss gives $\bar{\mathcal L}^\ast$. A tractable cousin tests the architecture, not the application.
+
+Known failures, mostly from the experiments in our book \emph{Generative Bayesian Computation} (Polson and Sokolov 2026a):
+\begin{itemize}
+\item \emph{Under-dispersion.} On three of the four tasks we took from the benchmark of Lueckmann and coauthors (2021), separate networks trained with the check loss alone on 10,000 simulations gave central 90 percent marginal intervals that contained 31 to 52 percent of the true parameter components over the ten benchmark observations of each task (31 and 33 of 100, 26 of 50), for reasons not diagnosed.
+\item \emph{High signal to noise.} Near deterministic outcomes, such as the luminosities of Chapter~\ref{ch:gente}, are the risk. The networks of that book gave intervals too wide in simulations and too narrow on its lake data set; for the narrow ones it offers only a heuristic, that the product of level and summary features starves the spread. Remedies: heteroscedastic ensembles, conformal calibration (marginal coverage only).
+\item \emph{Lost dependence.} Separate networks give the marginals without the dependence, so a contrast gets the wrong variance (Exercise~\ref{ex:chcomp:2}), which only its own ranks reveal; the triangular map of Section~\ref{comp:sec:noise} keeps it.
+\item \emph{Blurred jumps.} In surrogate regression of a response surface with a jump, averaging an ensemble blurs the jump, since its members place it at different points; one network given an estimated side of the jump did better. We have not tested a jump in a posterior or an outcome surface at a regression discontinuity.
+\end{itemize}

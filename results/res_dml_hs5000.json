@@ -1,0 +1,106 @@
+{
+ "s5": {
+  "hs5000_K2": {
+   "bias": -0.049702829847188656,
+   "bias_mcse": 0.005298981153904445,
+   "coverage": 0.74,
+   "coverage_se": 0.019616319736382767,
+   "se_over_sd": 0.5069994756536421,
+   "se_over_rmse": 0.4679304913411636,
+   "width": 0.2354848511289123,
+   "share_converged": null,
+   "n_converged": null,
+   "median_ess": null
+  },
+  "hs5000_K5": {
+   "bias": -0.012277764610491015,
+   "bias_mcse": 0.0025928682429392064,
+   "coverage": 0.93,
+   "coverage_se": 0.011410521460476728,
+   "se_over_sd": 0.9386731896407341,
+   "se_over_rmse": 0.9191886817247423,
+   "width": 0.21333295602994398,
+   "share_converged": null,
+   "n_converged": null,
+   "median_ess": null
+  }
+ },
+ "s15": {
+  "hs5000_K2": {
+   "bias": -0.05135783947345318,
+   "bias_mcse": 0.005294617854662862,
+   "coverage": 0.624,
+   "coverage_se": 0.021662132858977667,
+   "se_over_sd": 0.49552781281415575,
+   "se_over_rmse": 0.4549803859289255,
+   "width": 0.22996711883067647,
+   "share_converged": null,
+   "n_converged": null,
+   "median_ess": null
+  },
+  "hs5000_K5": {
+   "bias": -0.013556200237956006,
+   "bias_mcse": 0.002769483845204471,
+   "coverage": 0.918,
+   "coverage_se": 0.012269963325128561,
+   "se_over_sd": 0.886982269144708,
+   "se_over_rmse": 0.8672931175917675,
+   "width": 0.21531627773494139,
+   "share_converged": null,
+   "n_converged": null,
+   "median_ess": null
+  }
+ },
+ "s30": {
+  "hs5000_K2": {
+   "bias": -0.054552988393491986,
+   "bias_mcse": 0.0040319900872242504,
+   "coverage": 0.688,
+   "coverage_se": 0.020719845559269985,
+   "se_over_sd": 0.6239711436507314,
+   "se_over_rmse": 0.5342414539875374,
+   "width": 0.2205195259480774,
+   "share_converged": null,
+   "n_converged": null,
+   "median_ess": null
+  },
+  "hs5000_K5": {
+   "bias": -0.013742929396233117,
+   "bias_mcse": 0.003285513184337351,
+   "coverage": 0.83,
+   "coverage_se": 0.016798809481626965,
+   "se_over_sd": 0.7484307405053047,
+   "se_over_rmse": 0.736381569964068,
+   "width": 0.21553505777110307,
+   "share_converged": null,
+   "n_converged": null,
+   "median_ess": null
+  }
+ },
+ "weak": {
+  "hs5000_K2": {
+   "bias": -0.052223854329359054,
+   "bias_mcse": 0.010935531067929558,
+   "coverage": 0.866,
+   "coverage_se": 0.015234434679370286,
+   "se_over_sd": 0.7774809341363909,
+   "se_over_rmse": 0.7610619679574995,
+   "width": 0.7452340940334273,
+   "share_converged": null,
+   "n_converged": null,
+   "median_ess": null
+  },
+  "hs5000_K5": {
+   "bias": -0.025985621689491145,
+   "bias_mcse": 0.009112689954152701,
+   "coverage": 0.918,
+   "coverage_se": 0.012269963325128561,
+   "se_over_sd": 0.894058206303291,
+   "se_over_rmse": 0.887749596118172,
+   "width": 0.7141270387765687,
+   "share_converged": null,
+   "n_converged": null,
+   "median_ess": null
+  }
+ }
+}

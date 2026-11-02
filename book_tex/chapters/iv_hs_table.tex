@@ -1,0 +1,32 @@
+\begin{table}[ht]
+\centering
+\caption{Twenty instruments, 1,000 data sets per design, $n = 2{,}000$, $\tau = 0.1$ and error correlation 0.6. The concentration parameter $c$ is carried by $s$ active instruments, each with first stage coefficient $\sqrt{c/(ns)}$; the weak design of the text is $c = 1.8$ with $s = 20$, the sparse design $c = 135$ with $s = 3$. For two stage least squares the median estimate over data sets; for each first stage prior the median over data sets of the posterior median, the share of equal tailed 90\% intervals that cover the truth, and the median interval length. The Monte Carlo standard error of a coverage near 90\% is about one point.}
+\label{tab:ivmany}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcccccc}
+\toprule
+& \multicolumn{3}{c}{Three active, $s = 3$} & \multicolumn{3}{c}{Twenty active, $s = 20$} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+First stage prior & Median & Coverage & Length & Median & Coverage & Length \\
+\midrule
+\multicolumn{7}{@{}l}{\textit{Concentration $c = 1.8$}} \\
+Two stage least squares & 0.66 &  &  & 0.64 &  &  \\
+Diffuse, exact & 0.66 & 10\% & 0.59 & 0.64 & 9\% & 0.59 \\
+Hierarchical normal & 0.59 & 98\% & 3.09 & 0.56 & 98\% & 3.06 \\
+Horseshoe & 0.62 & 99\% & 5.54 & 0.59 & 99\% & 5.54 \\
+\midrule
+\multicolumn{7}{@{}l}{\textit{Concentration $c = 20$}} \\
+Two stage least squares & 0.39 &  &  & 0.40 &  &  \\
+Diffuse, exact & 0.37 & 40\% & 0.45 & 0.38 & 39\% & 0.45 \\
+Hierarchical normal & $-0.07$ & 91\% & 1.77 & $-0.05$ & 91\% & 1.75 \\
+Horseshoe & 0.08 & 92\% & 1.23 & 0.11 & 95\% & 1.76 \\
+\midrule
+\multicolumn{7}{@{}l}{\textit{Concentration $c = 135$}} \\
+Two stage least squares & 0.17 &  &  & 0.17 &  &  \\
+Diffuse, exact & 0.17 & 77\% & 0.25 & 0.17 & 76\% & 0.25 \\
+Hierarchical normal & 0.08 & 88\% & 0.32 & 0.08 & 89\% & 0.32 \\
+Horseshoe & 0.10 & 89\% & 0.30 & 0.10 & 90\% & 0.31 \\
+\bottomrule
+\end{tabular}
+\end{table}

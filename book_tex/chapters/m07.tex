@@ -1,0 +1,348 @@
+\chapter[Bayesian Nonparametrics for Causal Inference]{Bayesian Nonparametrics for Causal Inference: BART, Bayesian Causal Forests and Gaussian Processes}\label{ch:bart}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+Under ignorability, causal inference is regression of the potential outcomes on the covariates. Bayesian additive regression trees and Gaussian processes put priors on the whole response surface, so every effect, average, conditional or on the treated, is read off one fitted surface with its uncertainty attached. The Bayesian causal forest separates prognosis from effect and puts the propensity score into the prior, which guards against the main failure of plain BART.
+\end{tcolorbox}
+
+\section{The response surface approach}
+
+Double machine learning\index{double machine learning} (Chapters~\ref{ch:dml} and~\ref{ch:critique}) turns causal inference into nuisance estimation: the average effect is a residual on residual regression after partialling the confounders out of outcome and treatment. The estimand comes first; the model serves it.
+
+A different tradition models the potential outcomes directly. With a good model of $\E(Y \mid X, T)$ for both treatment values, the conditional average treatment effect follows at once,
+\begin{equation}
+\tau(x) = \E\{Y(1) \mid X = x\} - \E\{Y(0) \mid X = x\} = \mu_1(x) - \mu_0(x),
+\label{eq:bart:cate}
+\end{equation}
+where $\mu_t(x) = \E(Y \mid X = x, T = t)$. Under ignorability\index{ignorability} and overlap\index{overlap}, this response surface\index{response surface|textbf} approach needs only nonparametric regression, with no separate propensity model or orthogonalization.
+
+Bayesian nonparametrics\index{Bayesian nonparametrics|textbf} represents uncertainty about the whole function $\mu_t(\cdot)$ and carries it to every effect. Its leading tools are Gaussian processes and Bayesian additive regression trees, introduced by Chipman, George and McCulloch (2010), turned into a causal method by Hill (2011) and refined by Hahn, Murray and Carvalho's Bayesian causal forest\index{Bayesian causal forest}.
+
+\section{Bayesian additive regression trees}
+
+BART\index{Bayesian additive regression trees|textbf}\index{BART|see{Bayesian additive regression trees}} writes the regression function as a sum of $m$ trees:
+\begin{equation}
+Y = \sum_{j=1}^m g(x; \mathcal{T}_j, M_j) + \varepsilon, \qquad \varepsilon \sim N(0, \sigma^2).
+\label{eq:bart}
+\end{equation}
+Tree $\mathcal{T}_j$ partitions covariate space with splits $x_k < c$; $M_j$ holds its leaf values, and $g(x; \mathcal{T}_j, M_j)$ returns the value at $x$. A single tree is a step function; a sum of two hundred small trees represents smooth trends, sharp thresholds and interactions of moderate order. Each captures a small piece of the signal.
+
+The sum of trees suits causal work because it assumes no parametric form for $\mu_t(x)$ in \eqref{eq:bart:cate}: the thresholds and interactions that typically drive selection into treatment, a program that enrols the sick and the poor, say, are found from the data rather than specified.
+
+\subsection{The regularization prior}
+
+BART's power comes from its prior\index{Bayesian additive regression trees!regularization prior|textbf}, which keeps each tree weak. Chipman, George and McCulloch specify three components.
+
+\paragraph{Tree shape.} A node at depth $d$ splits with probability
+\[
+\alpha(1 + d)^{-\beta},
+\]
+with defaults $\alpha = 0.95$ and $\beta = 2$. The root splits with probability $0.95$, a node at depth one about $0.24$, at depth two about $0.11$, and at depth three about $0.06$. Most trees therefore have two or three terminal nodes. Splitting variables are chosen uniformly and split points uniformly among observed values. Figure~\ref{fig:bartdepth} plots these probabilities.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.85\linewidth]{bart_depth.pdf}
+\caption{Prior probability that a node at each depth splits, for the BART default and for the more conservative effect forest of the Bayesian causal forest introduced below.}
+\label{fig:bartdepth}
+\end{figure}
+
+\paragraph{Leaf values.} With the outcome rescaled to $[-0.5, 0.5]$, each leaf value has the prior
+\[
+\mu \sim N(0, \sigma_\mu^2), \qquad \sigma_\mu = \frac{0.5}{k\sqrt{m}},
+\]
+with default $k = 2$. The sum of $m$ independent leaf values then has prior standard deviation $0.5/k$, putting about 95\% of the prior mass for the regression function inside the observed range of the outcome.
+
+\paragraph{Error variance.} A scaled inverse chi squared prior on $\sigma^2$, with $\nu = 3$ degrees of freedom, puts the least squares residual standard deviation at the 90th prior percentile for $\sigma$, favouring smaller error variance since BART is expected to fit better.
+
+The default is $m = 200$ trees. Predictive performance usually levels off as $m$ grows and the leaf prior shrinks each tree more (Chipman, George and McCulloch 2010).
+
+\subsection{Backfitting MCMC}
+
+The posterior is
+\begin{multline*}
+p\bigl(\{\mathcal{T}_j, M_j\}_{j=1}^m, \sigma^2 \mid Y, X\bigr) \\
+\propto \prod_{i=1}^n N\Bigl(y_i; \sum_{j=1}^m g(x_i; \mathcal{T}_j, M_j), \sigma^2\Bigr) \prod_{j=1}^m p(\mathcal{T}_j)\,p(M_j \mid \mathcal{T}_j)\; p(\sigma^2),
+\end{multline*}
+explored by Bayesian backfitting\index{Bayesian additive regression trees!backfitting MCMC|textbf}. Cycling over trees, each is updated given the others by forming the partial residual
+\[
+R_j = Y - \sum_{l \neq j} g(x; \mathcal{T}_l, M_l)
+\]
+and treating it as data for a single tree model. A Metropolis Hastings step\index{Markov chain Monte Carlo} updates the structure, proposing to grow a terminal node, prune two terminal children, change a splitting rule, or swap a parent and child rule. Given the structure, the leaf values have conjugate normal full conditionals and are integrated out analytically in the structure proposal. Finally $\sigma^2$ is drawn from its inverse gamma full conditional.
+
+
+
+A known weakness is slow mixing: early trees can lock in splits that are hard to undo. The accelerated BART (XBART)\index{XBART|textbf} of He, Yalov and Hahn (2019) and He and Hahn (2023), the grow from root algorithm, rebuilds each tree by a stochastic search at each sweep and initializes the Markov chain. The \texttt{stochtree} software we use runs 20 such sweeps before the standard sampler in the applications (Chapter~\ref{ch:k401} and Section~\ref{sec:lalonde}) and 10 in the simulation below, substantially shortening burn in.
+
+\section{Hill's causal BART}
+
+Under ignorability, Hill's\index{Hill, Jennifer L.|textbf} (2011) causal BART\index{causal BART|textbf} fits the response surface $f(x, t) = \E(Y \mid X = x, T = t)$ with treatment as another covariate:
+\begin{equation}
+\E(Y \mid X = x, T = t) = \sum_{j=1}^m g(x, t; \mathcal{T}_j, M_j).
+\label{eq:bart:hill}
+\end{equation}
+For each posterior draw $f^{(s)}$, the unit level contrast is $\tau^{(s)}(x_i) = f^{(s)}(x_i, 1) - f^{(s)}(x_i, 0)$, and the average effect is $n^{-1}\sum_i \tau^{(s)}(x_i)$. For the effect on the treated\index{effect on the treated} there are two accountings. Averaging the contrast over the $n_1$ treated units gives $n_1^{-1}\sum_{i: T_i = 1}\tau^{(s)}(x_i)$, the sample version of $\E\{\tau(X) \mid T = 1\}$. The applications in this book instead keep the observed outcome of each treated unit and impute only its missing control mean:
+\[
+\tau_{\mathrm{ATT}}^{(s)} = \frac{1}{n_1}\sum_{i: T_i = 1}\bigl\{Y_i - f^{(s)}(x_i, 0)\bigr\}.
+\]
+This holds the treated outcomes fixed and carries only the uncertainty about the control surface. A posterior for the realized effect $n_1^{-1}\sum_{i: T_i = 1}\{Y_i(1) - Y_i(0)\}$ would also draw each missing $Y_i(0)$ from the predictive distribution, adding the residual variance. The three can have similar centres and different widths, and Section~\ref{sec:lalonde} returns to the difference. This is the accounting identity\index{accounting identity} exactly: one fitted surface, every causal estimand an average over a chosen set of units, and posterior uncertainty about $f$ passed to each through the draws.
+
+Hill's argument for modelling only the response surface, not the assignment, was practical: a flexible response model makes the propensity score\index{propensity score} unnecessary for bias removal, avoids the instability of weights, and gives coherent uncertainty for every target.
+
+\paragraph{Binary outcomes.} For a binary outcome Chipman, George and McCulloch (2010) use probit BART, $\Prob(Y = 1 \mid x, t) = \Phi\{h(x, t)\}$ with a sum of trees prior on $h$ and $\Phi$ the standard normal distribution function, fitted by drawing a truncated normal latent variable for each unit and then updating the trees as above. The effects are differences of probabilities: each draw gives $\tau^{(s)}(x) = \Phi\{h^{(s)}(x, 1)\} - \Phi\{h^{(s)}(x, 0)\}$, averaged over the chosen units as before. The contrast $h(x, 1) - h(x, 0)$ lives on the latent scale and is not a risk difference, and in a Bayesian causal forest with a probit link the effect forest acts on that latent scale.
+
+\begin{example}[The IHDP benchmark]
+Hill built her simulation on the Infant Health and Development Program\index{Infant Health and Development Program|textbf}\index{IHDP|see{Infant Health and Development Program}}, a randomized trial of intensive home visits and child care for low birth weight, premature infants. She removed a nonrandom subset of the treated children, those with nonwhite mothers, so that the remaining treated and control groups differed systematically and overlap was imperfect, then simulated outcomes from known linear and nonlinear response surfaces so that the true effect was known. Under the nonlinear surface, BART had lower root mean squared error and better interval coverage than propensity score matching, inverse probability weighting and linear regression adjustment. The design has become a standard benchmark for heterogeneous effect methods.
+\end{example}
+
+
+
+\section{The overlap problem}
+
+Weighting methods divide by the probability of the treatment received, so when the propensity is near zero or one the weights explode and a few observations dominate (Chapter~\ref{ch:ipw}).
+
+\begin{definition}[Overlap]
+Overlap, or positivity\index{overlap!positivity condition|textbf}, requires $0 < e(x) < 1$ for all $x$ in the support of the covariates, where $e(x) = \Prob(T = 1 \mid X = x)$.
+\end{definition}
+
+Overlap is an identification condition: without it the population average effect is not identified. But identification is a yes or no verdict, and overlap can be barely satisfied in some regions. Weighting puts the most weight exactly where the data are least informative.
+
+A response surface model treats poor overlap\index{overlap!and extrapolation|textbf} as extrapolation\index{extrapolation|textbf}. Where only treated units are observed, $\mu_0(x)$ is extrapolated under the prior, and a model whose posterior widens there reports the uncertainty instead of hiding it in a weight. A Gaussian process does (Figure~\ref{fig:gpcausal}, right). A tree ensemble gives no such guarantee: past its last split a tree predicts with its edge leaf however far away the point lies, so the width of a BART interval need not grow with distance from the data. Its counterfactual uncertainty is still a useful diagnostic, but the widening is a property of the fitted model, not an automatic consequence of poor overlap.
+
+\paragraph{Assessing common support.} Write $s_i^t$ for the posterior standard deviation of $f(x_i, t)$. A treated unit far from any control unit has a control outcome that BART must extrapolate, usually with a large $s_i^0$. Hill and Su (2013) turned this into a rule for discarding units that lack common support\index{overlap}. For the effect on the treated, their one standard deviation rule discards treated unit $i$ when
+\[
+s_i^0 > \max_{j: T_j = 1} s_j^1 + \operatorname{sd}_{j: T_j = 1}(s_j^1),
+\]
+so the uncertainty of each unit's counterfactual prediction\index{counterfactual!prediction|textbf} is compared with the uncertainty of the factual predictions in the same, treated, group. The LaLonde analysis of Section~\ref{sec:lalonde} uses a simpler variant, which compares each treated unit's $s_i^0$ with the 99th percentile of $s_j^0$ among the controls, whose outcomes are observed.
+
+This alternative to propensity trimming\index{trimming} discards units because the outcome model cannot predict their counterfactuals, not because a separate model says they were unlikely to be treated. The criteria can disagree: a unit with an extreme propensity may have a well predicted counterfactual on a flat surface, though without nearby controls the model cannot see that flatness and may keep a unit whose counterfactual is wrong (Exercise~\ref{ex:chbart:6}). Conversely, a unit with a moderate propensity can have a poorly predicted counterfactual where the surface is steep and the other arm sparse. Report the effect on supported units, the fraction they represent, how many units were discarded and how the effect on the treated moved. A large move signals reliance on extrapolation.
+
+\section{Bayesian causal forests}
+
+Hahn, Murray and Carvalho (2020) identified and fixed two weaknesses of Hill's approach. Treating $T$ as an ordinary covariate lets BART shrink the treatment effect like every other split, which can produce regularization induced confounding\index{regularization induced confounding}\index{regularization induced confounding!in the BART setting|textbf} (Chapter~\ref{ch:horseshoe}). Under strong targeted selection\index{targeted selection|textbf}, units with the largest prognostic scores are most likely to be treated, and BART can misattribute effect to prognosis or the reverse and undercover badly. Its heterogeneity prior is also implicit: whatever the trees' splits on $T$ imply.
+
+Their Bayesian causal forest (BCF)\index{Bayesian causal forest|textbf}\index{BCF|see{Bayesian causal forest}} separates the surface into a prognostic function\index{Bayesian causal forest!prognostic function|textbf} and an effect function\index{Bayesian causal forest!effect function|textbf},
+\begin{equation}
+Y_i = \mu\bigl(x_i, \hat e(x_i)\bigr) + \tau(x_i)\,T_i + \varepsilon_i,
+\label{eq:bcf}
+\end{equation}
+with separate BART priors on $\mu$ and $\tau$. Two design choices matter.
+
+\paragraph{The propensity as a covariate.} The estimated propensity $\hat e(x)$ enters the prognostic forest as an extra covariate\index{propensity score!as a covariate|textbf}, which the authors call targeted selection adjustment. A single split on $\hat e$ can then capture the confounding direction, protecting the effect estimate from regularization induced confounding. The coupled horseshoe of Chapter~\ref{ch:horseshoe} transplants this device from trees to sparse linear models.
+
+\paragraph{A stronger prior on heterogeneity.} The effect forest uses 50 trees rather than 200, with $\alpha = 0.25$ and $\beta = 3$ discouraging splits. Effects are expected to vary less and more simply than outcomes. The prior keeps prognostic variation out of the effect forest, which stays near a constant unless the data support heterogeneity.
+
+Tree depth sets how the effect varies; the leaf scale sets how much. Because leaf standard deviations scale as $m^{-1/2}$ (Exercise~\ref{ex:chbart:2}), fewer trees do not by themselves shrink the size of the effects, so Hahn, Murray and Carvalho (2020) also give each forest its own scale prior, half Cauchy for prognosis and half normal for the effect, the second pulling effects toward homogeneity. They also make the coding of the treatment part of the model, writing the effect term as $b_{T_i}\widetilde\tau(x_i)$ with $b_0$ and $b_1$ independent $N(0, 1/2)$ and $\tau(x) = (b_1 - b_0)\widetilde\tau(x)$, so that the prior does not depend on which arm is coded as zero.
+
+The propensity covariate plays for a response surface a role like that of the orthogonal score in DML. In the linear version of Appendix~\ref{app:theory}, with the propensity direction known and its coefficient left unshrunk, it removes the first order sensitivity of the effect to shrinkage in the confounding direction. A forest shrinks splits on $\hat e$ like any other split, so for the Bayesian causal forest this remains a heuristic, supported by the simulations of Hahn, Murray and Carvalho (2020) rather than by a theorem.
+
+\paragraph{Evidence from a competition.} The 2016 Atlantic Causal Inference Conference data analysis competition\index{Atlantic Causal Inference Conference competition|textbf}\index{ACIC|see{Atlantic Causal Inference Conference competition}}, analysed by Dorie, Hill, Shalit, Scott and Cervone in \emph{Statistical Science} in 2019, compared some thirty methods on many simulated data sets built from real covariates, with response surfaces and assignment mechanisms varied systematically. BART based methods were among the best for the average effect, and combinations of a flexible outcome model with some use of the propensity score did especially well.
+
+
+
+\section{Theory}
+
+BART long had excellent practice and thin theory\index{Bayesian additive regression trees!theory|textbf}; that has changed. Write $f_0$ for the true regression function, assumed $\zeta$ H\"older smooth on $[0,1]^p$ and depending on only $q \leq p$ coordinates.
+
+\begin{theorem}[Posterior contraction for Bayesian forests, informal]\label{thm:bart}
+Suppose $0 < \zeta \leq 1$ and that $\log p$ grows no faster than $n^{q/(2\zeta + q)}$. Under a modified BART prior\index{posterior contraction!for BART|textbf}, with a diffuse prior on the number of trees, a prior on the number of leaves that decays quickly enough and a sparsity inducing prior on the splitting variables, and under regularity conditions on $f_0$ and on the design, for every sequence $M_n \to \infty$
+\[
+\Pi\bigl(f : \|f - f_0\|_n > M_n\varepsilon_n \mid \mathcal{D}_n\bigr) \to 0 \quad \text{in } P_{f_0} \text{ probability},
+\]
+with $\varepsilon_n = n^{-\zeta/(2\zeta + q)}\log n$,
+where $\Pi(\cdot \mid \mathcal{D}_n)$ is the posterior given the data $\mathcal{D}_n$ and $\|\cdot\|_n$ is the empirical $L_2$ norm at the design points.
+\end{theorem}
+
+The result is Theorem 5.1 of Ro\v{c}kov\'a and van der Pas (2020), which states the regularity conditions exactly; their Theorem 4.1 gives the rate with $\sqrt{\log n}$ for a single Bayesian tree, and their Theorem 6.1 the rate for sums of functions of different smoothness. Ro\v{c}kov\'a and Saha (2019) give a companion result for a slightly modified Chipman, George and McCulloch prior. This is the minimax rate for $q$ dimensional $\zeta$ smooth functions up to the logarithm, attained without knowing $\zeta$ or which $q$ covariates matter. The restriction $\zeta \leq 1$ is real, since step functions cannot exploit more smoothness, and it motivates soft trees\index{soft BART|textbf}. Linero and Yang (2018) showed that soft decision trees adapt to both smoothness and sparsity, and Linero's (2018) Dirichlet additive regression trees place a Dirichlet prior on the probabilities of splitting on each variable, so that irrelevant covariates are rarely used.
+
+The theorem controls each arm only in its empirical design norm. To bound $\tau = \mu_1 - \mu_0$, the two arms need a common norm. If each contracts in $L_2(P_{X \mid T = t})$ and overlap is strict, $c \leq e(x) \leq 1 - c$ for some $c > 0$, then $\|h\|_{P_X} \leq \{\Prob(T = t)/c\}^{1/2}\|h\|_{P_{X \mid T = t}}$ transfers both rates to $L_2(P_X)$, and the triangle inequality gives $\tau$ the slower rate. The empirical to population step is not supplied by the theorem. Contraction alone also gives no Bernstein von Mises theorem for the average effect (Section~\ref{sec:crit:bayes} and Appendix~\ref{app:theory}).
+
+The parallel with the horseshoe is close. A horseshoe lets a few large coefficients through and shrinks the rest; a Dirichlet sparse BART splits on a few variables and starves the rest. Both are global local priors in spirit.
+
+\section{A simulation in the spirit of Hill}
+
+To see how tree methods\index{Bayesian additive regression trees!simulation|textbf} behave with a nonlinear response surface and confounded assignment, we simulated 1,000 data sets\index{simulation study!BART in the spirit of Hill|textbf} for each of three assignment designs and two sample sizes, 500 and 2,000 units, with ten standard normal covariates. The prognostic surface was $\mu(x) = 2\sin(\pi x_1) + 1.5\,\mathbf{1}(x_2 > 0.5) + x_3^2$, the effect was $\tau(x) = 1 + 0.5x_4$, and the outcome was $Y = \mu(x) + \tau(x)T + \varepsilon$ with $\varepsilon \sim N(0, 1)$. Design A used propensity $\expit\{1.2x_1 + 0.8\,\mathbf{1}(x_2 > 0.5)\}$. The targeted designs used $0.01 + 0.98\,\expit[\gamma\{\mu(x) - \E\mu(X)\}/\mathrm{sd}\,\mu(X)]$, with $\gamma = 1$ for T1 and $\gamma = 3$ for T3: units with high prognostic scores were likely to be treated. The population mean and standard deviation of $\mu$ come from two million draws; the smallest and largest propensities in a data set average 0.17 and 0.98 under T1 and 0.02 and 0.99 under T3. The target was each data set's sample average of $\tau(x_i)$, not the population value 1; bias, root mean squared error and coverage are measured against it. We compared least squares with all covariates linear, Hill's BART, BART with the estimated propensity as an extra covariate (shown in the figure only), the Bayesian causal forest, and DML with the augmented score and random forest nuisances, all on the same data sets.
+
+The tree methods ran on the \texttt{stochtree} 0.4.5 defaults, with 10 grow from root sweeps followed by four chains of 2,000 retained draws each, pooled, and not on the Chipman, George and McCulloch prior described above: the software standardizes the outcome, starts the leaf variance at about the variance of $y$ divided by $m$ and samples it, puts an inverse gamma prior with both parameters zero on $\sigma^2$, and gives the prognostic forest of the Bayesian causal forest 250 trees rather than 200. Tree intervals are the 2.5\% and 97.5\% posterior quantiles of the sample average effect. The forest took its propensity from a five fold cross validated logistic regression that is linear in $x$, and so misspecified, since the true propensity contains the indicator $\mathbf{1}(x_2 > 0.5)$ in design A and the whole prognostic surface in the targeted designs. DML used five fold cross fitting, random forests with 200 trees and minimum leaf size 5 for $\mu_0$, $\mu_1$ and $e$, propensities clipped to $[0.01, 0.99]$, and a Wald interval. Least squares reports a heteroskedasticity robust (HC3) interval.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{simbart.pdf}
+\caption{Error of five estimators of the sample average effect, estimate minus truth, over 1,000 simulated data sets per panel, by assignment design (A, and targeted selection T1 and T3) and sample size. LS is least squares, BART+e is BART with the estimated propensity as a covariate, BCF the Bayesian causal forest and AIPW is DML with the augmented score; boxes show the quartiles.}
+\label{fig:simbart}
+\end{figure}
+
+\begin{table}[ht]
+\centering
+\caption{Simulation results, 1,000 data sets per design and sample size. Design A is the confounded design of the text; T1 and T3 select on the prognostic surface with $\gamma = 1$ and 3. Coverage and width refer to 95\% intervals (HC3 for least squares), and the target is the sample average effect of each data set. The Monte Carlo standard error of a coverage near 0.9 is 0.01.}
+\label{tab:simbart}
+\small
+\begin{tabular}{llcccc}
+\toprule
+Design, $n$ & Method & Bias & RMSE & Coverage & Width \\
+\midrule
+A, 500 & Least squares (HC3) & 0.17 & 0.29 & 0.880 & 0.93 \\
+A, 500 & BART, Hill & 0.00 & 0.12 & 0.949 & 0.47 \\
+A, 500 & Bayesian causal forest & 0.01 & 0.12 & 0.946 & 0.47 \\
+A, 500 & DML, augmented score & $-0.03$ & 0.17 & 0.942 & 0.65 \\
+\midrule
+A, 2{,}000 & Least squares (HC3) & 0.17 & 0.21 & 0.705 & 0.46 \\
+A, 2{,}000 & BART, Hill & 0.00 & 0.06 & 0.945 & 0.22 \\
+A, 2{,}000 & Bayesian causal forest & 0.01 & 0.06 & 0.944 & 0.22 \\
+A, 2{,}000 & DML, augmented score & 0.05 & 0.09 & 0.869 & 0.28 \\
+\midrule
+T1, 500 & Least squares (HC3) & 1.55 & 1.56 & 0.000 & 0.78 \\
+T1, 500 & BART, Hill & 0.13 & 0.18 & 0.769 & 0.44 \\
+T1, 500 & Bayesian causal forest & 0.15 & 0.19 & 0.720 & 0.44 \\
+T1, 500 & DML, augmented score & 0.59 & 0.61 & 0.033 & 0.60 \\
+\midrule
+T1, 2{,}000 & Least squares (HC3) & 1.55 & 1.55 & 0.000 & 0.38 \\
+T1, 2{,}000 & BART, Hill & 0.04 & 0.07 & 0.873 & 0.20 \\
+T1, 2{,}000 & Bayesian causal forest & 0.05 & 0.07 & 0.826 & 0.20 \\
+T1, 2{,}000 & DML, augmented score & 0.27 & 0.27 & 0.020 & 0.25 \\
+\midrule
+T3, 500 & Least squares (HC3) & 2.67 & 2.67 & 0.000 & 0.69 \\
+T3, 500 & BART, Hill & 0.34 & 0.37 & 0.348 & 0.58 \\
+T3, 500 & Bayesian causal forest & 0.39 & 0.42 & 0.239 & 0.58 \\
+T3, 500 & DML, augmented score & 1.52 & 1.53 & 0.000 & 0.59 \\
+\midrule
+T3, 2{,}000 & Least squares (HC3) & 2.68 & 2.68 & 0.000 & 0.34 \\
+T3, 2{,}000 & BART, Hill & 0.12 & 0.14 & 0.562 & 0.26 \\
+T3, 2{,}000 & Bayesian causal forest & 0.13 & 0.15 & 0.483 & 0.26 \\
+T3, 2{,}000 & DML, augmented score & 1.01 & 1.01 & 0.000 & 0.30 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Figure~\ref{fig:simbart} and Table~\ref{tab:simbart} show why least squares fails: it cannot represent the sine and threshold terms that drive confounding. In design A the flexible methods remove most bias; the trees have the smallest error and intervals about three quarters as wide as DML's, with coverage close to 0.95. With 1,000 data sets, the Monte Carlo standard error of coverage near 0.95 is 0.007. DML's coverage falls from 0.942 at 500 units to 0.869 at 2,000, where its bias of 0.05 matters beside a shrinking interval. Targeted selection breaks every interval: the causal forest covers less than BART in every targeted cell, DML at most 0.033, and least squares never. More data shrink the trees' bias, from 0.34 to 0.12 at $\gamma = 3$, but also their intervals. The root mean squared error of $\tau(x_i)$ in design A at 500 units was 0.31 for each tree method; the DML estimator does not estimate these effects.
+
+With 1,000 replications the tree posteriors cover close to the nominal level in the confounded design A and undercover badly under targeted selection\index{targeted selection}, which Hahn, Murray and Carvalho (2020) also found for BART. The Bayesian causal forest they proposed for that case did no better here, but its propensity came from a linear logistic fit that misses the shape of the true one, and we did not try a better estimate. The intervals pool four chains of 2,000 draws, and the standard deviation of an endpoint across chains, averaged over data sets, is 0.016 to 0.026 at 500 units and 0.007 to 0.011 at 2,000, small beside intervals 0.44 to 0.58 and 0.20 to 0.26 wide. The chains agree with one another, which does not prove they have converged, but the shortfall tracks the bias: at 500 units in design T3 the BART estimate is off by 0.34 on average with an interval 0.58 wide. Going to 2,000 units cuts the bias by more than the width (to 0.12 against 0.26 for BART), so coverage rises, yet it stays well below 0.95. That is a reason to check posterior calibration by simulation, with chains long enough, in any important application (Chapter~\ref{ch:computation}).
+
+\section{Gaussian process causal inference}\label{sec:bart:gp}
+
+Gaussian processes\index{Gaussian process|textbf} are a second nonparametric prior for a response surface. A Gaussian process $f \sim \mathrm{GP}(m, k)$ has a mean function $m(x)$ and a covariance kernel $k(x, x')$. With Gaussian errors and the kernel and noise parameters fixed, the posterior is again a Gaussian process, $f \mid \mathcal{D}_n \sim \mathrm{GP}(m_n, k_n)$, with $m_n$ and $k_n$ given by the usual conditioning formulas. For causal work\index{Gaussian process!causal inference|textbf} one places independent priors on $\mu_0$ and $\mu_1$, or separate priors on $\mu$ and $\tau$ as in \eqref{eq:bcf}, and reads off the posterior of $\tau(x) = \mu_1(x) - \mu_0(x)$, again a Gaussian process given those parameters; a prior on them makes it a mixture of Gaussian processes.
+
+The kernel is the modelling decision. A squared exponential kernel\index{Gaussian process!squared exponential kernel|textbf} $k(x, x') = \exp\{-\|x - x'\|^2/(2\ell^2)\}$ makes the surface infinitely differentiable; a Mat\'ern kernel with parameter $\nu$ gives sample paths that are $\lceil\nu\rceil - 1$ times differentiable, which is often more realistic. Unlike a tree ensemble, a Gaussian process makes its uncertainty grow smoothly as $x$ moves away from the data, as one wants where overlap is poor. Ray and van der Vaart (2020) prove a semiparametric Bernstein von Mises theorem for the mean of a binary outcome in one treatment arm, using a Gaussian process prior and a Dirichlet process prior on the covariate distribution under smoothness conditions. Adding $\lambda/\hat e(x)$, with $\lambda$ a free coefficient, a relative of the Bayesian causal forest's device, weakens those conditions (Appendix~\ref{app:theory}). This inverse propensity direction is the mean's Riesz representer and the clever covariate of targeted learning: it lets the posterior move the regression and its mean without the prior's smoothing bias.
+
+\begin{example}[Gaussian process regression discontinuity]
+In a regression discontinuity design\index{regression discontinuity|textbf}, treatment is assigned when a running variable $R$ crosses a cutoff $c$, and the effect at the cutoff is the jump
+\[
+\tau(c) = \lim_{r \downarrow c}\E(Y \mid R = r) - \lim_{r \uparrow c}\E(Y \mid R = r).
+\]
+Branson, Rischard, Bornn and Miratrix (2019) give each side of the cutoff its own Gaussian process and take the difference of the two posteriors at $c$. The bandwidth of local polynomial methods is replaced by a kernel length scale that carries a prior and is integrated out; the posterior downweights observations far from the cutoff through the kernel, and the interval for the jump reflects the uncertainty about how far to look.
+\end{example}
+
+Figure~\ref{fig:gpcausal} shows both uses of a Gaussian process on simulated data, each panel a single data set. Every Gaussian process has a squared exponential kernel times a constant plus white noise, with all hyperparameters set by maximizing the marginal likelihood and then held fixed, so the posteriors condition on those values and do not integrate over the length scale as the method of Branson and coauthors does. In the left panel 300 units have a running variable $R$ uniform on $[-1, 1]$ and the outcome $Y = 0.8R + 0.6\sin(2R) + 0.5\,\mathbf{1}(R \geq 0) + \varepsilon$, a smooth nonlinear trend and a jump of 0.5 at zero, with noise standard deviation 0.3. Separate Gaussian processes give a posterior for the jump with mean 0.68 and standard deviation 0.09, so the truth sits just outside the 95\% interval: the posterior at a boundary rests on one side's data only, a known weakness of any smoother there and a reason Branson and coauthors attend carefully to the kernel. Here the true slope at the cutoff is 2.0, so near the boundary each side's posterior mean is pulled toward that side's own level, which tends to lower the left limit and raise the right limit; here the jump comes out too large. In the right panel, controls are observed only for $x < 0.4$ and treated units only for $x > -0.4$: 300 controls are uniform on $[-2, 0.4]$ with $\mu_0(x) = \sin(1.5x)$ and noise standard deviation 0.25, and only they enter the fit. The posterior for $\mu_0$ is tight where controls are observed, with standard deviation 0.02 at $x = -1$, and wide where only treated units are, 0.59 at $x = 1.5$. That widening is how a response surface model reports poor overlap.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{gp_causal.pdf}
+\caption{Gaussian processes for causal inference. Left: a regression discontinuity, with separate posteriors on each side of the cutoff and bands of two posterior standard deviations. Right: the posterior for the control surface $\mu_0$ when controls are observed only to the left of the shaded region.}
+\label{fig:gpcausal}
+\end{figure}
+
+The same logic serves panel and time series designs. Brodersen, Gallusser, Koehler, Remy and Scott (2015) fit a Bayesian structural time series before intervention, using untreated series as regressors under a spike and slab prior, and forecast the treated series' counterfactual path. The effect is the posterior predictive gap between the observed and forecast paths. This is a Bayesian relative of Abadie and Gardeazabal's (2003) synthetic control, replacing donor weights with a posterior over regression coefficients (Chapter~\ref{ch:did}). A Gaussian process can replace the state space model when a smooth function better describes the counterfactual path.
+
+\section{Models and accounting, revisited}
+
+Chapter~\ref{ch:mccullagh} argued that the average treatment effect is not a parameter of the data generating process but an accounting identity\index{accounting identity}\index{accounting identity!and BART|textbf}: an average of fitted contrasts over a chosen population. BART and Gaussian processes make this concrete: each effect is a prediction under the counterfactual assignment, averaged over the units of interest.
+
+Ignorability concerns how the data arose, not the statistical model. It licenses the causal reading but does not select a method. Once it is accepted, the response surface approach says: build the best outcome model you can and read off the effects.
+
+\begin{remark}[Causal and predictive models]
+A model can predict observed outcomes well and still extrapolate badly to the counterfactual regime. Under targeted selection, plain BART can confound prognosis and effect despite an excellent fit. Under ignorability, good estimates of $\mu_0$ and $\mu_1$ across the whole covariate support give good effect estimates. This motivates the Bayesian causal forest's separation and propensity covariate.
+\end{remark}
+
+\section{Heterogeneous treatment effects}
+
+BART estimates heterogeneous effects\index{heterogeneous treatment effects|textbf} $\tau(x)$\index{conditional average treatment effect} in \eqref{eq:bart:cate} without prespecified subgroups: trees splitting on both $x$ and $t$ capture effect modification\index{effect modification|see{heterogeneous treatment effects}}, those splitting mainly on $x$ capture prognosis. BCF's explicit separation \eqref{eq:bcf} improved calibration for $\tau(x)$ in Hahn, Murray and Carvalho (2020). Partially linear DML estimates a single weighted average (Chapter~\ref{ch:dml}); conditional effects need a basis expansion, the R learner or a causal forest, each a new estimator.
+
+A posterior for $\tau(\cdot)$ gives one for any functional of it. The effect on the treated is $\E\{\tau(X) \mid T = 1\}$. The share of covariate profiles with positive conditional effect is $\Prob\{\tau(X) > 0\}$. Quantile treatment effects at level $u$, $F_{Y(1)}^{-1}(u) - F_{Y(0)}^{-1}(u)$, need the marginal laws of the potential outcomes, which only a model for the outcome distribution, not just its mean, supplies. The share of individuals who benefit, $\Prob\{Y(1) > Y(0)\}$, is different: it depends on the joint law of the two potential outcomes, which the data never identify, and Chapter~\ref{ch:tianpearl} bounds it using the results of Tian and Pearl (2000).
+
+\section{Instruments and sensitivity, briefly}
+
+When treatment is endogenous, ignorability fails and the response surface approach is inconsistent however flexible the surface. A valid instrument restores identification of a narrower target (Section~\ref{iv:sec:late}). The nonparametric extension puts BART or Gaussian process priors on both the first stage $\E(T \mid Z, X)$ and the structural function, with correlated errors linking the two equations, so that first stage uncertainty propagates through the joint posterior (Chapter~\ref{ch:iv}). Ignorability itself is untestable from the observed data; Section~\ref{sec:sensitivity} and Chapter~\ref{ch:tianpearl} ask how far a conclusion moves if it fails.
+
+\section{Regularization and the prior as a selector}
+
+The prior is a regularizer\index{prior distribution!as a regularizer|textbf}: BART penalizes tree complexity, BCF separates prognosis from effect, and a Gaussian process encodes smoothness and lets uncertainty grow where data are sparse. A lasso selects one fit by cross validation, and a DML interval is then computed from the selected nuisance fits, with orthogonality making their first order error negligible. BART instead averages over tree structures, depths and leaf values, carrying model uncertainty into the interval for $\tau$. Gaussian processes also integrate over kernel parameters when those carry priors; Figure~\ref{fig:gpcausal} instead fixes them at marginal likelihood estimates. Averaging does not guarantee calibration: Hill (2011) and Hahn, Murray and Carvalho (2020) find often near nominal average effect coverage, but the latter also find severe undercoverage under strong targeted selection\index{targeted selection}.
+
+\begin{remark}[BART, adapted and purpose built]
+BART was designed for regression and classification; its causal use is an adaptation, conditioning on ignorability, no interference and overlap imposed from outside. BCF is purpose built, putting the separation of confounding and effect modification into the prior. Hahn, Murray and Carvalho (2020) found it usually better for heterogeneity; plain BART with $T$ as a covariate is simpler and competitive for the average effect when selection is not strongly targeted.
+\end{remark}
+
+\section{The propensity score in a Bayesian model}
+
+Rosenbaum\index{Rosenbaum, Paul R.!propensity score|textbf} and Rubin\index{Rubin, Donald B.!propensity score|textbf} (1983) showed that ignorability given $X$ implies ignorability given the propensity score\index{propensity score!Rosenbaum and Rubin theorem|textbf} $e(X)$, motivating matching\index{matching}, stratification and weighting. A Bayesian model can put a prior on $e$ and propagate its uncertainty, or use an estimate as an outcome covariate\index{propensity score!in a Bayesian model|textbf}, as BCF does.
+
+The first way, applied to a weighting estimator such as the H\'ajek\index{Hajek estimator@H\'ajek estimator} ratio
+\[
+\hat\tau_{\mathrm{H}} = \frac{\sum_i T_iY_i/\hat e(X_i)}{\sum_i T_i/\hat e(X_i)} - \frac{\sum_i (1 - T_i)Y_i/\{1 - \hat e(X_i)\}}{\sum_i (1 - T_i)/\{1 - \hat e(X_i)\}},
+\]
+replaces $\hat e$ with posterior draws of $e$ and averages. This propagates propensity uncertainty but does not by itself reduce variance from extreme weights. Reducing it requires borrowing across units, as in Li's (2010) hierarchical model, Ghosh's (2015) binning and Sims's (2012) sieve (Datta and Polson 2026; Section~\ref{sec:weak}). Response surfaces borrow through the outcome model; adding the propensity covariate retains the selection information required by the Robins, Ritov and Wasserman example (Section~\ref{sec:weak}).
+
+\section{Trees and the horseshoe compared}
+
+Trees\index{Bayesian additive regression trees!compared with the horseshoe|textbf} approximate smooth functions with many steps and are least efficient for a smooth low order polynomial, which a horseshoe on a polynomial or spline basis captures directly. Trees find interactions unprompted; a basis must include them, and their number grows quickly with dimension. Horseshoe coefficients are interpretable and their shrinkage factors diagnostic; tree ensembles are read through predictions.
+
+ The simulation of Table~\ref{tab:simbart} is a case where trees are the right tool, since the sine and threshold terms in the prognostic surface are exactly what a linear basis misses and what the trees found; the coupled horseshoe simulation of Chapter~\ref{ch:horseshoe} is the opposite case, with many covariates, few of them relevant, and a sparse linear structure that a tree would approximate with many steps.
+
+In Chapter~\ref{ch:k401} we report both. Agreement suggests the conclusion does not depend on functional form; disagreement is a finding. Fit the horseshoe first when a linear or additive baseline is plausible, trees first for hundreds or thousands of units with expected interactions or thresholds, and the other as a check whenever the answer matters. The book has no comparison of the two with $p$ near or above $n$, and the horseshoe results there are mixed: at $n = 200$, $p = 150$ or 300 with five strong confounders, DML was more accurate than every horseshoe posterior; with thirty weak confounders at $p = 150$, the coupled posterior was more accurate than DML (Section~\ref{sec:ricsim}).
+
+\section{BART, DML and generative computation}
+
+Table~\ref{tab:bart:compare} compares response surface models\index{Bayesian additive regression trees!compared with double machine learning|textbf}, DML (Chapters~\ref{ch:dml} and~\ref{ch:critique}) and generative Bayesian computation (GBC, Chapter~\ref{ch:computation}). All assume ignorability here. BART and DML differ in model and target; GBC changes computation, learning a quantile map for any model it is trained on, including a forest prior.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Three approaches to effects under ignorability.}
+\label{tab:bart:compare}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}L{0.9in}L{1.1in}L{1.1in}L{1.1in}@{}}
+\toprule
+ & BART and BCF & DML & GBC \\
+\midrule
+Model & outcome surface & two nuisance regressions & any model it is trained on, as a quantile map \\
+Main target & conditional effects & one scalar per score & any functional, including quantiles \\
+Uncertainty & posterior & asymptotic interval & posterior of that model, approximated \\
+Poor overlap & extrapolation under the prior; width model dependent & large score variance, or trimming that changes the target & inherited from the model \\
+Risk preferences & by postprocessing draws & not directly & distortions applied to learned quantiles \\
+Dynamic treatments & limited & limited & sequential decisions \\
+Propensity & optional covariate & required & optional \\
+Software & mature & mature & developing \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+BART and BCF suit unknown effect heterogeneity and moderate samples, from a few hundred to a few thousand units, when a posterior for every effect and mature software matter. DML suits a single scalar, a large sample, an acceptable partially linear or interactive model, and cheap computation. GBC suits decisions requiring the whole distribution of utility under each action, risk preferences beyond expected value, or sequential actions. No method dominates. GBC changes computation while aiming at the same posterior, and pays when one trained network serves many data sets from the same model.
+
+\section{Software and computation}
+
+BART software\index{Bayesian additive regression trees!software|textbf} includes Chipman, George and McCulloch's \texttt{BayesTree}\index{BayesTree|textbf}; Sparapani, Spanbauer and McCulloch's (2021) \texttt{BART}\index{software!BART packages|textbf}, which adds survival outcomes; Hahn, Murray and Carvalho's \texttt{bcf} for BCF; \texttt{bartCause} for Hill's method; and \texttt{stochtree}\index{stochtree|textbf}, used for this book's tree fits (Appendix~\ref{app:code}).
+
+Several variants matter for causal work. Soft BART\index{soft BART}, due to Linero and Yang (2018) and discussed above, replaces hard splits with smooth gates and adds a sparsity prior on the splitting variables. XBART\index{XBART}, the grow from root algorithm described earlier, scales to much larger samples than the original local moves. Particle Gibbs, as developed by Lakshminarayanan, Roy and Teh (2015), improves mixing by replacing local birth and death moves with a sequential Monte Carlo update of whole trees.
+
+Gaussian process models can be fitted with Stan or Python libraries for moderate $n$, and the inducing point approximations of Titsias (2009) extend them to tens of thousands of observations.
+
+
+
+\section{In practice}
+
+\paragraph{The target.} The targets are the average effect, the effect on the treated and the conditional effect $\tau(x)$. Each posterior draw of the BART surface, or of the Bayesian causal forest pair $(\mu, \tau)$ in \eqref{eq:bcf}, gives the fitted contrast at every unit; averaging over all units, treated units or any subgroup gives each target, and Hill's common support rule uses the same draws to choose which units.
+
+\paragraph{What the analyst does differently.} An analyst who fits a response surface states ignorability and overlap at the outset and then treats the rest as regression. When selection may be targeted she fits the Bayesian causal forest as well as plain BART, and she takes care over its propensity, since with a misspecified one the forest did no better than BART in Table~\ref{tab:simbart}. She applies Hill and Su's rule and reports how many units it discards and how the effect on the treated moves. She checks calibration on simulated data of the same design before reporting an interval, because a posterior is not automatically calibrated: in Table~\ref{tab:simbart} the tree intervals cover close to the nominal 0.95 in design A and fall well below it under targeted selection. And she reports $\tau(x)$ and its functionals from the same draws as the average.
+
+\paragraph{Against DML.} For the average effect alone design A at 500 units was close: root mean squared error 0.12 for both tree methods against 0.17 for DML, and DML's wider interval covered 0.942 of the data sets where the trees covered 0.949 and 0.946. At 2,000 units DML's coverage fell to 0.869, and under targeted selection every method undercovers and DML is the worst of the three flexible ones. DML is cheaper, but in this simulation it was not the safer choice even for the scalar: the trees had smaller root mean squared error in every cell. DML as run in Table~\ref{tab:simbart} also does not estimate $\tau(x_i)$, which the trees recovered with root mean squared error 0.31 in design A at 500 units; where overlap fails its interval widens through the inverse propensities in its score, or its target changes when it trims; and its support diagnostics come from the propensity model, not from the uncertainty of the counterfactual predictions. The limits are the ones the chapter has stated: the posterior is not automatically calibrated, contraction for the function is not by itself a Bernstein von Mises theorem for the average, and sampling trees costs more than a cross fitted regression.
+
+\section*{Notes}
+
+Rubin (1978) gives the Bayesian response surface formulation, predicting missing potential outcomes from a model. Hahn, Carvalho, Puelz and He (2018) study regularization induced confounding. For general posterior contraction theory see Ghosal and van der Vaart (2017), and for a BART review Hill, Linero and Murray (2020). Frequentist tools for conditional effects include the causal forest of Wager and Athey (2018) and the R learner of Nie and Wager (2021).
+
+\begin{exercises}
+\item\label{ex:chbart:1} Compute the prior probability that a BART tree has exactly one, two and three terminal nodes under $\alpha = 0.95$ and $\beta = 2$.
+\item\label{ex:chbart:2} Show that with $m$ trees and leaf prior standard deviation $0.5/(k\sqrt{m})$, the prior standard deviation of the regression function at any $x$ is $0.5/k$, independent of $m$.
+\item\label{ex:chbart:3} Derive the conjugate full conditional of the leaf values of one tree given its structure and the partial residuals.
+\item\label{ex:chbart:4} Explain why treating $T$ as an ordinary covariate in BART can produce regularization induced confounding, using the argument of Chapter~\ref{ch:horseshoe}.
+\item\label{ex:chbart:5} Show that the BCF prior with a constant effect forest reduces to a partially linear model with a BART prognostic function.
+\item\label{ex:chbart:6} Design a simulation in which Hill's common support rule and propensity trimming discard different units, and compare the resulting estimates of the effect on the treated.
+\item\label{ex:chbart:7} For a Gaussian process regression discontinuity with squared exponential kernels on each side of the cutoff, write the posterior mean and variance of the jump $\tau(c)$ in closed form given the length scales, signal variance and noise variance, and explain how a prior on the length scales replaces bandwidth selection.
+\end{exercises}

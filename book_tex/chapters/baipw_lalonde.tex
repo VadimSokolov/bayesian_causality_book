@@ -1,0 +1,18 @@
+\begin{table}[ht]
+\centering
+\caption{The randomized NSW sample, 445 units, 1978 earnings in dollars, eight standardized covariates. The AIPW rows give the range over three random fold assignments.}
+\label{tab:baipwlalonde}
+\small
+\begin{tabular}{lcc}
+\toprule
+Estimator & Estimate & Standard error \\
+\midrule
+Difference in means & 1794 & 671 \\
+Least squares with covariates & 1676 & \\
+AIPW, lasso nuisances & 1703 to 1769 & 646 to 679 \\
+AIPW, horseshoe nuisances & 1617 to 1692 & 662 to 677 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All estimators agree with the experimental difference in means to within sampling error, and their standard errors are close to the experimental one, 646 to 679 dollars against 671. Randomization makes the unadjusted difference unbiased, and the covariates turn out to be only weakly prognostic for 1978 earnings, so adjustment barely changes precision. The observational version of the problem, with survey controls, is the one in which the choice of estimator matters, and Section~\ref{sec:lalonde} treats it.

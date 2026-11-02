@@ -1,0 +1,32 @@
+\begin{table}[ht]
+\centering
+\caption{Three designs of our own, 200 replications each, true effect 1. OLS is least squares on all covariates. Coverage of nominal 95\% intervals is a count out of 200; $w_{99}$ is the 99th percentile inverse weight and ESS the effective sample size of the weights, both averaged over replications.}
+\label{tab:baipw}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{llccccc}
+\toprule
+Design & Estimator & Bias & RMSE & Coverage & $w_{99}$ & ESS \\
+\midrule
+I & OLS & $-$0.011 & 0.112 & & & \\
+ & AIPW, lasso & $-$0.004 & 1.498 & 175/200 & 17.0 & 279 \\
+ & AIPW, horseshoe & 0.012 & 0.116 & 182/200 & 5.8 & 398 \\
+\midrule
+II & OLS & 0.003 & 0.107 & & & \\
+ & AIPW, lasso & $-$2.720 & 7.128 & 161/200 & 54.1 & 77 \\
+ & AIPW, horseshoe & 0.332 & 0.352 & 39/200 & 4.0 & 460 \\
+\midrule
+III & OLS & $-$0.002 & 0.091 & & & \\
+ & AIPW, lasso & 0.162 & 0.211 & 74/200 & 6.2 & 706 \\
+ & AIPW, horseshoe & $-$0.014 & 0.138 & 180/200 & 11.5 & 359 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Sparse confounding.} In Design I (Table~\ref{tab:baipw}) the horseshoe version is nearly unbiased, 0.012, covers in 182 of 200 replications and has error 0.116 against 1.498 for the lasso version. Most of the lasso version's error is variance, a bias of $-$0.004 against an RMSE of 1.498, which fits its heavier weights: a 99th percentile of 17.0 against 5.8 and an effective sample size of 279 against 398.
+
+\paragraph{Dense confounding in both equations.} Design II is where the horseshoe fails. The lasso version breaks down through extreme weights (99th percentile 54.1), with bias $-$2.720 and RMSE 7.128, though its intervals, 8.2 wide on average, still cover in 161 of 200 replications. The horseshoe version has bias 0.332 and covers in 39 of 200. Its weights, with a 99th percentile of 4.0 and an effective sample size of 460 out of 500, are those of a propensity shrunk close to a constant, and with thirty weak coefficients in the outcome equation as well, neither nuisance removes the confounding. The grid above also has a dense propensity, up to fifty covariates, and the horseshoe copes. What differs is the outcome, which has five active covariates there and thirty here. In our experiments the horseshoe's trouble is a dense outcome, not a dense propensity. The dense design of Chapter~\ref{ch:critique}, with every coordinate nonzero, points the same way: DML with a horseshoe nuisance is biased by 0.68 there and covers in none of 500 replications (Table~\ref{tab:crit:head}). The grid and Design II also differ in the score and in the sample size, 1,000 against 500, so we read the contrast as a hypothesis for a designed test and not as a finding.
+
+\paragraph{Weak overlap.} In Design III the horseshoe version has the better coverage, 180 of 200 against 74 of 200, and the lower error, 0.138 against 0.211, but heavier weights, a 99th percentile of 11.5 against 6.2. Its estimated propensities range from 0.0001 to 0.9998, against true values from 0.0001 to 0.9997. The weight bound does not hold in finite samples, as explained above, and here it is the lasso's stronger shrinkage of the logit, not the horseshoe's, that keeps the weights small.
+
+\paragraph{The benchmark.} In all three designs the outcome is linear in the covariates, so least squares with all covariates is correctly specified, and it has the smallest error in every one: 0.112, 0.107 and 0.091. Horseshoe nuisances do not substitute for a correctly specified outcome model.

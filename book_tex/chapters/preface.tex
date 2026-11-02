@@ -1,0 +1,60 @@
+\chapter{Preface}
+
+This book grew out of our critique of double machine learning (DML), \emph{Orthogonality is not enough}, and years of work on shrinkage priors and generative computation. Its argument is short. Write one probability model for how outcomes depend on treatment and covariates, compute its posterior, and read every causal quantity off the same draws: the average effect, the effect on whom, the effect at which quantile, the probability of causation and the decision that follows. The probability of causation also needs a prior on how a unit's two potential outcomes are coupled, which the data do not identify. We give a fair account of DML, say where its guarantees need conditions that a Bayesian can state and check, and show what the posterior adds. In our simulations the coupled horseshoe posterior of Chapter~\ref{ch:horseshoe} is about as accurate as DML on the average effect with 50 covariates among 200 observations and clearly less accurate with 150 or 300, and it gives every other summary as well.
+
+We wrote this graduate text for statisticians, econometricians and data scientists who estimate causal effects for a living and want one coherent way to do all of it. It assumes courses in mathematical statistics (estimation, likelihood and asymptotics) and linear regression, and the idea of a posterior distribution. Measure theoretic probability appears mainly in proofs and the transfer theorem of Chapter~\ref{ch:computation}. Appendix~\ref{app:background} supplies the probability, Bayesian inference and large sample theory. No course in causal inference is assumed, because Part~I builds the frameworks.
+
+Two historical stories frame the book. The Lanarkshire milk experiment of 1930 was a large randomized trial undone by well meaning teachers, and Student's dissection of it remains the best lesson in why randomization matters. The smoking and lung cancer controversy of the 1950s set Fisher, the great experimentalist, against observational evidence that turned out to be right. Between them they cover the two failure modes of causal inference: a broken experiment, and the belief that observation can never settle a causal question.
+
+Several books sit near this one. Imbens and Rubin (2015) organize the subject around the assignment mechanism, Pearl (2009) around graphs and structural models, and the DML work of Chernozhukov and coauthors (2018) around orthogonal scores and cross fitting; Hern\'an and Robins (2020) combine potential outcomes with graphs. This book organizes the work around a single posterior, with DML as the benchmark that a Bayesian analysis must be measured against.
+
+\section*{How the book is organized}
+
+Part~I, Foundations, treats a causal question as a question about outcomes that were not observed (Chapter~\ref{ch:predictive}), sets the standard frameworks side by side (Chapter~\ref{ch:frameworks}), develops the model first view that the rest of the book uses (Chapter~\ref{ch:mccullagh}) and asks, with groups, urns and information, what makes an effect stable and which averages the data identify (Chapter~\ref{ch:groups}).
+
+Part~II, Double Machine Learning, is an account of DML: what it assumes (Chapter~\ref{ch:dml}), the inverse weighting estimators it descends from (Chapter~\ref{ch:ipw}) and, in our critique, the conditions its guarantees need (Chapter~\ref{ch:critique}).
+
+Part~III, Bayesian Alternatives, sets out the Bayesian methods: the coupled horseshoe prior (Chapter~\ref{ch:horseshoe}), the computation of its posterior by Gibbs sampling or a trained generative sampler (Chapter~\ref{ch:computation}), effects on whom and at which quantile (Chapter~\ref{ch:gente}), and trees and Gaussian processes (Chapter~\ref{ch:bart}).
+
+Part~IV, Identification beyond Ignorability, is for the cases in which ignorability fails or the target cannot be identified: instruments (Chapter~\ref{ch:iv}), bounds and sensitivity (Chapter~\ref{ch:tianpearl}) and, as a worked case, smoking and lung cancer (Chapter~\ref{ch:smoking}).
+
+Part~V, Designs and Applications, works through data: difference in differences (Chapter~\ref{ch:did}), the 401(k) and LaLonde benchmarks, where DML and the posterior meet on the same problems (Chapter~\ref{ch:k401}), two health applications (Chapter~\ref{ch:nhefs}) and a workflow that gathers the steps of an analysis (Chapter~\ref{ch:workflow}).
+
+Part~VI, Decisions, Markets and Open Problems, turns from effects to decisions: the causal expected utility of an action (Chapter~\ref{ch:cdt}), a merger, where no unit is treated and only a model can give the answer (Chapter~\ref{ch:blp}), and the open problems that the earlier chapters leave (Chapter~\ref{ch:open}).
+
+\section*{Reading paths}
+
+Chapter~\ref{ch:horseshoe} is the hinge. Every later chapter except Chapter~\ref{ch:iv} rests on it, directly or through earlier chapters. The paths below follow chapter dependencies; exceptions say what to read first.
+
+\begin{itemize}
+\item The argument in six chapters, for a reader who knows causal inference and DML and so skips Chapters~\ref{ch:predictive}, \ref{ch:frameworks}, \ref{ch:dml} and~\ref{ch:ipw}: Chapters~\ref{ch:mccullagh}, \ref{ch:critique}, \ref{ch:horseshoe}, \ref{ch:computation}, \ref{ch:gente} and~\ref{ch:k401}. Chapter~\ref{ch:k401} also uses the common support check of Chapter~\ref{ch:bart} and the sensitivity analysis of Chapter~\ref{ch:tianpearl}, and points to Chapter~\ref{ch:iv} for instruments; read these when they come up.
+\item A one semester graduate course: foundations in weeks 1 to 3 (Chapters~\ref{ch:predictive} to~\ref{ch:mccullagh}), DML and its critique in weeks 4 to 6 (Chapters~\ref{ch:dml} to~\ref{ch:critique}), the Bayesian alternative and its computation in weeks 7 to 9 (Chapters~\ref{ch:horseshoe} to~\ref{ch:gente}), identification beyond ignorability in weeks 10 to 12 (Chapters~\ref{ch:iv} to~\ref{ch:smoking}), and designs and decisions in weeks 13 to 15 (Chapters~\ref{ch:did}, \ref{ch:k401} and~\ref{ch:cdt}). Skim Chapters~\ref{ch:predictive}, \ref{ch:bart} and~\ref{ch:smoking} (Chapter~\ref{ch:k401} uses the common support check of Chapter~\ref{ch:bart}), and leave Chapters~\ref{ch:nhefs}, \ref{ch:workflow}, \ref{ch:blp} and~\ref{ch:open} for student projects.
+\item Bayesian computation for causal questions: Chapters~\ref{ch:horseshoe}, \ref{ch:computation} and~\ref{ch:gente}, after Chapters~\ref{ch:predictive}, \ref{ch:mccullagh} and~\ref{ch:dml} to~\ref{ch:critique}, which they cite. Chapter~\ref{ch:bart} adds trees and Gaussian processes.
+\item Applied econometrics, for readers who know the frameworks of Chapters~\ref{ch:predictive} and~\ref{ch:frameworks}: instruments (Chapter~\ref{ch:iv}), difference in differences (Chapter~\ref{ch:did}) and the merger (Chapter~\ref{ch:blp}). The last two require Chapter~\ref{ch:mccullagh} and Chapters~\ref{ch:dml} to~\ref{ch:computation}; Chapter~\ref{ch:iv} cites almost none of these. Readers who know DML can skip Chapters~\ref{ch:dml} and~\ref{ch:ipw}.
+\item What an effect is, which averages the data identify and which scale is stable: Chapter~\ref{ch:groups}, after Chapter~\ref{ch:mccullagh}. Later chapters point to it for asides, and Chapter~\ref{ch:open} takes five problems from it. Section~\ref{gr:sec:ld}, on large deviations, can be skipped on a first reading.
+\end{itemize}
+
+\section*{Exercises, solutions and notes}
+
+Every chapter except Chapters~\ref{ch:workflow} and~\ref{ch:open} ends with exercises, mostly derivations and calculations with a few simulations. Most exercises have worked solutions in Appendix~\ref{app:solutions}. Notes before the exercises cover each chapter's history and reading; Further Reading at the end of the book lists standard works by approach. The proofs, Bayesian guarantees and notation are in Appendices~\ref{app:theory}, \ref{app:guarantees} and~\ref{app:notation}, respectively.
+
+\section*{Conventions}
+
+The treatment effect is $\tau$ throughout; Chapter~\ref{ch:groups} also writes $\psi$ for an effect defined by a group action, to keep it apart from the averages it is compared with. The global scale of the horseshoe, which the literature also calls $\tau$, is written $\gscale$.
+
+Each chapter opens with an In brief box that gives its results in one paragraph. Except in Chapters~\ref{ch:workflow} and~\ref{ch:open}, the text of every chapter closes with three paragraphs: The target, the chapter's target as a functional of one posterior; What the analyst does differently; and Against DML, where the Bayesian analysis does better than DML and where it does not. That repetition is the argument, and the workflow of Chapter~\ref{ch:workflow} collects it.
+
+Three topics get only an overview: time varying treatments in full generality (Section~\ref{fw:sec:gmethods}), interference between units (Section~\ref{sec:interference}) and causal discovery (Section~\ref{fw:sec:discovery}). Further Reading names a text for the first, and two applied texts for the designs we treat only briefly, such as regression discontinuity and synthetic control.
+
+\section*{Code and data}
+
+The book prints no code. Every simulation, figure and table states its design: the data generating process, sample size, number of replications and quantity reported. Source files are in the public repository \coderepo. Appendix~\ref{app:code} maps chapters to files and identifies the public data sets; the minivan and cereal industries of Chapter~\ref{ch:blp} are simulated from published designs. Historical data we do not have, such as the Lanarkshire measurements or the smoking cohorts, we describe without reproducing unverified numbers. Simulated examples are labelled as such.
+
+\section*{Acknowledgements}
+
+Chapters~\ref{ch:horseshoe}, \ref{ch:gente} and~\ref{ch:cdt} draw on joint work with Maria Nareklishvili on generative causal inference, deep partial least squares, distributional effects and optimal transport, and with Daniel Zantedeschi, and Section~\ref{sec:weak} on joint work with Jyotishka Datta; we thank all three. Chapter~\ref{ch:horseshoe} also reports the simulation study of Nareklishvili, Polson and Sokolov that compares DML with hierarchical Bayes. We also thank our colleagues at Chicago Booth and George Mason for many years of discussion.
+
+\bigskip
+\noindent Nick Polson, Chicago\\
+Vadim Sokolov, Fairfax\\
+October 2026

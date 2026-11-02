@@ -1,0 +1,481 @@
+\chapter{The Horseshoe and the Coupled Prior}\label{ch:horseshoe}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+The horseshoe shrinks noise hard and leaves large signals almost untouched, because its regularly varying tails make the score of the marginal vanish. In our designs with five strong confounders it leaves much less regularization induced confounding than the lasso does; with thirty weak ones it leaves slightly more. Coupling the outcome prior to the treatment model through the estimated treatment regression reduces the bias further with 50 covariates, where the coupled posterior matches least squares, trails DML slightly on the average effect and also returns every other summary. With 150 and 300 covariates and the same five confounders DML is clearly more accurate. With thirty weak confounders among 150 covariates the order reverses: the coupled posterior is the most accurate estimator and covers 0.944, DML covers 0.756, and coupling through a cross fitted treatment regression fails completely. Shared local scales also protect instruments, which can cost more than it gains. The chapter then puts the horseshoe inside DML as its nuisance estimator and tests that estimator in simulation and on the LaLonde experiment.
+\end{tcolorbox}
+
+This chapter argues that most problems double machine learning\index{double machine learning}\index{double machine learning!Bayesian alternative to|textbf} was built to solve are problems of the prior on the nuisance coefficients, and that the horseshoe\index{horseshoe prior} leaves much less of the bias a shrinkage prior puts in the treatment effect. Coupled to the treatment model, through the estimated treatment regression or shared local scales, it also protects confounders from shrinkage, which attacks the mechanism behind regularization induced confounding and the Robins and Ritov failure. Shared scales protect instruments too, so the best coupling depends on whether instruments are present.
+
+
+
+\section{The normal means problem}
+
+Observe $y_j = \beta_j + \varepsilon_j$, $\varepsilon_j \sim N(0, 1)$, for $j = 1, \ldots, p$, with most $\beta_j$ zero or near zero and a few large\index{sparsity|textbf}. Every regression with orthogonal design reduces to this normal means problem\index{normal means problem|textbf}.
+
+The ideal estimator would zero the null $\beta_j$ and leave the large ones alone. Three classical estimators fall short.
+\begin{itemize}
+\item The normal prior $\beta_j \sim N(0, v)$ gives the linear rule $\hat\beta_j = y_j v/(1+v)$, shrinking everything by one factor, so it either spares noise or crushes signals.
+\item The lasso, or Laplace prior mode, gives the soft threshold $\hat\beta_j = \mathrm{sign}(y_j)(|y_j| - \lambda)_+$. It kills small values but subtracts $\lambda$ from large values forever. 
+\item Hard thresholding keeps large values and kills small ones, but is discontinuous and unstable near the threshold.
+\end{itemize}
+
+The first two failures have a common cause. Each applies the same shrinkage, in absolute or in relative terms, to every observation, and so cannot distinguish a $y_j$ that is large because $\beta_j$ is large from one that is large by chance. A better rule shrinks by nearly all of $y_j$ when $|y_j|$ is of the order of the noise, and by nearly nothing when $|y_j|$ is several times larger. Such a rule must be nonlinear in $y_j$, and the natural way to produce one is a prior with a sharp peak at zero and heavy tails. In causal terms the $\beta_j$ are the coefficients of the nuisance functions, the few large ones include the confounders, and the lasso's constant subtraction leaks into the treatment effect.
+
+\section{The horseshoe prior}
+
+The horseshoe\index{horseshoe prior|textbf}\index{horseshoe|see{horseshoe prior}}, introduced by Carvalho, Polson and Scott in \emph{Biometrika} in 2010, is a scale mixture of normals\index{horseshoe prior!as a scale mixture of normals|textbf}\index{horseshoe prior}:
+\begin{equation}
+\beta_j \mid \lambda_j, \gscale \sim N(0, \lambda_j^2\gscale^2), \qquad \lambda_j \sim C^+(0, 1), \qquad \gscale \sim C^+(0,1).
+\label{eq:hs}
+\end{equation}
+Here $C^+(0,1)$ is the standard half Cauchy. The global scale\index{global scale|textbf} $\gscale$ sets overall sparsity; the local scales\index{local scale|textbf} $\lambda_j$ let individual coefficients escape\index{global local prior|textbf}.
+
+Define the shrinkage coefficient\index{shrinkage coefficient|textbf} $\kappa_j = 1/(1 + \lambda_j^2\gscale^2)$. Conditional on $\kappa_j$,
+\[
+\E(\beta_j \mid y_j, \kappa_j) = (1 - \kappa_j) y_j.
+\]
+With $\gscale = 1$, the half Cauchy prior on $\lambda_j$ implies $\kappa_j \sim \mathrm{Beta}(1/2, 1/2)$. This density is unbounded at both ends, shaped like a horseshoe, hence the name (Figure~\ref{fig:hsprior}). Mass near $\kappa = 1$ shrinks noise to zero; mass near $\kappa = 0$ leaves signals alone.
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{hs_prior.pdf}
+\caption{Left: the horseshoe density with $\gscale = 1$, unbounded at the origin with Cauchy like tails, against a Laplace prior with unit variance, a standard normal and a standard Cauchy. Right: the implied prior on the shrinkage coefficient $\kappa$ for an observation with unit variance, the exact $\mathrm{Beta}(1/2, 1/2)$ density for the horseshoe and, for the Laplace, a histogram of $\kappa = 1/(1 + v)$ over 200,000 draws of its mixing variance $v \sim \mathrm{Exp}(1)$. The Laplace density vanishes at $\kappa = 0$, which is why the Laplace never stops shrinking large signals.}
+\label{fig:hsprior}
+\end{figure}
+\begin{proposition}
+With $\gscale = 1$, the posterior mean under the horseshoe\index{horseshoe prior!posterior mean and shrinkage profile|textbf} is
+\[
+\E(\beta \mid y) = y\,\{1 - \E(\kappa \mid y)\},
+\]
+where
+\[
+p(\kappa \mid y) \propto (1-\kappa)^{-1/2} e^{-\kappa y^2/2}, \qquad 0 < \kappa < 1.
+\]
+\end{proposition}
+
+\begin{proof}
+Given $\kappa$, $y \sim N(0, 1/\kappa)$, so the likelihood of $\kappa$ is $\kappa^{1/2}e^{-\kappa y^2/2}$. Multiply by the $\mathrm{Beta}(1/2,1/2)$ density $\kappa^{-1/2}(1-\kappa)^{-1/2}$ to obtain the stated posterior, and use $\E(\beta \mid y, \kappa) = (1-\kappa)y$.
+\end{proof}
+
+Figure~\ref{fig:profiles} compares the shrinkage profiles\index{horseshoe prior!posterior mean and shrinkage profile}, the horseshoe computed by numerical integration of the proposition. The horseshoe estimate is 0.38 at $y = 1$, shrinking noise hard; 1.06 at $y = 2$; 3.45 at $y = 4$; 5.66 at $y = 6$; and 7.75 at $y = 8$. The gap $y - \E(\beta \mid y)$ goes to zero as $y$ grows. 
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{shrink_profiles.pdf}
+\caption{Posterior mean as a function of the observation in the normal means problem, for the horseshoe, a normal prior with unit variance, and a lasso soft threshold at 1.5.}
+\label{fig:profiles}
+\end{figure}
+
+\section{Tail robustness and regular variation}
+
+Tweedie's formula\index{Tweedie formula@Tweedie's formula|textbf} shows why the horseshoe\index{horseshoe prior!tail robustness|textbf} leaves large signals alone\index{tail robustness|textbf}. It expresses the posterior mean through the marginal density $m(y) = \int \phi(y - \beta)\pi(\beta)\,d\beta$:
+\begin{equation}
+\E(\beta \mid y) = y + \frac{d}{dy}\log m(y).
+\label{eq:tweedie}
+\end{equation}
+Shrinkage is the score of the marginal. If $m$ has light normal tails, the score grows linearly and shrinkage never stops; if $m$ has polynomial tails, the score decays and shrinkage vanishes for large $y$.
+
+\begin{definition}[Regular variation]
+A positive function $f$ on $(0,\infty)$ is regularly varying\index{regular variation|textbf} at infinity with index $\alpha$ if $f(cx)/f(x) \to c^{\alpha}$ as $x \to \infty$ for every $c > 0$.
+\end{definition}
+
+\begin{theorem}[Tail robustness]
+If the prior density $\pi(\beta)$ is regularly varying at infinity with index $-\alpha$, $\alpha > 1$, and is eventually differentiable with $\beta\pi'(\beta)/\pi(\beta) \to -\alpha$, then the marginal $m(y)$ is regularly varying with the same index and
+\[
+y - \E(\beta \mid y) = \frac{\alpha}{y}\{1 + o(1)\} \to 0 \quad\text{as } y \to \infty.
+\]
+\end{theorem}
+
+\begin{proof}[Sketch]
+For large $y$, the Gaussian kernel concentrates on $\beta$ near $y$, where the prior changes little over unit distances. This gives $m(y)\sim\pi(y)$, so $m$ inherits the regular variation\index{regular variation}. The derivative hypothesis also gives $m'(y)\sim\pi'(y)$, and hence
+\[
+\frac{m'(y)}{m(y)}\sim\frac{\pi'(y)}{\pi(y)}\sim-\frac{\alpha}{y}.
+\]
+Substitution in \eqref{eq:tweedie} proves the result. Appendix~\ref{app:theory} establishes both convolution limits.
+\end{proof}
+
+The horseshoe density behaves like $\beta^{-2}$ in the tails, so $\alpha = 2$ and a large signal $y$ is shrunk by about $2/y$. At $y = 8$ that predicts about 0.25; the exact value from the proposition is 0.25. 
+
+\section{Minimax and contraction}
+
+Tail robustness concerns single coefficients; the global scale $\gscale$ gives adaptivity across all of them. Van der Pas, Kleijn and van der Vaart showed in 2014 that the horseshoe posterior contracts\index{posterior contraction|textbf}\index{posterior concentration|see{posterior contraction}} around a sparse truth at the minimax rate\index{minimax rate|textbf}\index{horseshoe prior!minimax rate|textbf}.
+
+\begin{theorem}[van der Pas, Kleijn and van der Vaart]
+In the normal means problem with unit variance, suppose the true mean vector has at most $s_p$ nonzero entries, with $s_p \to \infty$ and $s_p = o(p)$. If $\gscale$ is set at $(s_p/p)^{c}$ for $c \geq 1$, or estimated by an empirical Bayes\index{empirical Bayes|textbf} rule that meets the conditions of their paper, the horseshoe posterior contracts around the truth in squared $\ell_2$ distance at rate $s_p \log(p/s_p)$, the minimax rate.
+\end{theorem}
+
+A hierarchical prior on $\gscale$ supported on $[1/p,1]$, such as a truncated half Cauchy, achieves a rate of the same order without knowing $s_p$, when $\log p \lesssim s_p \le p^{a}$ for some $a < 1$, and within a logarithmic factor under weaker conditions on the hyperprior (van der Pas, Szab\'o and van der Vaart 2017a), and the horseshoe predictive density has Kullback and Leibler risk of the same minimax order. Appendix~\ref{app:guarantees} states these results, the coverage of horseshoe credible sets, and their consequences for causal functionals.  The horseshoe plus prior\index{horseshoe plus prior|textbf} of Bhadra, Datta, Polson and Willard (2017) adds a second layer of half Cauchy mixing and is aimed at ultra sparse signals.
+
+\section{Regression and computation}\label{sec:hsregression}
+
+In the linear regression $Y = Z\beta + \varepsilon$, $\varepsilon \sim N(0, \sigma^2 I)$, the horseshoe\index{horseshoe prior!in regression|textbf} places \eqref{eq:hs} on each coefficient, scaled by $\sigma$, so that $\beta_j \mid \lambda_j, \gscale, \sigma \sim N(0, \sigma^2\lambda_j^2\gscale^2)$, and $\sigma^2$ has the prior $p(\sigma^2) \propto 1/\sigma^2$. Makalic and Schmidt (2016) gave a simple Gibbs sampler by writing each half Cauchy as an inverse gamma mixture of inverse gammas, $\lambda_j^2 \mid \nu_j \sim \mathrm{IG}(1/2, 1/\nu_j)$ and $\nu_j \sim \mathrm{IG}(1/2, 1)$, and similarly for $\gscale^2$ with auxiliary $\xi$. All full conditionals are then standard, with $\mathrm{IG}(a, b)$ the inverse gamma of shape $a$ and rate $b$.
+
+\begin{enumerate}
+\item Draw $\beta \sim N(A^{-1}Z^\top Y, \sigma^2 A^{-1})$, where $A = Z^\top Z + \mathrm{diag}\{(\lambda_j^2\gscale^2)^{-1}\}$.
+\item Draw $\sigma^2 \sim \mathrm{IG}\bigl((n + p)/2, \{\|Y - Z\beta\|^2 + \sum_j \beta_j^2/(\lambda_j^2\gscale^2)\}/2\bigr)$.
+\item Draw $\lambda_j^2 \sim \mathrm{IG}\bigl(1, 1/\nu_j + \beta_j^2/(2\gscale^2\sigma^2)\bigr)$ and $\nu_j \sim \mathrm{IG}(1, 1 + 1/\lambda_j^2)$.
+\item Draw $\gscale^2 \sim \mathrm{IG}\bigl((p + 1)/2, 1/\xi + \sum_j \beta_j^2/(2\lambda_j^2\sigma^2)\bigr)$ and $\xi \sim \mathrm{IG}(1, 1 + 1/\gscale^2)$.
+\end{enumerate}
+Coefficients that should not be shrunk, such as the treatment effect, get a flat prior by setting their prior precision to zero in $A$. They are then left out of steps 3 and 4 and of the penalty sum in step 2, and $p$ in steps 2 and 4 becomes the number of shrunk coefficients. Sections~\ref{sec:ricsim} and~\ref{sec:sharedsim} use this sampler.
+
+Section~\ref{comp:sec:horseshoe} tests quantile networks trained on prior draws and their implied data (Polson and Sokolov 2026a) on a regression with ten coefficients. None of three pipelines was both calibrated and in agreement with the far cheaper Gibbs sampler. A network computes the posterior of its training prior; a coupled horseshoe network has not been tried.
+
+\paragraph{Logistic outcomes with the horseshoe.}
+For a binary outcome the Polya Gamma\index{Polya Gamma@P\'olya Gamma} augmentation of Chapter~\ref{ch:computation} makes horseshoe logistic regression conditionally Gaussian. With $\zeta_i = z_i^\top\beta$ and $\tilde y_i = y_i - 1/2$, draw $\omega_i \sim \mathrm{PG}(1, \zeta_i)$ and then
+\[
+\beta \sim N(V Z^\top\tilde y, V), \qquad V = (Z^\top\Omega Z + \Lambda^{-1})^{-1},
+\]
+where $\Omega = \mathrm{diag}(\omega_i)$ and $\Lambda$ is the diagonal matrix of prior variances $\lambda_j^2\gscale^2$. The scale updates are as in the Gaussian case with $\sigma^2 = 1$. The causal targets, risk differences averaged over any $Q$, follow from the draws of $\beta$ as in Chapter~\ref{ch:mccullagh}.
+
+\paragraph{The regularized horseshoe.} Under separation, a covariate that splits the outcomes perfectly leaves the likelihood flat as its coefficient grows, so the posterior tail of that coefficient is the prior's Cauchy like tail and its posterior mean does not exist. Piironen and Vehtari (2017) cap the prior variance with a slab scale $c$,
+\[
+\beta_j \mid \lambda_j, \gscale, c \sim N(0, \gscale^2\tilde\lambda_j^2), \qquad \tilde\lambda_j^2 = \frac{c^2\lambda_j^2}{c^2 + \gscale^2\lambda_j^2}.
+\]
+For $\gscale\lambda_j$ small against $c$ this is the horseshoe; as $\lambda_j$ grows the variance approaches $c^2$, giving normal shrinkage of scale $c$ and, under separation, a Gaussian posterior tail with a finite mean. Choose $c$ on the scale of the largest plausible log odds effect of one covariate. The cap bounds the variance, not coefficients or propensities, so it does not by itself keep $\hat e$ inside $[c', 1 - c']$. The simulations of this chapter use the plain horseshoe.
+
+\section{Why independent shrinkage confounds}
+
+Return to the partially linear model\index{partially linear model!with linear nuisances|textbf} with linear nuisances:
+\[
+Y = \tau T + X^\top\beta + \varepsilon, \qquad T = X^\top\gamma + \nu.
+\]
+Fit the outcome regression with a shrinkage prior on $\beta$, giving the shrunk estimate $\hat\beta$, and a flat prior on $\tau$. The estimate of $\tau$ is roughly the coefficient from regressing $Y - X^\top\hat\beta$ on $T$, and
+\[
+\hat\tau - \tau \approx \frac{\mathrm{Cov}\{T, X^\top(\beta - \hat\beta)\}}{\mathrm{Var}(T)} = \frac{\gamma^\top \Sigma_X (\beta - \hat\beta)}{\mathrm{Var}(T)}.
+\]
+The bias is the shrinkage error $\beta - \hat\beta$ projected on the treatment direction $\gamma$. Confounders, with large $\gamma_j$ and large $\beta_j$, contribute most, so any prior\index{prior distribution!independent shrinkage confounds|textbf} that shrinks $\beta_j$ without regard to $\gamma_j$ shrinks confounders and biases $\tau$.
+
+This is the regularization induced confounding\index{regularization induced confounding!remedy by coupling|textbf} of Hahn, Carvalho, Puelz and He (2018). For the lasso, subtracting a constant from every coefficient leaves a component of size $\lambda$ in $\beta - \hat\beta$ along every active confounder. 
+
+An independent horseshoe is much better, because tail robustness makes $\beta_j - \hat\beta_j$ small for large $\beta_j$ when the confounders are not strongly correlated. But moderate confounders, with $\beta_j$ of one or two standard errors, still sit where the horseshoe shrinks substantially.
+
+\section{The partially exchangeable horseshoe}
+
+The proposed remedy\index{coupled prior|textbf}\index{coupled prior!horseshoe version|textbf} is to tell the prior which coefficients are confounders\index{coupling!of the outcome and treatment priors|textbf}\index{coupling}, in one of two closely related ways.
+
+\paragraph{Shared local scales.} Place horseshoe priors on both the outcome and treatment coefficients, with a common local scale for each covariate\index{shared scale prior|textbf}\index{coupled prior!shared scale form|textbf}:
+\begin{equation}
+\beta_j \sim N(0, \sigma_Y^2\lambda_j^2\tau_{\mathrm{g},Y}^2), \qquad \gamma_j \sim N(0, \sigma_T^2\lambda_j^2\tau_{\mathrm{g},T}^2), \qquad \lambda_j \sim C^+(0,1).
+\label{eq:shared}
+\end{equation}
+Here $\sigma_Y^2$ and $\sigma_T^2$ are the error variances of the outcome and treatment equations, each with prior proportional to its inverse, and the global scales $\tau_{\mathrm{g},Y}$ and $\tau_{\mathrm{g},T}$ have independent $C^+(0,1)$ priors, as in Section~\ref{sec:hsregression}. Covariates are now partially exchangeable\index{partially exchangeable horseshoe|textbf}\index{exchangeability!partial}: exchangeable within each model, linked through $\lambda_j$. A strong treatment predictor has a large posterior $\lambda_j$, protecting its outcome coefficient whether it is a confounder or a covariate that predicts treatment and not the outcome, an instrument in the language of Chapter~\ref{ch:iv}. Section~\ref{sec:sharedsim} shows that protecting instruments can cost more than it gains.
+
+\paragraph{Propensity as a covariate.} Fit the treatment model first, obtain $\hat m(X) = X^\top\hat\gamma$, and include it in the outcome regression with a flat prior:
+\[
+Y = \tau T + \delta\,\hat m(X) + X^\top\beta + \varepsilon.
+\]
+The unshrunk $\delta$ absorbs the confounding direction $\Sigma_X\gamma$, so shrinking $\beta$ leaks much less into $\tau$. We call $\hat m(X)$ the propensity covariate: for a continuous treatment it is the fitted treatment regression, and for a binary one the estimated propensity score\index{propensity score!estimated, in the coupled prior|textbf}. This is the Bayesian causal forest\index{Bayesian causal forest} device of Hahn, Murray and Carvalho (2020), transplanted to the horseshoe.
+
+\begin{proposition}
+In vector form let $Y = \tau T + X\beta + \varepsilon$ and $T = X\gamma + \nu$, where $X$ is the $n \times p$ matrix of covariates with columns $X_j$ satisfying $\|X_j\|^2 \le Kn$, and $\nu$ is independent of $X$ with independent, mean zero, sub-Gaussian entries of variance $\sigma_\nu^2$. Suppose the treatment fit is exact, $\hat m = X\gamma \ne 0$, and let $\tilde T = T - \hat m\,(\hat m^\top T)/(\hat m^\top\hat m)$ be the residual of $T$ on $\hat m$. Put flat priors on $\tau$ and on the coefficient $\delta$ of $\hat m$, any prior on the coefficient vector $b$ of $X$, and let $\hat\beta$ be the posterior mean of $b$, however it depends on the data. Then the posterior mean of $\tau$ satisfies
+\begin{equation}
+\hat\tau - \tau = \frac{\tilde T^\top\varepsilon + \tilde T^\top X(\beta - \hat\beta)}{\tilde T^\top\tilde T},
+\label{eq:pcbias}
+\end{equation}
+and, conditional on $X$, with probability tending to one as $n$ and $p$ grow, $\|X^\top\tilde T\|_\infty \le c_1\sqrt{n\log p}$ and $\tilde T^\top\tilde T \ge c_2n$, so that
+\begin{equation}
+\left|\frac{\tilde T^\top X(\beta - \hat\beta)}{\tilde T^\top\tilde T}\right| \le c_3\sqrt{\frac{\log p}{n}}\,\|\beta - \hat\beta\|_1,
+\label{eq:pcbound}
+\end{equation}
+where $c_1$, $c_2$ and $c_3$ depend only on $K$, $\sigma_\nu$ and the sub-Gaussian norm of $\nu$.
+\end{proposition}
+
+\begin{proof}
+Condition on $b$ and $\sigma^2$. With flat priors on $\tau$ and $\delta$, the posterior mean of $\tau$ is the least squares coefficient of $T$ when $Y - Xb$ is regressed on $T$ and $\hat m$, which by Frisch, Waugh and Lovell is $\tilde T^\top(Y - Xb)/\tilde T^\top\tilde T$. This is linear in $b$, so averaging over the posterior of $b$ replaces $b$ by $\hat\beta$; substituting $Y = \tau T + X\beta + \varepsilon$ with $\tilde T^\top T = \tilde T^\top\tilde T$ gives \eqref{eq:pcbias}.
+
+For the bounds, write $M = I - \hat m\hat m^\top/\|\hat m\|^2$. Since $T = \hat m + \nu$ and $M\hat m = 0$, $\tilde T = M\nu$. Conditional on $X$, the $j$th coordinate of $X^\top\tilde T$ is $(MX_j)^\top\nu$, which is sub-Gaussian with scale at most $C_\nu\|MX_j\| \le C_\nu\sqrt{Kn}$, where $C_\nu$ is a constant multiple of the sub-Gaussian norm of $\nu$, so $\|X^\top\tilde T\|_\infty = O_p(\sqrt{n\log p})$ by the union bound. Next,
+\[
+\tilde T^\top\tilde T = \nu^\top\nu - \frac{(\hat m^\top\nu)^2}{\|\hat m\|^2} = n\sigma_\nu^2\{1 + o_p(1)\},
+\]
+because $\nu^\top\nu/n \to \sigma_\nu^2$ in probability and $\hat m^\top\nu/\|\hat m\|$ is sub-Gaussian with scale $C_\nu$, so the subtracted term is $O_p(1)$. The bound \eqref{eq:pcbound} follows from $|\tilde T^\top X(\beta - \hat\beta)| \le \|X^\top\tilde T\|_\infty\|\beta - \hat\beta\|_1$.
+\end{proof}
+
+Without the propensity covariate the bias term is $T^\top X(\beta - \hat\beta)/T^\top T$, and $X^\top T = X^\top X\gamma + X^\top\nu$ has coordinates of order $n$ wherever $\Sigma_X\gamma$ is not small, so the bias is of the order of the shrinkage error itself and not of $\sqrt{\log p/n}$ times its $\ell_1$ norm. The propensity covariate removes the first order term in the shrinkage error. What is left is below the sampling error, which is of order $n^{-1/2}$, when $\|\beta - \hat\beta\|_1 = o(1/\sqrt{\log p})$. That condition is of the same kind as the rate conditions of Chapter~\ref{ch:dml} and cruder than the one cross fitting gives, because the bound holds for every $\hat\beta$ however it depends on the data. The proposition concerns an exact, oracle treatment fit, and it does not say how large $\|\beta - \hat\beta\|_1$ is for the horseshoe.
+
+ Given $\hat\beta$, the estimate solves $\sum_i\tilde T_i(Y_i - \tau T_i - X_i^\top\hat\beta) = 0$, the treatment residual times the outcome residual. At the true nuisances this is the Robinson score \eqref{eq:robscore} of Chapter~\ref{ch:dml}: with $m_0(X) = \E(T \mid X)$, $g_0(X) = X^\top\beta$ and $\ell_0 = \tau m_0 + g_0$,
+\[
+(T - m_0)(Y - \tau T - g_0) = (T - m_0)\{Y - \ell_0 - \tau(T - m_0)\}.
+\]
+Perturb the outcome fit by $h(X)$ and the score moves by $-(T - m_0)h(X)$, whose expectation is zero because $\E(T - m_0 \mid X) = 0$. This is Neyman orthogonality, reached by putting the treatment fit into the outcome model with a flat prior instead of correcting the score afterwards.
+
+If $\hat m(X)$ misses $X^\top\gamma$, $\tilde T$ keeps a component along $X(\gamma - \hat\gamma)$, and the bias becomes the product of that error and the shrinkage error: small when either is small, and the second order term of Chapter~\ref{ch:dml}. With a binary treatment the AIPW weight $T/\hat e(X) - (1 - T)/\{1 - \hat e(X)\}$ equals the treatment residual $T - \hat e(X)$ divided by $\hat e(X)\{1 - \hat e(X)\}$, so it plays the part of $\tilde T$, and it is the clever covariate of van der Laan and Rubin (2006). Orthogonality is also why the coupled posterior and the DML estimator of Section~\ref{sec:baipw} agree when they do: both multiply the outcome residual by the treatment residual, and in both the nuisance errors enter as a product.
+
+Appendix~\ref{app:theory} makes the product precise for a fixed coefficient vector $\hat\gamma$ in $\hat m = X\hat\gamma$ (Proposition~\ref{ss:prop:product}). Write $\Delta = \gamma - \hat\gamma$ for the error of the treatment fit, $c$ for the limit of the shrinkage error $\beta - \hat\beta$ and $\Sigma$ for the covariance of the covariates. With $p$ fixed, the bias of the posterior mean of $\tau$ tends to the covariance of $X\Delta$ and $Xc$, after the parts explained by $\hat m$ are removed, divided by the variance left in $\tilde T$. It is zero when $\Delta = 0$ and at most $\|\Sigma^{1/2}\Delta\|\,\|\Sigma^{1/2}c\|/\sigma_\nu^2$ in absolute value. The free coefficient on $\hat m$ matters: in the reduced form coordinates of Hahn, Carvalho, Puelz and He (2018) and DiTraglia and Liu (2025), where the coefficient of $T - X\hat\gamma$ is the effect, the limit has an extra term quadratic in $\Delta$. The limit says how given errors combine, not how large they are. With $p$ fixed, a posterior mean that is consistent for $b + \delta\hat\gamma$, the coefficient vector of $X$ that the data identify, makes it zero, so a nonzero limit needs a prior that excludes the true coefficients or a $p$ that grows with $n$. Section~\ref{sec:baipw} takes up the rates, and for the horseshoe logistic propensity model we cannot supply them.
+
+
+
+\paragraph{Back to Robins and Ritov.}
+The coupled prior of Section~\ref{sec:rrw} centres each cell's outcome probability on a function of its selection probability. Here the outcome coefficient's scale is tied to its treatment coefficient. Both priors encode a relation between selection and outcome; there, it turns an inconsistent posterior into a consistent one.
+
+Orthogonalization and cross fitting\index{cross fitting} protect the target from nuisance shrinkage by construction of the estimator; the coupled horseshoe\index{coupled horseshoe|see{coupled prior}} attacks the same leak by construction of the prior, and keeps the posterior, with every other causal summary.
+
+\section{A first test of coupling}\label{sec:ricsim}
+
+The test\index{coupled prior!first test of|textbf} is a simulation\index{simulation study!coupling, first test|textbf} in the partially linear model $Y = \tau T + X^\top\beta + \varepsilon$, $T = X^\top\gamma + \nu$, with $n = 200$ observations and $p = 50$ independent standard normal covariates. Five are confounders with $\gamma_j = \beta_j = 1$ and the other 45 have zero coefficients in both equations; $\nu$ and $\varepsilon$ are independent standard normal, there is no intercept, and $\tau = 1$. Over 500 data sets we report each estimator's bias, root mean squared error (RMSE) and the coverage\index{coverage!simulated|textbf} of its nominal 95 percent interval.
+
+Seven estimators are compared. Least squares on $T$ and all 50 covariates needs no regularization, and least squares on $T$ and the five true confounders is an oracle that no analyst can compute. The lasso plug in is the coefficient of $T$ in a lasso of $Y$ on $T$ and the covariates. DML is the partialling out estimator of Chapter~\ref{ch:dml} with five fold cross fitting, lasso fits of $Y$ and of $T$ on $X$, and a sandwich interval. The independent horseshoe puts the prior \eqref{eq:hs} on the 50 covariate coefficients and a flat prior on $\tau$. The coupled horseshoe adds the lasso fit $\hat m(X)$ of the treatment to that regression as a covariate with a flat prior, either fitted once on the whole sample (the row labelled $\hat m(X)$) or cross fitted on the five folds that DML uses (the row labelled cross fitted). Every lasso penalty is chosen by five fold cross validation, and every horseshoe is a Gibbs run of 1,500 sweeps with the first 500 discarded, reporting the posterior mean and the central 95 percent posterior interval. In 20 data sets of this design, four chains from the default start gave a split $\hat R$ for the coefficient of $T$ of at most 1.003 (independent prior) and 1.007 (coupled prior), with at least 1,340 effective draws out of 4,000 (Section~\ref{comp:sec:cost}).
+
+\input{chapters/ric_table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{ric.pdf}
+\caption{Estimate minus the truth for seven estimators of $\tau = 1$ over 500 simulated data sets with $n = 200$ and $p = 50$. Boxes span the quartiles, the heavy line is the median, whiskers reach the most extreme estimate within 1.5 interquartile ranges of the box, and dots are estimates beyond that.}
+\label{fig:ric}
+\end{figure}
+
+In Table~\ref{tab:ric} and Figure~\ref{fig:ric}, least squares on all the covariates is unbiased, covers 0.944 and has the same RMSE as the coupled horseshoe, 0.084, and DML, at 0.079, is slightly better than both. The design therefore tests regularization induced confounding and does not show a gain over a method that does no regularization. 
+
+The lasso plug in is biased by 0.212, a fifth of the effect. DML removes most of that (0.009), and the independent horseshoe keeps some (0.059) and covers 0.868. Coupling to the whole sample $\hat m(X)$ takes the bias from 0.059 to $-0.023$, the RMSE from 0.103 to 0.084 and the coverage from 0.868 to 0.918, and the coupled posterior is closer to the truth than the independent one in 58 percent of the data sets. It is slightly less accurate than DML, which is closer to the truth in 54 percent. The Monte Carlo standard errors are at most 0.004 for biases and RMSEs and 0.019 for coverages, so 500 data sets separate DML and the coupled posterior from the plug in and the independent horseshoe, and only just separate them from each other (a paired $t$ of 2.8 on the squared errors). Their coverages, 0.924 and 0.918, cannot be ranked, and both fall short of 0.95 by more than two standard errors.
+
+Cross fitting the propensity covariate makes coupling worse. The cross fitted version has bias 0.088, RMSE 0.114 and coverage 0.764, and it is closer to the truth than the whole sample version in only 32 percent of the data sets. 
+
+Least squares matched the coupled posterior because $p$ is small against $n$. We therefore repeated the simulation with $p = 150$ and $p = 300$, keeping $n = 200$, the five confounders, the 500 data sets and every other detail of the design (Tables~\ref{tab:ric_hd150} and~\ref{tab:ric_hd300}). With $p = 150$ least squares is still defined, with 49 residual degrees of freedom, and with $p = 300$ it does not exist. The oracle regression is unaffected, with RMSE 0.069 and 0.071.
+
+\input{chapters/ric_hd150_table}
+
+\input{chapters/ric_hd300_table}
+
+DML is the most accurate estimator an analyst can compute in both designs, and its RMSE barely moves, 0.079, 0.080 and 0.084 at $p = 50$, 150 and 300. The coupled horseshoe loses more: its RMSE is 0.084, 0.096 and 0.124, and its bias goes from $-0.023$ to $-0.045$ and $-0.071$, against $+0.059$, $+0.067$ and $+0.067$ for the independent horseshoe. Replication by replication, the squared error of the coupled posterior exceeds that of DML by an amount with a paired $t$ of 2.8, 4.2 and 7.2 at the three values of $p$, and the coupled posterior is the closer one in 46, 45 and 42 percent of the data sets. Least squares on all the covariates has RMSE 0.138 at $p = 150$, 1.7 times that of DML.
+
+The gain of coupling over the independent horseshoe does not survive the larger designs with five confounders. Its RMSE was 0.019 smaller at $p = 50$ (paired $t = -4.8$), is 0.011 smaller at $p = 150$ ($t = -1.4$) and is 0.013 larger at $p = 300$ ($t = 1.5$), and the last two cannot be told from zero with 500 data sets. The sign of the coupled posterior's bias is opposite to that of the independent horseshoe in all three designs and its size grows with $p$. The decomposition below places it in the residual of $T$ on $\hat m(X)$, which is slightly negatively correlated with $X\gamma$, more so as $p$ grows; why it is negatively correlated we have not found.
+
+Apart from least squares at $p = 150$, whose intervals are twice as long as DML's (median length 0.569 against 0.268) and cover 0.960, no estimator that an analyst can compute covers at the nominal rate in the larger designs. At $p = 150$ the coupled posterior covers 0.912 and DML 0.902; at $p = 300$ they cover 0.836 and 0.892. A coverage here has a Monte Carlo standard error of at most 0.022, so 0.836 is about seven standard errors below 0.95, and 15 percent of the coupled posterior's intervals lie wholly below the truth, in line with its negative bias. The cross fitted version covers 0.654 and 0.562 and is less accurate than the independent horseshoe as well.
+
+The five confounders of these designs are strong, with unit coefficients. To see what happens when confounding is spread thin, we ran one more design with $n = 200$ and $p = 150$ standard normal covariates. The first 30 are confounders with $\gamma_j = \beta_j = 0.3$, the next four affect only the outcome, with $\beta_j = 1$ and $\gamma_j = 0$, and the other 116 have zero coefficients in both equations; $\nu$ and $\varepsilon$ are independent standard normal, there is no intercept, and $\tau = 1$. The seven estimators, the penalties, the sampler, the folds and the random seeds are those of the designs above, except that the oracle regression now uses $T$ and the 30 confounders and so leaves the four outcome only covariates in its error. Table~\ref{tab:ric_weak30} reports bias, RMSE and coverage over 500 data sets. The shared seeds give the same covariates and errors as the five confounder design at $p = 150$, so least squares repeats its row in Table~\ref{tab:ric_hd150}.
+
+\input{chapters/ric_weak30_table}
+
+The ranking of the strong designs is reversed. The lasso plug in is biased by 0.615 and the independent horseshoe by 0.670, about two thirds of the effect, and no interval of the independent horseshoe covers the truth: with thirty coefficients of 0.3 both shrink the confounders hard. DML removes most of that bias but not all of it. Its bias is 0.069, its intervals are short (median length 0.284), and they cover 0.756, with 22 percent lying wholly above the truth. The coupled horseshoe with the whole sample $\hat m(X)$ has bias 0.004, RMSE 0.113 and coverage 0.944, within a Monte Carlo standard error of 0.95, with a median interval length of 0.410. It is the most accurate estimator in the table and is closer to the truth than DML in 57 percent of the data sets; its squared error is below DML's by 0.0032 on average, with a paired standard error of 0.0012. Least squares on all the covariates covers 0.960, but its RMSE of 0.138 exceeds the coupled posterior's by an amount with a paired $t$ of 5.0. The oracle is less accurate than both (RMSE 0.168), because the four outcome only covariates it leaves out raise its error variance from one to five.
+
+Cross fitting the propensity covariate fails badly here. The cross fitted version has bias 0.467 and RMSE 0.471, none of its 500 intervals covers the truth, and it is closer to the truth than the whole sample version in one data set of the 500. Its bias is about four times that with five strong confounders at $p = 150$ (0.113), and about 70 percent of the independent horseshoe's 0.670.
+
+Equation~\eqref{eq:pcbias} separates the error of either coupled fit into two terms, with $\tilde T$ the residual of $T$ on that fit's $\hat m$ and $\hat\beta$ the posterior mean of its covariate coefficients. The first, in $\varepsilon$, has mean zero conditional on $T$ and $X$, because $\hat m$ is fitted using only $T$ and $X$ and $\varepsilon$ is independent of both. The expected second term is therefore the bias: shrinkage error weighted by the covariate variation left in the treatment residual.
+
+Proposition~\ref{ss:prop:product} gives the product formula for fixed $p$ and fixed $\hat\gamma$ in $\hat m=X\hat\gamma$. It does not explain the difference between our coupled fits, so we measured it. We reran the four designs with the seeds of the tables and computed, in each of the 500 data sets and for both coupled fits, the two terms of \eqref{eq:pcbias}, the correlation of $\tilde T$ with the confounding signal $X\gamma$, and the $\ell_1$ norm of the shrinkage error $\beta - \hat\beta$. With thirty weak confounders the second term carries the bias. Averaged over the data sets it is 0.465 for the cross fitted version, whose bias is 0.467, and $-0.001$ for the whole sample version, with a Monte Carlo standard error of 0.003; the first term averages 0.005 or less in both. The shrinkage error is not what differs. Over the 30 confounders its $\ell_1$ norm averages 8.54 for the whole sample fit and 8.42 cross fitted, both close to the 9 it would be if every confounder's coefficient were estimated as zero. What differs is $\tilde T$: its correlation with $X\gamma$ averages 0.420 when $\hat m$ is cross fitted and 0.007 when it is fitted on the whole sample. The cross fitted residual keeps part of the confounding signal, and the second term passes the shrinkage error through it into $\tau$. The designs with five strong confounders repeat the pattern on a smaller scale. Cross fitted, the second term averages 0.089, 0.108 and 0.123 at $p = 50$, 150 and 300, against biases of 0.088, 0.113 and 0.128, with correlations of 0.041 to 0.060. Whole sample, it averages $-0.021$, $-0.052$ and $-0.077$, close to the coupled posterior's biases of $-0.023$, $-0.045$ and $-0.071$, with correlations of $-0.010$ to $-0.028$. These are measured averages over four designs, not a theorem. We have not found why the residual on the whole sample lasso fit carries almost none of $X\gamma$ when the same lasso, fitted on four fifths of the data and evaluated on the rest, leaves a correlation of 0.420. Nor have we separated two possible causes of the failure: a different lasso fit in each fold, so that $\hat m$ is not one linear function of the columns of $X$, and fitting on four fifths of the sample.
+
+With five strong confounders, then, the coupled horseshoe is not a substitute for DML when $p$ is large, and its gain over the independent horseshoe at $p = 50$ is not resolved at $p = 150$ or $p = 300$, although at $p = 150$ the coupled intervals cover more often (0.912 against 0.838). With thirty weak confounders the coupled posterior is the most accurate estimator, and apart from least squares the only one an analyst can compute whose intervals cover at the nominal rate. We ran one value of $n$, two patterns of confounding, independent covariates, a lasso nuisance learner and one sampler setting. Denser confounding, correlated covariates, other nuisance learners, repeated cross fitting and other ratios of $p$ to $n$ are not tested; the sampler's convergence was checked only for the coefficient of $T$, in 20 data sets at $p = 50$, 10 each at $p = 150$ and 300 with five confounders, and 10 with thirty weak confounders, where both coupled priors passed and the independent horseshoe mixed more slowly, with $\hat R$ up to 1.020 and as few as 234 effective draws out of 4,000 (Section~\ref{comp:sec:cost}).
+
+The practical consequence is narrow. If the horseshoe is coupled, fit the propensity covariate once on the whole sample, or use a known one as in the proposition above, and do not cross fit it; coupling then needs no sample splitting. Both families of designs have no instruments and a linear treatment model, and an analyst does not know in advance which family a problem belongs to. Chapter~\ref{ch:critique} finds the same kind of result in five other designs with $n = 300$ and $p = 400$: the Bayesian reduced form leaves a positive bias in all five, and in the sparse designs with good overlap DML with a cross validated lasso has the smaller bias (Section~\ref{sec:crit:bayes}).
+
+\section{Shared scales and instruments: a simulation}\label{sec:sharedsim}
+
+We tested the shared scale prior\index{shared scale prior}\index{coupled prior!shared scale form} \eqref{eq:shared} against independent horseshoe\index{horseshoe prior} priors with three kinds of covariate\index{simulation study!shared scales and instruments|textbf}. Of $p = 50$ standard normal covariates, five are moderate confounders with $\beta_j = \gamma_j = 0.5$; five are instruments, with $\gamma_j = 1$ and no outcome effect; five are prognostic, with $\beta_j = 1$ and $\gamma_j = 0$; the rest are noise. Treatment is $T = X^\top\gamma + \nu$ and the outcome $Y = T + X^\top\beta + \varepsilon$, with $n = 200$ and $\nu$ and $\varepsilon$ independent standard normal. Both priors were fitted by joint Gibbs sampling of the treatment and outcome models, 1,500 sweeps per fit with the first 500 discarded, over 40 replications.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{shared.pdf}
+\caption{Posterior mean of $\tau$ minus the truth under independent and shared local scales, 40 replications with moderate confounders, instruments and prognostic covariates.}
+\label{fig:shared}
+\end{figure}
+
+\input{chapters/shared_numbers}
+
+The result runs against the intuition behind the shared prior. Sharing scales protected the moderate confounders, but also the five instruments, whose large treatment coefficients left their zero outcome coefficients barely shrunk. Unshrunk instruments in an outcome regression inflate variance and, with residual confounding, amplify bias, the bias amplification\index{bias amplification|textbf} of Pearl (2011) and Wooldridge (2016). Here that cost outweighed the protection of confounders.
+
+The independent horseshoe did well, and the instruments explain most of it. The bias of a shrunken estimate is the shrinkage error on the confounders' coefficients, projected on $\gamma$ and divided by $\mathrm{Var}(T)$, and the instruments raise $\mathrm{Var}(T)$ from 2.25 to 7.25. Exercise~\ref{ex:ch07:7} runs the design without them, where the independent prior has bias 0.074 and the shared prior 0.046, and the ratio $2.25/7.25$ turns 0.074 into a predicted 0.023 for the independent prior here, against 0.017 in the 40 replications of the table and 0.021 in 100.
+
+The coupled prior should protect an outcome coefficient in proportion to the covariate's role as a confounder, which needs both $\gamma_j$ and $\beta_j$ nonzero; a shared scale can protect on the evidence of $\gamma_j$ alone. One refinement adds a private local scale to the shared one, $\beta_j \sim N(0, \sigma_Y^2\lambda_j^2\eta_j^2\tau_{\mathrm{g},Y}^2)$ with $\lambda_j$ shared and $\eta_j$ private. Problem~9 of Chapter~\ref{ch:open} compares independent scales, shared scales, this product prior\index{product prior|textbf}\index{coupled prior!product form|textbf} and the propensity covariate in this design. Independent scales did best, for the reason given above. The product prior recovers most of what sharing loses but still lets instruments through, and the propensity covariate is the least biased of the four but imports the variance of the instruments that dominate $\hat\gamma$. 
+
+\section{Choosing the global scale}
+
+The global scale\index{global scale!choice of|textbf} $\gscale$ controls how many coefficients escape shrinkage; under the continuous horseshoe none is exactly zero. With orthogonal columns of squared norm $n$ and the prior variance $\sigma^2\lambda_j^2\gscale^2$ of Section~\ref{sec:hsregression}, Piironen and Vehtari (2017) define the effective number\index{effective number of nonzero coefficients|textbf} of nonzero coefficients,
+\[
+\kappa_j = \frac{1}{1 + n\lambda_j^2\gscale^2}, \qquad m_{\mathrm{eff}} = \sum_{j=1}^p (1 - \kappa_j),
+\]
+and show that under half Cauchy local scales
+\[
+\E(m_{\mathrm{eff}} \mid \gscale) = \frac{p\sqrt{n}\,\gscale}{1 + \sqrt{n}\,\gscale}.
+\]
+They recommend scaling the prior\index{horseshoe prior!choice of global scale|textbf} on $\gscale$ by the value at which this mean equals a guess $p_0$ of the number of relevant covariates,
+\[
+\tau_{\mathrm{g},0} = \frac{p_0}{p - p_0}\,\frac{1}{\sqrt{n}}.
+\]
+Their coefficient prior is not scaled by $\sigma$, so their version of the formula carries a factor $\sigma$ that ours absorbs, and with correlated columns $m_{\mathrm{eff}}$ is an approximation. In causal problems $p_0$ is the analyst's guess at the number of confounders and prognostic variables. With $p = 50$ and a guess of $p_0 = 10$ relevant covariates, as in Section~\ref{sec:sharedsim}, the coefficient's prior scale $\sigma\tau_{\mathrm{g},0}$ is a quarter of $\sigma/\sqrt{n}$, the scale of a single noise coefficient.
+
+The half Cauchy prior on $\gscale$ in \eqref{eq:hs} is a good default for moderate $p$. With thousands of covariates and only a handful relevant, a more concentrated prior can keep small coefficients from pulling $\gscale$ upward. Report the posterior of $m_{\mathrm{eff}}$ with the treatment effect; a large departure from $p_0$ suggests revisiting the sparsity guess or the model.
+
+\paragraph{Effective number of confounders.}
+A useful causal diagnostic is the posterior of the effective number of protected confounders,
+\[
+c_{\mathrm{eff}} = \sum_{j=1}^p (1 - \kappa_j^{Y})(1 - \kappa_j^{T}),
+\]
+where $\kappa_j^Y$ and $\kappa_j^T$ are the shrinkage coefficients of covariate $j$ in the outcome and treatment models. A covariate contributes only if it escapes shrinkage in both. With independent covariates, a $c_{\mathrm{eff}}$ concentrated near zero suggests little measured confounding. With correlated covariates it does not: a covariate that drives treatment and a correlated one that drives the outcome confound the effect while each escapes shrinkage in one model only, so $c_{\mathrm{eff}}$ is read beside the change from the unadjusted estimate and not in place of it. If it is large, adjustment matters, and the analyst should check that the confounder model is flexible enough. In the design of Section~\ref{sec:sharedsim}, with five confounders, five instruments and five prognostic covariates, only the confounders should add to $c_{\mathrm{eff}}$, since the instruments escape shrinkage only in the treatment model and the prognostic covariates only in the outcome model. With shared scales the five instruments, whose outcome coefficients were barely shrunk, would be counted as well.
+
+
+
+\section{Horseshoe versus spike and slab}
+
+The spike and slab\index{spike and slab prior|textbf} prior places a point mass at zero and a diffuse slab elsewhere:
+\[
+\beta_j \sim (1 - w)\delta_0 + w\,N(0, v).
+\]
+Its strength is variable selection\index{variable selection|textbf}: posterior inclusion probabilities\index{posterior inclusion probability|textbf} have a direct interpretation, and large coefficients are nearly unshrunk. Its drawback is computational. The posterior mixes over $2^p$ models, and stochastic search mixes slowly when covariates are correlated, exactly the causal situation where confounders predict treatment.
+
+The horseshoe\index{horseshoe prior!versus spike and slab|textbf} is a continuous relaxation. The $\mathrm{Beta}(1/2, 1/2)$ prior on $\kappa_j$ puts most mass near zero and one, mimicking the discrete choice, while the continuous posterior is easy for Gibbs sampling. Carvalho, Polson and Scott (2010) showed that horseshoe posterior means closely track spike and slab posterior means in sparse problems, at a fraction of the cost.
+
+Under the spike and slab, $1 - \kappa_j$ is replaced by the posterior inclusion probability times the slab shrinkage factor $v/(1 + v)$; under the horseshoe, $1 - \E(\kappa_j \mid y)$ plays the role of a soft inclusion probability\index{inclusion probability}, and $m_{\mathrm{eff}}$ and $c_{\mathrm{eff}}$ are its versions of the expected model size and the expected number of confounders. The practical case for the horseshoe is that it runs inside a Gibbs sampler with the treatment model, the propensity covariate and the Polya Gamma augmentation, so that every coupling of this chapter is a change of a few lines; a spike and slab with the same couplings would need a model search over the treatment and outcome models jointly. Where $p$ is small and inclusion probabilities are themselves the object of interest, the spike and slab remains the better tool.
+
+\section{Nonlinear nuisances}
+
+Real nuisances\index{nuisance function!nonlinear, under the horseshoe|textbf} are rarely linear; two extensions keep the horseshoe central.
+
+The first is a basis expansion, $g(x) = \sum_k \beta_k b_k(x)$ for splines, wavelets, or random features, with the horseshoe on $\beta_k$. Tail robustness protects the large coefficients that carry the sharp features of $g$, and shared local scales with the propensity expansion protect the basis directions that predict treatment, instruments among them. The design matrix $Z$ of the Gibbs sampler now holds basis evaluations, and sparsity now means sparsity in the basis. On a spline or wavelet basis a smooth nuisance has a few large coefficients on the coarse functions and many small ones on the fine, the pattern the horseshoe is built for; a signal spread over many small coefficients defeats any sparsity prior, as the dense outcome of Design II in Section~\ref{sec:baipw} shows for raw covariates.
+
+The second puts a horseshoe on a neural network's final layer or all its weights. GenTE (Chapter~\ref{ch:gente}) passes a learned propensity embedding to the baseline network but not the effect network, the neural analogue of the propensity covariate. Both extensions protect directions that predict treatment by giving the outcome model the estimated propensity or shared scales. The choice between a basis and a network depends on the dimension of $x$ and the expected smoothness of $g$.
+
+\section{A horseshoe inside double machine learning}\chlabel{ch:baipw}\label{sec:baipw}
+
+A reader who wants DML's frequentist guarantee anyway can keep it and still ask where a Bayesian model belongs. Nareklishvili, Polson and Sokolov (2026a) answer: inside DML, as the nuisance estimator\index{Bayesian AIPW!inside double machine learning|textbf}. DML supplies Neyman orthogonality and cross fitting, and the horseshoe supplies the fits of the outcome and treatment regressions.
+
+
+
+\subsection{Where the two approaches meet}
+
+DML is agnostic about how the nuisances are estimated. Any learner can be plugged in whose errors satisfy a product rate condition,
+\[
+\|\hat\mu_t - \mu_t\|\,\|\hat e - e\| = o_p(n^{-1/2}),
+\]
+with $\mu_t$ the outcome regression in arm $t$ and $e$ the propensity score. If the nuisances converge fast enough the estimator is root $n$ normal with valid standard errors, and if they do not, careful cross fitting cannot save it. 
+
+A horseshoe prior offers three things to such a fit. Tail robustness leaves large confounder coefficients unshrunk, the global scale shrinks the many small ones hard, and in the propensity logit shrinkage toward the intercept tempers the inverse weights that destabilize augmented estimators. Whether the fitted nuisances meet the product rate is a separate question.
+
+\paragraph{What the horseshoe does to the weights.} Cross validation tunes the lasso propensity to predict treatment, which need not stabilize $1/\hat e$. The horseshoe shrinks logit coefficients unless the data insist; its heavy tails can leave large coefficients and extreme propensities alone. The posterior mean of $\expit(\gamma^\top x)$ lies in $(0,1)$, but overlap $c \leq e \leq 1 - c$ does not put finite sample estimates in $[c, 1 - c]$. Uniform consistency puts them in $[c - \epsilon, 1 - c + \epsilon]$ with probability tending to one for every $\epsilon > 0$. Design I shows the tempering, and Design III its absence.
+
+\subsection{The estimator}
+
+We ran the idea in two forms. The first is the partialling out score of Robinson (1988) for the partially linear model $Y = \tau T + g(X) + \varepsilon$ with a binary treatment, and it is the form behind the 500 replication grid below. Write $m(x) = \E(T \mid X = x)$, which is the propensity score, and $\ell(x) = \E(Y \mid X = x)$. In each of five cross fitting folds a horseshoe linear regression of $Y$ on $X$ gives $\hat\ell$ and a horseshoe logistic regression of $T$ on $X$ gives $\hat m$, both fitted on the other four folds by the Gibbs samplers of Section~\ref{sec:hsregression}, the logistic one through Polya Gamma augmentation, each for 600 sweeps with the first 200 discarded. The fitted propensity is the logistic function at the posterior mean coefficients, clipped to $[0.01, 0.99]$. With $\tilde Y_i = Y_i - \hat\ell(X_i)$ and $\hat V_i = T_i - \hat m(X_i)$ evaluated on the held out fold,
+\[
+\begin{gathered}
+\hat\tau = \frac{\sum_i\hat V_i\tilde Y_i}{\sum_i\hat V_i^2},
+\qquad
+\widehat{\mathrm{se}} = \frac{\{n^{-1}\sum_i\hat\psi_i^2\}^{1/2}}{\hat J\sqrt n}, \\
+\hat\psi_i = \hat V_i(\tilde Y_i - \hat\tau\hat V_i),
+\qquad
+\hat J = n^{-1}\sum_i\hat V_i^2.
+\end{gathered}
+\]
+Since $\ell = \tau m + g$ inherits the shape of $m$, a linear $\hat\ell$ is misspecified whenever the propensity is nonlinear in the covariates.
+
+The second form is the augmented inverse probability weighted (AIPW) score, which is what our own check below runs. Within each fold, separate horseshoe linear regressions on the treated and the control units of the other folds give $\hat\mu_1$ and $\hat\mu_0$, and a horseshoe logistic regression gives $\hat e$ as the posterior mean of $\expit(\gamma^\top x)$ over the draws. The score is
+\[
+\begin{gathered}
+\hat\psi_i = \hat\mu_1(X_i) - \hat\mu_0(X_i) + h_i\bigl\{Y_i - \hat\mu_{T_i}(X_i)\bigr\}, \\
+h_i = \frac{T_i}{\hat e(X_i)} - \frac{1 - T_i}{1 - \hat e(X_i)},
+\end{gathered}
+\]
+the estimate is $\hat\tau_B = n^{-1}\sum_i\hat\psi_i$, and its variance estimate is $n^{-2}\sum_i(\hat\psi_i - \hat\tau_B)^2$. We call this form Bayesian AIPW\index{Bayesian AIPW|textbf}, since every nuisance in it is a posterior mean.
+
+Double robustness is due to Robins, Rotnitzky and Zhao (1994); cross fitted normality is Theorem 5.1 of Chernozhukov et al. (2018).
+
+\begin{theorem}[Double robustness and normality]
+Suppose $c \leq e_0 \leq 1 - c$ for some $c > 0$, and that with probability tending to one every fitted propensity lies in $[c', 1 - c']$ for some fixed $c' > 0$. If either $\hat e$ or $\hat\mu_t$ is consistent and the other converges to some limit, $\hat\tau_B$ is consistent. If both are consistent, at rates $r_n$ and $s_n$ with $r_ns_n = o_p(n^{-1/2})$, then under moment conditions $\sqrt{n}(\hat\tau_B - \tau_0)$ converges in distribution to $N(0, V_0)$ with $V_0$ the semiparametric efficiency bound, and $n$ times the plug in variance estimate converges in probability to $V_0$.
+\end{theorem}
+
+The rates are the assumption, and for the horseshoe we cannot supply them. Known contraction results cover normal means (van der Pas, Kleijn and van der Vaart 2014; van der Pas, Szab\'o and van der Vaart 2017a) and linear regression under conditions on the design; we know of none for a horseshoe logistic regression with random design, which is what the propensity model is. If the propensity were estimated at the rate $(k_e\log p/n)^{1/2}$ and the outcome regressions at $(k_\mu\log p/n)^{1/2}$, with $k_e$ and $k_\mu$ active coefficients, the product condition would read $k_ek_\mu\log^2 p = o(n)$. The simulations below are evidence on whether it holds in their designs, not a proof.
+
+\subsection{A grid of 500 replications}
+
+The companion paper's main simulation\index{simulation study|textbf} crosses the density of the propensity model with the strength of the treatment signal. Each of nine cells has 500 replications with $n = 1{,}000$ units and $p = 100$ independent standard normal covariates. Treatment is Bernoulli with logit $\delta\,k_e^{-1/2}\sum_{j\leq k_e}X_j$ and the outcome is $Y = T + 5^{-1/2}\sum_{j\leq 5}X_j + \varepsilon$ with standard normal $\varepsilon$, so the true effect is one. The first $k_e \in \{5, 25, 50\}$ covariates drive treatment and the first five drive the outcome, so the outcome is sparse in every cell and its five covariates are always among the treatment covariates. The logit has standard deviation $\delta \in \{0.5, 1, 2\}$ whatever $k_e$ is. A larger $k_e$ therefore spreads the same signal over more covariates, each with the smaller coefficient $\delta/\sqrt{k_e}$, which is $0.45\delta$ at $k_e = 5$ and $0.14\delta$ at $k_e = 50$.
+
+Four estimators are compared. OLS regresses $Y$ on $T$ and all 100 covariates, which is correctly specified because the outcome is linear, and it gives no interval here. The other three are DML with the partialling out score, five fold cross fitting and propensities clipped to $[0.01, 0.99]$, and they differ in the learner: a lasso for the outcome with an $\ell_1$ penalized logistic regression for treatment, each with its penalty chosen by fivefold cross validation, a random forest of 200 trees with minimum leaf size 5 for both, or the horseshoe with 600 Gibbs sweeps, 200 of them discarded, and the posterior mean as the fit. An interval is the estimate plus and minus 1.96 sandwich standard errors.
+
+\input{chapters/hbdml_cs_table}
+
+Least squares has the smallest root mean squared error in all nine cells, 0.047 to 0.053 (Table~\ref{tab:hbdml:cs}). It uses the model that generated the data, and no nuisance based estimator should be expected to beat it. The random forest has the largest error in eight cells, and its intervals are of no use here, with coverage from 0.008 to 0.890.
+
+On error the horseshoe is lower in five cells, the three with $k_e = 50$ and the two with $k_e = 25$ and $\delta \leq 1$, and higher in the other four. The differences are modest either way: 0.073 against 0.089 at $k_e = 50$ and $\delta = 0.5$ for the horseshoe, 0.076 against 0.071 at $k_e = 5$ and $\delta = 0.5$ for the lasso. Coverage separates them more. The horseshoe's lies between 0.920 and 0.962, and within two Monte Carlo standard errors (0.009 to 0.012) of 0.95 in seven of the nine cells. The lasso's lies between 0.816 and 0.938 and is below 0.90 in five cells, $k_e = 25$ with $\delta \leq 1$ and $k_e = 50$ at all three values of $\delta$.
+
+The mean errors show where the lasso's shortfall comes from. In the five cells where it undercovers the lasso's mean error is negative, from $-0.035$ to $-0.066$ (Monte Carlo standard error 0.003 to 0.004). In absolute value that is 0.46 to 0.96 of the spread of its estimates, 0.067 to 0.082, and its reported standard errors are a little small as well: 0.064 against a spread of 0.072 at $k_e = 25$ and $\delta = 0.5$. The horseshoe's mean error is negative too, in all nine cells, but smaller, $-0.004$ to $-0.033$, and largest at $\delta = 2$.
+
+ Every cell has a sparse outcome, so the grid is silent about the dense outcome of Design II below, and it leaves out the coupled posterior of this chapter, so it cannot say whether DML with a horseshoe does better or worse than the Bayesian analysis it is meant to complement.
+
+\subsection{Three designs of our own}
+
+The grid uses the Robinson score. We also ran the AIPW form on three designs of our own\index{simulation study!three designs of our own|textbf}, chosen to probe sparse confounding, dense confounding in both equations, and weak overlap. In each, $p = 100$ standard normal covariates, the first $k_e$ drive treatment and outcome through the same index $s = k_e^{-1/2}\sum_{j \leq k_e}X_j$, treatment is Bernoulli with probability $\expit(s)$ and $Y = T + s + \varepsilon$ with standard normal $\varepsilon$. Design I has $k_e = 5$ and $n = 500$. Design II has $k_e = 30$ and $n = 500$, which puts thirty coefficients of $30^{-1/2} \approx 0.18$ in each equation. Design III has $k_e = 10$, treatment probability $\expit(2s)$ and $n = 1{,}000$, and the smallest true propensity in its 200 replications is 0.0001. Bayesian AIPW, with five stratified folds and 600 Gibbs sweeps of which the first 200 are discarded, is compared with the same score and folds under lasso nuisances (an $\ell_1$ penalized logistic propensity and lasso outcome regressions by arm, with penalties chosen by fivefold cross validation) and with least squares on all covariates. With 200 replications per design the Monte Carlo standard error of a coverage near 0.9 is about 0.02, and coverage is printed as a count out of 200.
+
+\input{chapters/baipw_table}
+
+\paragraph{The LaLonde experimental sample.} We applied the same estimators to the 445 units of the randomized National Supported Work sample, with 1978 earnings as the outcome and eight standardized covariates (Table~\ref{tab:baipwlalonde}). This application is ours. Under randomization the experimental difference in means already estimates the average effect; weakly prognostic covariates offer little precision gain.
+
+\input{chapters/baipw_lalonde}
+
+\subsection{Panel data with dropout missing at random}
+
+Consider $Y_{it} = \alpha_i + \tau T_{it} + g(X_{it}) + \varepsilon_{it}$ for unit $i$ in period $t$. Within unit demeaning removes $\alpha_i$, which is DML partialling out with a unit intercept as one of the nuisances, and Clarke and Polselli (2025) extend DML to static panels in this way. Now let units drop out\index{panel data with dropout|textbf}, with $R_{it} = 1$ while unit $i$ is observed in period $t$ and the chance of leaving depending only on the observed history, so that dropout is missing at random\index{missing data!dropout|textbf}\index{missing data}. Rathouz (2004) proved inconsistency under such dropout for conditional maximum likelihood in binary longitudinal fixed effects models: the sufficient statistic from observed periods differs from the complete data one. This does not establish inconsistency for continuous outcomes.
+
+The companion paper weights each observed period by $\hat w_{it} = R_{it}/\hat\pi_{it}$, the inverse of its estimated probability of still being observed from a horseshoe logistic model, and adds an imputation term for the missing periods:
+\[
+\psi_{it} = \hat w_{it}\hat V_{it}(\tilde Y_{it} - \tau\hat V_{it}) - (\hat w_{it} - 1)\hat\mu^{V}_{it},
+\]
+where $\tilde Y_{it}$ and $\hat V_{it}$ are the demeaned outcome and treatment residuals and $\hat\mu^{V}_{it}$ imputes the score for unobserved periods. Our simulation runs the first term only, so the estimator it tests is inverse probability weighted and not augmented. With dropout in the score, products of $\hat\pi - \pi_0$ with the other nuisance errors enter the remainder, among them the error of $\hat\mu^{V}$ against $\mu^{V}_0$, the mean of the score at the true nuisances given the history. So does the squared error of the treatment regression, which the companion paper's statement leaves out: even in the cross section with no dropout, the partialling out score evaluated at the fitted nuisances has expectation $\E(\Delta_m\Delta_\ell) - \tau_0\E(\Delta_m^2)$, where $\Delta_m = \hat m - m_0$ and $\Delta_\ell = \hat\ell - \ell_0$. The condition for root $n$ normality then reads
+\begin{multline*}
+\|\Delta_m\|^2 + \|\Delta_\ell\|\,\|\Delta_m\| \\
++ \|\hat\pi - \pi_0\|\bigl(\|\Delta_\ell\| + \|\Delta_m\| + \|\hat\mu^{V} - \mu^{V}_0\|\bigr) = o_p(n^{-1/2}).
+\end{multline*}
+We have not proved that it suffices for the panel score, and a proof would also have to say on which history $\hat\mu^{V}_{it}$ conditions. As in the cross section, the horseshoe is assumed to meet it.
+
+The simulation has 200 or 1,000 units observed for five periods, $p = 50$ standard normal covariates drawn afresh in every period, and unit effects $\alpha_i \sim N(0,1)$. Treatment is Bernoulli with logit $10^{-1/2}\sum_{j\leq 10}X_{itj}$ and $Y_{it} = \alpha_i + T_{it} + 5^{-1/2}\sum_{j\leq 5}X_{itj} + \varepsilon_{it}$ with standard normal $\varepsilon_{it}$, so $\tau = 1$. We run three conditions: no dropout, and dropout in which a unit still observed in period $t - 1$ leaves before period $t$ with probability $\expit(-2 + 0.5\,Y_{i,t-1})$ (mild, 70 percent of the unit periods observed) or $\expit(-2 + Y_{i,t-1})$ (strong, 60 percent). The hazard depends on an observed outcome, so the data are missing at random.
+
+Four estimators ignore the dropout. Within OLS regresses the demeaned outcome on the demeaned treatment and all 50 demeaned covariates, with no cross fitting. The other three demean within units and then run cross fitted partialling out with least squares, lasso (penalty by fivefold cross validation, folds grouped by unit) or horseshoe (600 sweeps, the first 200 discarded) nuisance regressions, all linear since the demeaned treatment is continuous. Cross fitting is by unit, so a unit's whole history sits in one of five folds, and every standard error is clustered by unit. Units seen in fewer than two periods are dropped before demeaning, for every estimator.
+
+Two further rows weight each unit period by the inverse of its probability of still being observed, in the unit means and in the final weighted partialling out. One estimates the hazard of leaving by a horseshoe logistic regression on the previous outcome (400 sweeps, the first 150 discarded), fitted on the training units only, and the other uses the true hazard as an oracle. In both, each period's hazard is clipped to $[0.01, 0.99]$ and the probability of still being observed is floored at 0.01, so no weight exceeds 100. Each block has 2,000 replications.
+
+\input{chapters/hbdml_panel_table}
+
+Without dropout the four estimators agree (Table~\ref{tab:hbdml:panel}), with root mean squared errors of 0.079 to 0.082 at 200 units and 0.035 at 1,000, and coverage between 0.937 and 0.951.  At 200 units the lasso carries a bias of 0.014 and the horseshoe of $-0.004$, each against a Monte Carlo standard error of about 0.002, and at 1,000 units all biases are within 0.004.
+
+Dropout moves the uncorrected estimators little. Under the mild hazard their biases at 200 units are $-0.003$ (within OLS), 0.016 (lasso) and $-0.012$ (horseshoe), and under the strong one $-0.012$, 0.012 and $-0.023$, against a spread of 0.10 to 0.12 in the estimates. The companion paper says the correction is necessary when dropout depends strongly on past outcomes. Even with a hazard twice as steep this design cannot test that, because the uncorrected estimators have almost no bias to correct.
+
+The weights do not help. The weighted horseshoe has bias $-0.013$ under the mild hazard and $-0.026$ under the strong one, the same sign and size as the uncorrected horseshoe, and its RMSE is 0.112 and 0.174 against 0.101 to 0.109 and 0.112 to 0.126 for the uncorrected rows. At 1,000 units the strong hazard gives 0.082 against 0.051. The weights based on the oracle hazard do no better (bias $-0.027$, RMSE 0.163 at 200 units), so the loss comes from the weights and not from estimating the hazard. They remove no bias and raise the spread of the horseshoe estimate by 7 to 10 percent under the mild hazard and by 40 to 60 percent under the strong one.
+
+With unit clustered standard errors and unit folds the intervals are close to nominal, 0.92 to 0.95 in nearly every row, and the mean reported standard error is 87 to 100 percent of the spread. The exceptions are least squares nuisances at 200 units (0.918 and 0.901) and the two weighted rows at 200 units under the strong hazard, whose standard errors of 0.148 (estimated weights) and 0.141 (oracle hazard) fall short of spreads of 0.172 and 0.161, with coverage 0.930 and 0.926. The undercoverage of an earlier run of this study, 0.89 to 0.91 in every row, came from treating demeaned unit periods as independent and from cross fitting on rows.
+
+
+
+\subsection{What the comparison shows}
+
+Horseshoe nuisances are a reasonable way to put a Bayesian model inside DML, and our numbers support a narrower message than the one we began with. With a sparse outcome they cost a little error when the propensity is sparse too. When it is dense they lower the error a little and keep the intervals near nominal where the lasso's are not. Chapter~\ref{ch:critique} found DML with a horseshoe nuisance the best centred arm in the four of its designs where any procedure covers, and its coverage was above the lasso arm's in all four. In Design II, where the outcome is dense, the horseshoe failed. It was never clearly better than least squares where least squares was correct, and in Design III it left the weights heavier than the lasso did. Three qualifications remain.
+
+First, in its AIPW form it is still a Horvitz Thompson type estimator, and the critique of Section~\ref{sec:weak} applies: H\'ajek and adaptive normalization can reduce its variance further, and a hierarchical model avoids the $1/e$ factor altogether.
+
+Second, it estimates one functional. The posterior behind the horseshoe nuisances already contains the effect on the treated, subgroup effects and quantile effects, and horseshoe DML discards it for a single score.
+
+Third, its guarantees are frequentist and asymptotic, and for the horseshoe they rest on a rate we have not proved. Where the coupled posterior and horseshoe DML agree, as we expect in large samples, either will do. Where they disagree, in small samples or with weak overlap, the disagreement is informative and the posterior locates the uncertainty. No simulation of this section includes the coupled posterior, so none of them says which of the two does better.
+
+\section{In practice}
+
+\paragraph{The target.} The target is $\tau$, or $\tau(x)$ when the treatment coefficient varies with the covariates. Under the coupled horseshoe with a linear outcome model each Gibbs draw gives $\tau^{(s)}$ directly; with a constant coefficient every $\tau_Q$ equals $\tau$, and with a varying one the posterior of $\tau_Q$ follows by averaging $\tau^{(s)}(x)$ over $Q$ within each draw. With a binary outcome the coefficient is a log odds ratio, and a constant one still gives a risk difference that changes with $Q$: each draw gives the two fitted risks of every unit, and $\tau_Q$ is their difference averaged over $Q$, as in Chapter~\ref{ch:mccullagh}. Fitting the treatment and outcome models jointly, as the shared scale prior of Section~\ref{sec:sharedsim} does, carries uncertainty about which covariates are confounders into every reported interval; the propensity covariate posterior conditions on a fitted treatment regression and does not.
+
+\paragraph{What the analyst does differently.} The analyst fits two models, the treatment model and the outcome model, and couples them before looking at $\tau$. The coupling is a choice to be stated, and instruments decide it. When instruments are unlikely and $p$ is well below $n$, a propensity covariate $\hat m(X)$ with a flat prior, fitted once on the whole sample and not cross fitted, lowered the bias and the error of the independent horseshoe (Section~\ref{sec:ricsim}). When pure instruments may be among the covariates, or $p$ is close to or above $n$, do not assume that coupling pays (Section~\ref{sec:sharedsim}). The global scale is set from a stated guess $p_0$ at the number of relevant covariates, and the posterior of $m_{\mathrm{eff}}$ is reported with it. The posterior of $c_{\mathrm{eff}}$ is reported too, and a count near zero is a reason to compare with the unadjusted estimate rather than to celebrate. The treatment coefficient gets a flat prior, never a shrinkage prior; with a binary outcome, where separation can leave the posterior under a flat prior improper, a wide proper normal prior takes its place. One run of the Gibbs sampler of this chapter then gives the posterior of $\tau$ and of any subgroup or population version of it. When only one functional is wanted, the sample is large, the outcome is believed sparse and the report needs DML's frequentist guarantee, the analyst can run DML with horseshoe nuisances (Section~\ref{sec:baipw}) in place of the coupled posterior; in a sample that large we expect the two to agree.
+
+\paragraph{Against DML.} DML and the coupled horseshoe attack the same mechanism, nuisance shrinkage leaking into the target, by different means. DML orthogonalizes the score and cross fits; the horseshoe makes the leak small by tail robustness and, with 50 covariates, smaller still by coupling, with no sample splitting and with a posterior that DML does not produce. On accuracy DML won with five strong confounders, by more as $p$ grew (Section~\ref{sec:ricsim}), and the harder designs of Chapter~\ref{ch:critique} ($n = 300$, $p = 400$) point the same way (Section~\ref{sec:crit:bayes}). With thirty weak confounders at $p = 150$ the coupled posterior won, with RMSE 0.113 against 0.126 and coverage 0.944 against 0.756. DML is not wrong, only incomplete: it returns one functional and an interval, and the posterior returns the rest. Section~\ref{sec:dml:practice} lists four conditions under which one functional is enough and DML is the right tool. Dense confounding is the hard case for both. With thirty weak confounders in the outcome equation as well as the treatment equation (Design II of Section~\ref{sec:baipw}) horseshoe nuisances inside DML were biased by 0.33 and covered in 39 of 200 replications, and in the dense design of Chapter~\ref{ch:critique} no procedure covered. There least squares is the safer choice when the outcome is linear and $p$ is well below $n$; when $p$ exceeds $n$ that chapter's advice is to report no interval. The design with thirty weak confounders of Section~\ref{sec:ricsim} is the one exception we have for the coupled posterior: it covered 0.944 with intervals shorter than those of least squares.
+
+DML with a horseshoe nuisance needs several sampler runs, and Section~\ref{comp:sec:engine} gives the cost comparison. We use the coupled horseshoe in the rest of the book for the posterior it returns, which answers the questions that a decision needs.
+
+\section*{Notes}
+
+Polson and Scott (2011) built the theory of global local priors on the horseshoe. For Tweedie's formula see Efron (2011), and for the tail robustness theorem, with its condition on the derivative of the prior density, Polson and Sokolov (2026b), the paper behind Chapter~\ref{ch:critique}. Bhadra, Datta, Polson and Willard (2019) survey the lasso and the horseshoe.
+
+The minimax rate over nearly black vectors is due to Donoho, Johnstone, Hoch and Stern (1992). Van der Pas, Szab\'o and van der Vaart (2017b) show that credible sets enlarged by a constant factor have good coverage under an excessive bias restriction. Appendix~\ref{app:guarantees} states these results and the predictive risk, citing Mukherjee and Johnstone (2015) and Zhai and Ro\v{c}kov\'a (2026).
+
+The Notes of Chapter~\ref{ch:computation} give the samplers for $p > n$ and the Polya Gamma augmentation. For spike and slab priors in regression, Castillo, Schmidt Hieber and van der Vaart (2015) prove a Bernstein von Mises theorem. Orthogonal scores are due to Neyman (1959).
+
+Elsewhere, Section~\ref{iv:sec:many} uses a horseshoe first stage for many instruments, Chapter~\ref{ch:bart} treats BART and Bayesian causal forests, and Chapter~\ref{ch:did} the horseshoe in difference in differences.
+
+\begin{exercises}
+\item\label{ex:ch07:1} Derive the horseshoe prior density $\pi(\beta)$ in terms of the exponential integral, and verify that it is bounded above and below by multiples of $\log(1 + 4/\beta^2)$ and $\log(1+2/\beta^2)$.
+\item\label{ex:ch07:2} Using \eqref{eq:tweedie}, show that a Laplace prior leads to constant shrinkage of size $\lambda$ for large $y$, and that a normal prior leads to shrinkage growing linearly in $y$.
+\item\label{ex:ch07:3} Check numerically that $y - \E(\beta \mid y) \approx 2/y$ for the horseshoe at $y = 6, 8, 10$.
+\item\label{ex:ch07:4} Derive the full conditionals of the Makalic and Schmidt sampler from the inverse gamma mixture representation of the half Cauchy.
+\item\label{ex:ch07:5} Under the shared scale prior \eqref{eq:shared}, write the full conditional of $\lambda_j^2$ and show that it depends on both $\beta_j$ and $\gamma_j$.
+\item\label{ex:ch07:6} Prove the Frisch, Waugh and Lovell step in the proof of the propensity covariate proposition: the coefficient of $T$ in a regression on $T$ and $\hat m(X)$ equals the coefficient in the regression on $\tilde T$.
+\item\label{ex:ch07:7} Simulate the partially linear model with $n = 200$ and $p = 50$ standard normal covariates, five of them moderate confounders ($\beta_j = \gamma_j = 0.5$), and compare the bias of the independent and shared scale horseshoe posteriors. Repeat after adding five instruments ($\gamma_j = 1$, $\beta_j = 0$) and five prognostic covariates ($\beta_j = 1$, $\gamma_j = 0$). Take $\tau = 1$, standard normal errors and 200 data sets.
+\item\label{ex:ch07:8} Compare the prior on the shrinkage coefficient $\kappa_j$ under the horseshoe plus prior with the Beta$(1/2, 1/2)$ prior of the horseshoe, and say how the difference changes the shrinkage of a null coefficient and of a confounder when there are thousands of covariates and one or two confounders.
+
+\item\label{ex:chbaipw:1} Show that the augmented score with horseshoe nuisances is Neyman orthogonal, and that its orthogonality does not depend on how the nuisances were estimated.
+\item\label{ex:chbaipw:2} Expand the augmented panel score around the true nuisances and find the cross products of nuisance errors in its remainder. Do they give the terms of the displayed condition, which we have not proved?
+\item\label{ex:chbaipw:3} Construct an example with overlap $0.05 \leq e_0 \leq 0.95$ in which the horseshoe posterior mean propensity for some unit falls below $0.01$ in a sample of size 200, showing that the bound $[c', 1 - c']$ on the fitted propensities in the theorem cannot hold almost surely in finite samples.
+\item\label{ex:chbaipw:4} Replace the Horvitz Thompson weights in Bayesian AIPW by H\'ajek normalized weights within each fold and compare the variance in Design III.
+\end{exercises}

@@ -1,0 +1,26 @@
+\begin{table}[ht]
+\centering
+\caption{Cross section grid of the companion simulation: $n = 1000$, $p = 100$, true effect 1, 500 replications per cell. Treatment is Bernoulli with logit $\delta\,k_e^{-1/2}\sum_{j\le k_e}X_j$ and the outcome is $Y = T + 5^{-1/2}\sum_{j\le 5}X_j + \varepsilon$. OLS is least squares of $Y$ on $T$ and all 100 covariates, which is correctly specified here and gives no interval. Lasso, RF and HS are DML with the partialling out score, five fold cross fitting, and lasso, random forest or horseshoe nuisance models. Bias is the mean error, RMSE the root mean squared error, and coverage that of nominal 95\% intervals, whose Monte Carlo standard error is about 0.01 near 0.93.}
+\label{tab:hbdml:cs}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{rrrrrrrrrrr}
+\toprule
+ & & \multicolumn{2}{c}{Bias} & \multicolumn{4}{c}{RMSE} & \multicolumn{3}{c}{Coverage} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-8}\cmidrule(lr){9-11}
+$k_e$ & $\delta$ & Lasso & HS & OLS & Lasso & RF & HS & Lasso & RF & HS \\
+\midrule
+5 & 0.5 & $-$0.008 & $-$0.004 & 0.048 & 0.071 & 0.166 & 0.076 & 0.914 & 0.442 & 0.934 \\
+ & 1 & 0.006 & $-$0.009 & 0.050 & 0.071 & 0.245 & 0.079 & 0.938 & 0.106 & 0.936 \\
+ & 2 & 0.023 & $-$0.013 & 0.053 & 0.085 & 0.354 & 0.094 & 0.932 & 0.008 & 0.940 \\
+\addlinespace
+25 & 0.5 & $-$0.051 & $-$0.009 & 0.049 & 0.088 & 0.102 & 0.078 & 0.820 & 0.834 & 0.928 \\
+ & 1 & $-$0.035 & $-$0.010 & 0.048 & 0.082 & 0.153 & 0.076 & 0.884 & 0.558 & 0.962 \\
+ & 2 & 0.006 & $-$0.027 & 0.052 & 0.089 & 0.216 & 0.096 & 0.912 & 0.218 & 0.922 \\
+\addlinespace
+50 & 0.5 & $-$0.058 & $-$0.009 & 0.047 & 0.089 & 0.088 & 0.073 & 0.832 & 0.890 & 0.948 \\
+ & 1 & $-$0.066 & $-$0.012 & 0.048 & 0.096 & 0.119 & 0.078 & 0.816 & 0.758 & 0.932 \\
+ & 2 & $-$0.065 & $-$0.033 & 0.048 & 0.105 & 0.168 & 0.091 & 0.854 & 0.464 & 0.920 \\
+\bottomrule
+\end{tabular}
+\end{table}

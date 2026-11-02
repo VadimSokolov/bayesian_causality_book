@@ -1,0 +1,31 @@
+% comp 05: the algorithm and what it costs; phase 2 rewrite of the moved m14 and m16 text
+\section{The algorithm and what it costs}\label{comp:sec:algorithm}\label{gbc:sec:algorithm}
+
+Everything the network knows about the model comes from simulations: the algorithm\index{generative Bayesian computation!algorithm|textbf} is a table of simulated pairs and one regression on it.
+
+\begin{enumerate}[leftmargin=*]
+\item \emph{Simulate.} For $j=1,\dots,J$, draw $\theta^{(j)}$ from the prior and a data set $D^{(j)}$ from the model at $\theta^{(j)}$.
+\item \emph{Summarize.} Compute $s^{(j)}=S(D^{(j)})$ for every simulated data set, with the code later applied to the observed data.
+\item \emph{Train.} Draw levels $u_j$ uniformly on $(0,1)$ and fit $f_\phi$ by minimizing the check loss \eqref{gbc:eq:pinball} over the triples $(\theta^{(j)},u_j,s^{(j)})$, coordinate by coordinate in triangular order if $\theta$ is a vector (Section~\ref{gbc:sec:qnn}).
+\item \emph{Infer.} Compute $s=S(D^{\mathrm{obs}})$, draw $U_1,\dots,U_R$ uniformly and return $\theta^{(r)}=f_\phi(U_r,s)$. For a vector $\theta$, draw an independent uniform for each coordinate and evaluate the maps in triangular order, each given the coordinates already drawn.
+\end{enumerate}
+
+The $R$ draws approximate the posterior of $\theta$ given $S=s$ (Section~\ref{comp:sec:summaries}); they follow it exactly only if $f_\phi$ is the conditional quantile function, and Section~\ref{comp:sec:checks} says how to test how close it is. 
+
+Training costs $C_{\mathrm{train}}$ for steps 1 to 3; step 4 costs $C_{\mathrm{net}}$ per data set, including $R$ forward passes. A sampler costs $C_{\mathrm{mcmc}}$ per data set. The network is cheaper for $n_{\mathrm{sets}}$ data sets when
+\[
+C_{\mathrm{train}} + n_{\mathrm{sets}}\,C_{\mathrm{net}} < n_{\mathrm{sets}}\,C_{\mathrm{mcmc}}
+\quad\Longleftrightarrow\quad
+n_{\mathrm{sets}} > \frac{C_{\mathrm{train}}}{C_{\mathrm{mcmc}} - C_{\mathrm{net}}},
+\]
+which is close to $C_{\mathrm{train}}/C_{\mathrm{mcmc}}$ when a forward pass costs far less than a chain.
+
+The ten networks of Section~\ref{comp:sec:horseshoe} each took more than an hour to train, so $C_{\mathrm{train}}>10\times3{,}600=36{,}000$ seconds. Break-even is about 57{,}000 data sets at 0.63 seconds per horseshoe fit, 116{,}000 at 0.31 seconds (Section~\ref{comp:sec:cost}) and 440{,}000 at 0.081 seconds (40.6 seconds for 500 data sets, Section~\ref{comp:sec:horseshoe}), or more. The timings come from different machines, so these are orders of magnitude: the sampler wins unless there are at least tens of thousands of data sets.
+
+
+
+For a new $s$, rejection ABC\index{approximate Bayesian computation|textbf}\index{ABC|see{approximate Bayesian computation}} keeps the fraction $a$ of the stored summaries nearest to $s$ and reads the posterior off their $\theta^{(j)}$. That is a local, nearest neighbour estimate of the conditional quantile function at $s$ that needs a tolerance and discards $(1-a)J$ simulations at every data set. The network is one global fit to all $J$ pairs. For rejection ABC with the tolerance balanced against Monte Carlo variance, the expected quadratic loss of the posterior mean exceeds its limit by a term of order $J^{-4/(4+k)}$ in the summary dimension $k$ (Fearnhead and Prangle 2012).  No theorem covers a network trained at random levels by stochastic gradient descent, so we claim no advantage in rate.
+
+A network is trusted only where it has seen summaries: outside the simulated region, or where simulations are sparse, it extrapolates and the training loss does not flag it (Section~\ref{comp:sec:checks}).
+
+

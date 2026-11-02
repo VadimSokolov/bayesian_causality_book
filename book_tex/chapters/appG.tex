@@ -1,0 +1,271 @@
+\newcommand{\pgqmin}{0.82}
+\newcommand{\pgqmax}{1.73}
+\newcommand{\pgkmin}{0.16}
+\newcommand{\pgkmax}{0.38}
+\chapter{Posterior Guarantees}\label{app:guarantees}
+
+A Bayesian analysis is coherent by construction, but coherence says nothing about whether the posterior is close to the truth when the data come from a fixed distribution. This appendix collects the frequentist guarantees\index{posterior guarantees|textbf} behind the book's methods. Results from the literature are stated with references; corollaries derived here are proved.
+
+\section{Posterior concentration}\label{pg:sec:contraction}
+
+Let $X^{(n)}$ have density $p_\theta^{(n)}$, let the truth be $\theta_0$, let $d$ be a metric on the parameter space and let $\Pi$ be a prior. The posterior contracts\index{posterior contraction} at rate $\varepsilon_n\to0$ if, for every $M_n\to\infty$,
+\[
+\E_{\theta_0}\Pi\bigl(\theta: d(\theta,\theta_0) > M_n\varepsilon_n \bigm| X^{(n)}\bigr)\to 0 .
+\]
+
+In the sequence models below the dimension grows with $n$, and rates are stated for the unnormalized Euclidean distance, which need not tend to zero: the horseshoe rate $\sigma\sqrt{p_n\log(n/p_n)}$, for instance, is the rate $\sigma\sqrt{(p_n/n)\log(n/p_n)}$ for the distance $n^{-1/2}\lVert\theta-\theta_0\rVert_2$.
+
+\begin{theorem}[Ghosal, Ghosh and van der Vaart 2000, Theorem 2.1]\label{pg:thm:ggv}
+For independent and identically distributed observations\index{Ghosal Ghosh van der Vaart theorem}, let $d$ be the Hellinger distance\index{Hellinger distance|textbf} and let $\varepsilon_n\to0$ with $n\varepsilon_n^2\to\infty$. Suppose there are sets $\Theta_n$ and a constant $C>0$ with
+\begin{enumerate}[label=(\roman*)]
+\item $\log D(\varepsilon_n,\Theta_n,d)\le n\varepsilon_n^2$, where $D$ is the packing number;
+\item $\Pi(\Theta\setminus\Theta_n)\le e^{-(C+4)n\varepsilon_n^2}$;
+\item $\Pi\bigl(\theta: K(\theta_0,\theta)\le\varepsilon_n^2,\ V(\theta_0,\theta)\le\varepsilon_n^2\bigr)\ge e^{-Cn\varepsilon_n^2}$,
+\end{enumerate}
+where $K$ is the Kullback and Leibler divergence\index{Kullback Leibler divergence|textbf} and $V$ the second moment of the log likelihood ratio. Then for $M$ large enough the posterior probability of $\{\theta: d(\theta,\theta_0)\ge M\varepsilon_n\}$ tends to zero in probability: the posterior contracts at rate $\varepsilon_n$.
+\end{theorem}
+
+The conditions bound model size\index{Ghosal Ghosh van der Vaart theorem|textbf}, make prior mass outside $\Theta_n$ negligible, and require enough mass near the truth (the prior mass condition\index{prior mass condition|textbf}). For a regular parametric model with a prior density continuous and positive at $\theta_0$, the rate is $n^{-1/2}$ up to a logarithm. Ro\v{c}kov\'a and van der Pas (2020, Theorem 5.1) obtain adaptive near minimax rates for H\"older smooth regression functions of smoothness at most one, verifying such conditions for a modified Bayesian additive regression tree prior in the fixed design empirical norm (Chapter~\ref{ch:bart}). Ghosal and van der Vaart (2017) give the general theory.
+
+A contraction rate for a regression surface implies a rate for any functional Lipschitz in the same metric. For the accounting functional $\tau_Q = \int(\mu_1 - \mu_0)\,dQ$ of Chapter~\ref{ch:mccullagh}, with $Q$ a probability law, write $\mu_{t,0}$ and $\tau_{Q,0}$ for the true surfaces and effect. The Cauchy and Schwarz inequality gives
+\[
+\lvert\tau_Q-\tau_{Q,0}\rvert\le\lVert\mu_1-\mu_{1,0}\rVert_{L^2(Q)}+\lVert\mu_0-\mu_{0,0}\rVert_{L^2(Q)},
+\]
+so if both surfaces contract at rate $\varepsilon_n$ in $L^2(Q)$, the posterior of $\tau_Q$ concentrates at rate $2\varepsilon_n$. For nonparametric surfaces this bound is slower than $n^{-1/2}$, and a sharper rate for the average effect needs a separate, semiparametric, theory (Section~\ref{pg:sec:bvm}).
+
+\section{Bernstein von Mises theorems}\label{pg:sec:bvm}
+
+\paragraph{The parametric case.} In a correct regular parametric model, the Bernstein von Mises theorem\index{Bernstein von Mises theorem} makes credible intervals for smooth accounting functionals with nonzero gradient at the truth asymptotically confidence intervals of the same level (Appendix~\ref{app:theory}).
+
+\paragraph{Misspecification.} The guarantee\index{Bernstein von Mises theorem!misspecified models|textbf} assumes a correct model\index{misspecified model|textbf}\index{misspecification|see{misspecified model}}. What happens when it fails is known precisely.
+
+\begin{theorem}[Kleijn and van der Vaart 2012, Theorems 2.1 and 3.1]\label{pg:thm:misspec}
+Let the observations be independent with law $P_0$ not in the model $\{p_\theta\}$, and let $\theta^\ast$ minimize the Kullback and Leibler divergence from $P_0$ to the model, writing $\dot\ell_\theta$ and $\ddot\ell_\theta$ for the first and second derivatives of $\log p_\theta$ in $\theta$ for one observation, with $V_{\theta^\ast} = -\E_{P_0}\ddot\ell_{\theta^\ast}$ nonsingular. For a prior with a density continuous and positive in a neighbourhood of $\theta^\ast$, under the smoothness and integrability conditions of their Theorem 3.1, which give local asymptotic normality at $\theta^\ast$, and the existence for every $\epsilon>0$ of tests that separate $\theta^\ast$ from $\{\theta:\lVert\theta-\theta^\ast\rVert\ge\epsilon\}$ in their misspecified sense, the posterior satisfies\index{Bernstein von Mises theorem!misspecified models}
+\[
+\bigl\lVert\Pi(\sqrt n(\theta-\theta^\ast)\in\cdot\mid X^{(n)}) - N\bigl(\Delta_n, V_{\theta^\ast}^{-1}\bigr)\bigr\rVert_{\mathrm{TV}}\to0
+\]
+in $P_0$ probability, where $\Delta_n$ converges in distribution to $N(0, V_{\theta^\ast}^{-1}W_{\theta^\ast}V_{\theta^\ast}^{-1})$ with $W_{\theta^\ast} = \E_{P_0}\dot\ell_{\theta^\ast}\dot\ell_{\theta^\ast}^\top$.
+\end{theorem}
+
+The posterior concentrates at $\theta^\ast$, the minimizer of the reverse divergence $\KL(P_0\,\|\,p_\theta)$ of Theorem~\ref{gr:thm:isanov}, so an accounting functional concentrates at $\psi(\theta^\ast)$, the true causal quantity only if the misspecification leaves it untouched. The posterior spread is $V^{-1}$ while the sampling spread of the centre is the sandwich $V^{-1}WV^{-1}$, so credible intervals are miscalibrated unless the two agree.
+
+\begin{corollary}\label{pg:cor:sandwich}
+Under the conditions of Theorem~\ref{pg:thm:misspec}, for a continuously differentiable $\psi$ with $g = \nabla\psi(\theta^\ast)\neq0$ and $W_{\theta^\ast}$ nonsingular, the asymptotic coverage of the equal tailed credible interval\index{credible interval!frequentist coverage of} of level $1-\alpha$ for $\psi(\theta^\ast)$ is $2\Phi(z_{\alpha/2}\,r)-1$, where $r^2 = g^\top V^{-1}g\,/\,g^\top V^{-1}WV^{-1}g$\index{sandwich variance} and $z_{\alpha/2}$ is the upper $\alpha/2$ normal quantile.
+\end{corollary}
+\begin{proof}
+By the delta method the posterior of $\sqrt n\{\psi(\theta)-\psi(\theta^\ast)\}$ is asymptotically $N(g^\top\Delta_n, g^\top V^{-1}g)$, so up to negligible terms the credible interval covers $\psi(\theta^\ast)$ exactly when $\lvert g^\top\Delta_n\rvert\le z_{\alpha/2}(g^\top V^{-1}g)^{1/2}$. Since $g^\top\Delta_n$ is asymptotically $N(0, g^\top V^{-1}WV^{-1}g)$, the limiting coverage is $2\Phi(z_{\alpha/2}r)-1$.
+\end{proof}
+
+For grouped binomial logistic counts with the correct mean and common overdispersion factor $\phi>1$, $W=\phi V$, so $r=\phi^{-1/2}<1$ and credible intervals for the average effect undercover. Remedies are flexible models with small misspecification (Chapters~\ref{ch:horseshoe} and \ref{ch:bart}), posterior predictive checks, and comparing posterior spread with sandwich or bootstrap spread for the functional.
+
+\paragraph{Semiparametric models.} With a nonparametric outcome surface, the average effect needs a semiparametric theorem. Castillo and Rousseau (2015) give general conditions. For the mean of a binary outcome in one treatment arm, Ray and van der Vaart (2020) obtain a Bernstein von Mises theorem at the efficient variance under weaker smoothness with a propensity dependent prior direction than without it (Appendix~\ref{app:theory}). For high dimensional linear regression with spike and slab selection priors, Castillo, Schmidt Hieber and van der Vaart (2015) show, under conditions on the design, the sparsity and the prior, that the posterior is close to a mixture of normal laws over candidate models (their Theorem~6). When the nonzero coefficients are large enough to be selected, it is close to one normal law on the true model (their Corollary~2), so credible sets for those coefficients are confidence sets. The corresponding theorem for the horseshoe in regression, and for the coupled horseshoe of Chapter~\ref{ch:horseshoe}, is open (Chapter~\ref{ch:open}).
+
+\paragraph{Computed posteriors.} These guarantees concern the exact posterior $\Pi_n$. Let $\widetilde\Pi_n$ be the approximation computed by Generative Bayesian Computation (Polson and Sokolov 2026a), the quantile network of Chapter~\ref{ch:computation}, and let $\delta_n$ be their Wasserstein distance for the cost $d$, the infimum of $\E\,d(\theta,\tilde\theta)$ over couplings with marginals $\Pi_n$ and $\widetilde\Pi_n$. The triangle inequality and Markov's inequality give
+\[
+\widetilde\Pi_n\{d(\theta,\theta_0)>M\varepsilon_n\}\le\Pi_n\{d(\theta,\theta_0)>M\varepsilon_n/2\}+\frac{2\delta_n}{M\varepsilon_n}.
+\]
+So the computed posterior contracts at the rate of the exact one when $\delta_n/\varepsilon_n$ is bounded in probability. For a scalar functional $\psi$, let $\delta_n^\psi$ be the Wasserstein distance between its two posterior laws for the absolute difference; this controls the law of $\psi$, not the joint posterior of $\theta$. Coupling the exact quantiles $Q_n$ and the learned quantiles $\widehat Q_n$ at the same uniform level gives $\delta_n^\psi\le\int_0^1\lvert\widehat Q_n(u)-Q_n(u)\rvert\,du$. Coverage asks for more. If the exact posterior of $\psi$ satisfies a Bernstein von Mises theorem with a nondegenerate normal limit and $\sqrt n\,\delta_n^\psi\to0$ in probability, the computed posterior of $\psi$ has the same normal limit, and its equal tailed credible intervals have the same asymptotic coverage. Both distances are measured from the posterior given the full data, so they include what a summary discards as well as the training error (Section~\ref{comp:sec:summaries}). How fast a finite training run reaches these accuracies is open (Chapter~\ref{ch:open}).
+
+\section{The horseshoe in the sparse normal means model}\label{pg:sec:hs}
+
+The sharpest results for the horseshoe are in the sequence model\index{sparse normal means model|textbf}
+\[
+X_i = \theta_i + \sigma\varepsilon_i,\qquad \varepsilon_i\sim N(0,1)\ \text{independent},\qquad i = 1,\dots,n,
+\]
+with $\theta_0$ in the nearly black class\index{nearly black vector|textbf} $\ell_0[p_n] = \{\theta: \#\{i:\theta_i\neq0\}\le p_n\}$ and $p_n = o(n)$. The minimax squared error risk over this class is
+\[
+\inf_{\hat\theta}\sup_{\theta\in\ell_0[p_n]}\E_\theta\lVert\hat\theta-\theta\rVert^2 = 2\sigma^2p_n\log(n/p_n)\{1+o(1)\}
+\]
+(Donoho, Johnstone, Hoch and Stern 1992). The horseshoe prior is $\theta_i\mid\lambda_i,\gscale\sim N(0,\sigma^2\lambda_i^2\gscale^2)$ with $\lambda_i$ independent standard half Cauchy.
+
+\begin{theorem}[van der Pas, Kleijn and van der Vaart 2014, Theorems 3.1 and 3.3]\label{pg:thm:hs}
+As $n\to\infty$ and $\gscale\to0$, with $p_n\to\infty$ and $p_n = o(n)$, the posterior mean $\hat\theta_{\gscale}$ satisfies
+\[
+\sup_{\theta_0\in\ell_0[p_n]}\E_{\theta_0}\lVert\hat\theta_{\gscale}-\theta_0\rVert^2 \lesssim \sigma^2\Bigl\{p_n\log\frac1{\gscale} + (n-p_n)\,\gscale\sqrt{\log\frac1{\gscale}}\Bigr\}.
+\]
+In particular, let $\gscale = (p_n/n)^\alpha$ with $\alpha\ge1$. Then
+\[
+\sup_{\theta_0\in\ell_0[p_n]}\E_{\theta_0}\lVert\hat\theta_{\gscale}-\theta_0\rVert^2 \lesssim \sigma^2 p_n\log(n/p_n),
+\]
+and the posterior contracts around $\theta_0$ at the same rate: for every $M_n\to\infty$,
+\[
+\sup_{\theta_0\in\ell_0[p_n]}\E_{\theta_0}\Pi\bigl(\theta:\lVert\theta-\theta_0\rVert^2 > M_n\sigma^2 p_n\log(n/p_n)\bigm| X\bigr)\to0 .
+\]
+\end{theorem}
+The summed posterior variance obeys the same bound as the squared error of the mean (their Theorem 3.2), and it is of exactly that order when $\gscale$ is of order $(p_n/n)\sqrt{\log(n/p_n)}$ (their Theorems 3.4 and 3.5); with $\alpha>1$ it can be of smaller order than the squared error of the centre, so the posterior can be overconfident there.
+
+Thus the horseshoe estimator is minimax up to a constant over nearly black vectors\index{horseshoe prior!minimax rate}, and the whole posterior, not only its mean, concentrates at the minimax rate\index{minimax rate}.
+
+\begin{theorem}[van der Pas, Szab\'o and van der Vaart 2017a, Theorems 3.1, 3.2 and 3.7]\label{pg:thm:adaptive}
+Let $p_n\to\infty$ with $p_n/n\to0$. If $\gscale$ is replaced by its marginal maximum likelihood estimate restricted to $[1/n,1]$, or is given a hyperprior\index{hyperprior|textbf} supported in $[1/n,1]$ that puts mass at least $e^{-cp_n}$ on an interval $[t_n/2,t_n]$ around the oracle scale $t_n\asymp(p_n/n)\sqrt{\log(n/p_n)}$, the posterior contracts at the near minimax rate $p_n\log n$ for the squared Euclidean distance, uniformly over $\ell_0[p_n]$ and adaptively\index{adaptivity|textbf} in $p_n$; the rate is within a constant of the minimax rate $p_n\log(n/p_n)$ when $p_n\le n^\beta$ for some $\beta<1$. A half Cauchy truncated to $[1/n,1]$ satisfies the mass condition when $p_n\ge C\log n$; under weaker conditions on the hyperprior an extra logarithmic factor appears.
+\end{theorem}
+
+\paragraph{Credible sets.} Van der Pas, Szab\'o and van der Vaart (2017b, Theorems 2.1, 2.2, 4.2 and 4.5) show that credible balls from the horseshoe posterior, with empirical Bayes or hierarchical $\gscale$ and with the radius enlarged by a sufficiently large constant factor, have honest frequentist coverage over parameters that satisfy an excessive bias restriction, which limits how much signal can sit undetected below the detection boundary\index{detection boundary|textbf} $\sigma\sqrt{2\log(n/p_n)}$; self-similar parameters, in which a fixed fraction of the nonzero means lie a constant factor above the boundary, satisfy it. Marginal credible intervals, centred at the posterior mean and enlarged in the same way, cover most coordinates that are zero or of order $\sigma\gscale$, far below the smallest signal in Figure~\ref{pg:fig:hs}, and most coordinates well above the boundary, but fail for signals of intermediate size below it. Such signals are shrunk substantially and the intervals do not widen enough to compensate: the frequentist shadow of the moderate confounders of Chapter~\ref{ch:horseshoe}, where shrinkage bias is largest near the detection boundary.
+
+\paragraph{Tail robustness.} Appendix~\ref{app:theory} proves the horseshoe's vanishing shrinkage, of order $\sigma^2/\lvert x\rvert$ for large observations; its pole at zero strongly shrinks small observations. A prior with exponential tails, such as the Laplace prior of the Bayesian lasso\index{Bayesian lasso|textbf}, shrinks large observations by a constant, and its full posterior contracts at a suboptimal rate even though its mode, the lasso, attains the near minimax rate (Castillo, Schmidt Hieber and van der Vaart 2015).
+
+Figure~\ref{pg:fig:hs} illustrates Theorem~\ref{pg:thm:hs} with $n = 2{,}000$, noise standard deviation one, $\gscale = p_n/n$ held fixed, and nonzero means equal to $1.5\sqrt{2\log(n/p_n)}$. The top left panel uses $p_n = 5, 10, 20, 40, 80$ and 160 with 500 replications each; the posterior mean is computed by numerical integration over the local scale on a logarithmic grid of 1,200 points from $10^{-4}$ to $10^4$. The top right panel uses $p_n = 5$, 20 and 80, with 500 replications, each evaluated at the six noise variances $0.5, 0.6, \ldots, 1.0$, and evaluates the integral of Theorem~\ref{pg:thm:glx} by the trapezoid rule. The squared error risk of the horseshoe posterior mean, divided by $p_n\log(n/p_n)$, stays between \pgqmin\ and \pgqmax\ as $p_n$ ranges from 5 to 160, below the asymptotic minimax constant of 2 at this signal size (Monte Carlo standard errors at most 0.03).
+
+The bottom panels check the credible sets in the same model, with $p_n = 5$, 20 and 80 nonzero means equal to $a\sqrt{2\log(n/p_n)}$ for $a = 0.25, 0.5, \ldots, 2.5$ and 500 replications for each $a$. The global scale is fixed at its oracle value $\gscale = p_n/n$ rather than estimated. The ball is centred at the posterior mean, with radius $L$ times the 0.95 quantile of the distance of 400 posterior draws from it.
+
+The 95 percent credible ball ($L=1$) covers the truth in at most half the replications for $0.75\le a\le1.25$ when $p_n=5$ or 20 and $0.75\le a\le1.75$ when $p_n=80$; coverage is zero for $p_n=80$ and $0.75\le a\le1.25$. For $a\le 0.5$ and $a\ge 2.25$ it covers in at least 99 percent. The ball with twice the radius covers in every replication of every design, in line with the enlarged balls of van der Pas, Szab\'o and van der Vaart (2017b), whose result is for an estimated or hierarchical $\gscale$.
+
+Central 95 percent marginal intervals for the nonzero means, not enlarged, never reach their nominal level. They cover 1 to 50 percent of these coordinates for $a\le 1$ and 89 to 94 percent for $a\ge 2$, so they fail for the smallest signals as well as for those of intermediate size.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{fig_hs_theory.pdf}
+\caption{The horseshoe in the sparse normal means model, $n = 2{,}000$, 500 replications per point, with error bars of one Monte Carlo standard error. Top left: squared error risk of the posterior mean divided by $p_n\log(n/p_n)$, with the asymptotic minimax constant 2. Top right: Kullback and Leibler risk of the horseshoe predictive density, computed through the identity of Theorem~\ref{pg:thm:glx}, divided by $p_n\log(n/p_n)$, with the constant $1/2$ of the exact minimax risk (dashed). Bottom left: coverage of the 95 percent credible ball at its own radius ($L=1$, solid) and at twice it ($L=2$, dashed) against the signal size $a$, for $p_n = 5$, 20 and 80. Bottom right: coverage of central 95 percent posterior intervals for the nonzero means. The dotted lines mark 0.95.}
+\label{pg:fig:hs}
+\end{figure}
+
+\section{Predictive densities}\label{pg:sec:pred}
+
+Counterfactual prediction\index{counterfactual!prediction} is predictive density estimation\index{predictive density estimation|textbf}: the missing potential outcome of a treated unit, or the untreated outcome of a treated cohort after adoption, is a future observation to predict. The natural loss is the Kullback and Leibler divergence\index{Kullback Leibler divergence} between the true density of the future observation and the predictive density.
+
+Let $X\sim N_n(\mu, v_x I)$ be observed and $Y\sim N_n(\mu, v_yI)$ be a future observation, independent given $\mu$. For a prior $\pi$ write $\hat p_\pi(y\mid x) = \int\phi(y;\mu,v_yI)\,\pi(\mu\mid x)\,d\mu$ for the Bayes predictive density, and
+\[
+R_{\mathrm{KL}}(\mu,\hat p_\pi) = \E_\mu\int\phi(y;\mu,v_yI)\log\frac{\phi(y;\mu,v_yI)}{\hat p_\pi(y\mid X)}\,dy .
+\]
+For $v>0$ let $\hat\mu_{\pi,v}$ be the posterior mean of $\mu$ based on $W\sim N_n(\mu,vI)$, with quadratic risk $R_Q(\mu,\hat\mu_{\pi,v}) = \E_\mu\lVert\hat\mu_{\pi,v}(W)-\mu\rVert^2$.
+
+\begin{theorem}[Brown, George and Xu 2008, Theorem 1]\label{pg:thm:glx}
+Let $\pi$ be a prior density on $\mu$ under which the marginal density of $X$ is finite everywhere, and let $R_{\mathrm{KL}}(\mu,\hat p_\pi)$\index{predictive density estimation} be finite. With $v_w = v_xv_y/(v_x+v_y)$,
+\[
+R_{\mathrm{KL}}(\mu,\hat p_\pi) = \frac12\int_{v_w}^{v_x}\frac{1}{v^2}\,R_Q(\mu,\hat\mu_{\pi,v})\,dv .
+\]
+\end{theorem}
+
+Brown, George and Xu prove the identity in difference form, against the uniform prior, from Lemmas 2 and 3 of George, Liang and Xu (2006) and Stein's formula for quadratic risk; the form displayed follows because the uniform prior has $R_{\mathrm{KL}} = (n/2)\log(v_x/v_w)$ and the maximum likelihood estimator has quadratic risk $nv$. The identity links predictive risk to estimation risk at noise levels between that of the observed data, $v_x$, and that of the data augmented by the future observation, $v_w$. Priors with superharmonic marginals give predictive densities that dominate the uniform prior's and are minimax (George, Liang and Xu 2006).
+
+\begin{corollary}[Predictive risk of the horseshoe]\label{pg:cor:hspred}
+In the sparse normal means model with $v_x$ and $v_y$ fixed, as $n\to\infty$ with $p_n\to\infty$ and $p_n = o(n)$, let $\pi$ be the horseshoe prior\index{predictive density estimation!for the horseshoe|textbf} on $\mu$ with $\gscale = (p_n/n)^\alpha$ and $\alpha\ge1$, on the scale $\mu_i\mid\lambda_i\sim N(0,\lambda_i^2\gscale^2)$. Then
+\[
+\sup_{\mu\in\ell_0[p_n]}R_{\mathrm{KL}}(\mu,\hat p_\pi) \lesssim p_n\log(n/p_n)\,\log\Bigl(1 + \frac{v_x}{v_y}\Bigr).
+\]
+\end{corollary}
+\begin{proof}
+For $v\in[v_w,v_x]$, rescaling by $\sqrt v$ gives a unit variance model for $\mu/\sqrt v\in\ell_0[p_n]$ with $\tau_{\mathrm{g},v}=\gscale/\sqrt v=c_v(p_n/n)^\alpha$ and $c_v=v^{-1/2}\in[v_x^{-1/2},v_w^{-1/2}]$. Since $\alpha\ge1$, $\log(1/\tau_{\mathrm{g},v})=O(\log(n/p_n))$ and $n\tau_{\mathrm{g},v}\le c_vp_n$. Theorem~\ref{pg:thm:hs} therefore gives $R_Q(\mu,\hat\mu_{\pi,v})\lesssim v\,p_n\log(n/p_n)$ uniformly over $\mu\in\ell_0[p_n]$ and $v\in[v_w,v_x]$. Integrating with Theorem~\ref{pg:thm:glx} gives
+\[
+R_{\mathrm{KL}}(\mu,\hat p_\pi)\lesssim p_n\log(n/p_n)\int_{v_w}^{v_x}\frac{dv}{v}=p_n\log(n/p_n)\log\Bigl(1+\frac{v_x}{v_y}\Bigr).
+\]
+\end{proof}
+
+Mukherjee and Johnstone (2015) compute the exact asymptotic minimax predictive risk, of order $p_n\log(n/p_n)$, and construct a prior that attains it. Zhai and Ro\v{c}kov\'a (2026) prove exact asymptotic minimaxity for the horseshoe predictive density with known sparsity. With an exponential hyperprior on $\gscale$ of rate $n$, it adapts to unknown sparsity when every nonzero mean exceeds $c\sqrt{2\log n}$ in noise units, $c>\sqrt6$ (their Theorem~3.1). The top right panel of Figure~\ref{pg:fig:hs} computes the Kullback and Leibler risk through Theorem~\ref{pg:thm:glx} with $v_x = v_y = 1$: divided by $p_n\log(n/p_n)$ it stays between \pgkmin\ and \pgkmax, against the constant $1/(1+v_y/v_x) = 1/2$ in the exact minimax risk of Mukherjee and Johnstone.
+
+\section{Consequences for treatment effects}\label{pg:sec:causal}
+
+\paragraph{Heterogeneous effects in a trial.} For $K$ prespecified, disjoint subgroups in a randomized trial, let $\hat\tau_k\sim N(\tau_k,\sigma^2)$ independently, where $\tau_k=\bar\tau+\delta_k$ with $p$ nonzero deviations. If $\bar\tau$ is known, $\hat\tau_k-\bar\tau$ is a sparse normal means problem. As $K\to\infty$ with $p\to\infty$ and $p=o(K)$, Theorems~\ref{pg:thm:hs} and \ref{pg:thm:adaptive} give posterior concentration\index{posterior contraction!for treatment effects|textbf} of $\delta$ at squared Euclidean rate $\sigma^2p\log(K/p)$ with the oracle scale, or $\sigma^2p\log K$ adaptively. Estimating $\bar\tau$ from the same data under a flat prior gives correlated projected noise and a mean that is not exactly sparse, so this rate remains heuristic. With known $\bar\tau$, shrinkage toward the common effect is minimax over the sparse class, with vanishing shrinkage of large subgroup effects\index{subgroup effect}.
+
+\paragraph{Accounting functionals.} Any reported effect is a weighted sum $\psi_w = \sum_kw_k\tau_k$ of subgroup or cell effects.
+
+\begin{corollary}\label{pg:cor:linear}
+If the posterior of $\tau\in\R^K$ contracts around $\tau_0$ at rate $\varepsilon_K$ in Euclidean norm, then for any weight vector $w$ the posterior of $\psi_w = w^\top\tau$ contracts around $w^\top\tau_0$ at rate $\lVert w\rVert_2\,\varepsilon_K$.
+\end{corollary}
+\begin{proof}
+$\lvert w^\top\tau - w^\top\tau_0\rvert\le\lVert w\rVert_2\lVert\tau-\tau_0\rVert_2$, so the event $\{\lvert\psi_w - w^\top\tau_0\rvert > M\lVert w\rVert_2\varepsilon_K\}$ is contained in $\{\lVert\tau-\tau_0\rVert_2 > M\varepsilon_K\}$.
+\end{proof}
+
+For a population average, $w_k$ is the share of subgroup $k$, so $\lVert w\rVert_2\le1$; equal shares improve the rate of the vector by the factor $\lVert w\rVert_2 = K^{-1/2}$.
+
+\paragraph{Regularization induced confounding.} In the partially linear model with a flat prior on the treatment coefficient, Appendix~\ref{app:theory} expresses the shrinkage bias in that coefficient as a sum of the confounder coefficients' shrinkage errors, with weights from the treatment model. It derives the formula for a normal prior, but its first step, $\hat\tau = (T^\top T)^{-1}T^\top(Y - X\hat\beta)$ with $\hat\beta$ the posterior mean of the confounder coefficients, holds for any prior on them independent of the flat prior on $\tau$, the horseshoe included. When the confounders are orthogonal after the treatment is removed and the global and noise scales are held fixed, the posterior acts coordinatewise. Tail robustness then makes the shrinkage of a large coefficient, relative to its least squares estimate, of order $s_j^2/\lvert\beta_j\rvert$, where $s_j^2$ is the sampling variance of that estimate, so large confounders induce vanishing bias. The bias comes from confounders of intermediate size, up to about the detection boundary, and these are largely the coordinates for which the marginal credible intervals of Section~\ref{pg:sec:hs} fail. A learned global or noise scale couples the coefficients through its posterior, and correlated confounders couple them through the likelihood; in either case the posterior mean of a large coefficient also moves with the shrinkage of the others, and this account is a heuristic. Heuristically, for a normal prior and with the propensity known (Appendix~\ref{app:theory}), the propensity covariate of Chapter~\ref{ch:horseshoe} removes the first order part of this term by not shrinking in the direction of the propensity score.
+
+\section{Difference in differences}\label{pg:sec:did}
+
+The horseshoe difference in differences\index{difference in differences!posterior guarantees|textbf} estimator of Chapter~\ref{ch:did} writes the effect in cohort $g$ at event time $e$ as $\tau_{g,e} = \theta_e + u_{g,e}$, a common event path plus sparse cohort deviations, and allows sparse unit departures $\delta_i$ from parallel trends.
+
+\begin{corollary}[Cohort deviations, oracle event path]\label{pg:cor:did}
+Suppose the cell estimates satisfy $Z_{g,e} = \theta_e + u_{g,e} + \varepsilon_{g,e}$ for $g = 1,\dots,G$ and $e = 1,\dots,E$, with $\varepsilon_{g,e}\sim N(0, \sigma^2/m)$ independent, $m$ the number of units per cell, the event path $\theta$ known, and at most $s$ nonzero deviations among the $GE$ cells, as $GE\to\infty$ with $s\to\infty$ and $s = o(GE)$. With a horseshoe prior on $u$, the posterior of $u$ contracts in Euclidean norm at rate $\varepsilon_{GE}$, where
+\[
+\varepsilon_{GE}^2 = \frac{\sigma^2}{m}\,s\log\frac{GE}{s},
+\]
+which is the minimax rate over $s$ sparse deviations when the global scale is set at the oracle value $\gscale = (s/GE)^\alpha$ with $\alpha\ge1$; $\varepsilon_{GE}^2$ becomes $(\sigma^2/m)\,s\log(GE)$ when the scale is chosen adaptively under the conditions of Theorem~\ref{pg:thm:adaptive}, and by Corollary~\ref{pg:cor:linear} the posterior of the effect on the treated, $\sum_{g,e}w_{g,e}\tau_{g,e}$ with weights proportional to cell sizes, contracts at rate $\lVert w\rVert_2\,\varepsilon_{GE}$; since every cell has $m$ units, $w_{g,e} = 1/(GE)$ and $\lVert w\rVert_2 = (GE)^{-1/2}$.
+\end{corollary}
+\begin{proof}
+Given $\theta$, the observations $Z_{g,e}-\theta_e$ form a sequence model with $n = GE$, noise variance $\sigma^2/m$ and an $s$ sparse mean, so Theorems~\ref{pg:thm:hs} and \ref{pg:thm:adaptive} apply after rescaling by $\sigma/\sqrt m$, and the minimax lower bound of Donoho, Johnstone, Hoch and Stern applies to the same class. The second claim is Corollary~\ref{pg:cor:linear}.
+\end{proof}
+
+When the event path is estimated, an error in $\hat\theta_e$ is shared by all $G$ cohorts at event time $e$. If each $\hat\theta_e$ has mean squared error of order $\sigma^2/(mG)$, as when few of the cohorts deviate at event time $e$, this adds a squared error of order $G\cdot E\cdot\sigma^2/(mG) = E\sigma^2/m$ to the cell effects, of smaller order than $\varepsilon_{GE}^2$ when $s\log(GE/s)\gg E$. Total sparsity, $s=o(GE)$, does not give that error bound, since it allows every cohort to deviate at the same event time. A full proof for the joint posterior of $(\theta,u)$ would need a condition separating the common path from the deviations, such as a restricted eigenvalue condition analogous to the compatibility conditions of high dimensional regression; we leave it open, with the corresponding result for unit departures. The simulation of Chapter~\ref{ch:did}, with a flat event path and horseshoe deviations, gives coverage close to nominal, although the corollary concerns the rate and not coverage.
+
+\paragraph{Parallel trends and prediction.} With the common trend known and horseshoe unit departures $\delta_i$ observed with independent noise, predicting a treated unit's untreated path is an idealized sparse predictive density problem. Corollary~\ref{pg:cor:hspred} would bound its Kullback and Leibler risk by a multiple of $p\log(N/p)\log(1+v_x/v_y)$ when at most $p$ of the $N$ units depart from parallel trends, $v_x$ is the noise variance of the estimated departures and $v_y$ that of a future outcome. The parallel trends assumption becomes a sparsity assumption about departures, and the price of not knowing which units depart is the logarithmic factor.
+
+\section{Groups, scales and stability}\label{pg:sec:groups}
+
+This section proves the guarantees of Chapter~\ref{ch:groups}\index{group action!posterior guarantees|textbf}; the other proofs of that chapter are in Appendix~\ref{app:groupsproofs}.
+
+\begin{proof}[Proof of Theorem~\ref{gr:thm:recon}, part (b)]
+On the chart scale, $z_i=h(Y_i)-h(\gamma_i)=\theta+\varepsilon_i$ for the $n_1$ treated units, with $\theta=\psi(g)$ and independent errors of density $f$: a location model, a transformation model for $G\cong\R$ acting by $z\mapsto z+c$. Let $\hat g$ be equivariant and $\hat\theta=\psi(\hat g)$, so that $\hat\theta(z+c)=\hat\theta(z)+c$, and let $a=(z_i-\hat\theta)_i$ be the maximal invariant. Since $z_i=\hat\theta+a_i$, the Jacobian of the change from $z$ to $(\hat\theta,a)$ depends only on $a$, so the conditional sampling density of $\hat\theta$ given $a$ is
+\[
+q(\hat\theta-\theta\mid a)=c_1(a)\prod_if(\hat\theta+a_i-\theta),
+\]
+with $c_1(a)^{-1}=\int\prod_if(t+a_i)\,dt$. The right Haar measure on $\R$ is Lebesgue measure, so the posterior density of $\theta$ is $c_1(a)\prod_if(\hat\theta+a_i-\theta)$ (substitute $t=\hat\theta-\theta$ in the normalizer). Hence the posterior law of $\hat\theta-\theta$ and its conditional sampling law given $a$ coincide. A set $\{\theta:\theta-\hat\theta\in A(a)\}$ of posterior probability $1-\alpha$ therefore has coverage $1-\alpha$, conditionally on $a$ and unconditionally. The location case is due to Fisher (1934) and Pitman (1939), the group version to Fraser (1961), and Hora and Buehler (1966) give the confidence property.
+
+For a general group $G$ acting on the observations the same argument runs as follows. Let $z=ge$ with $e$ drawn from a fixed law, and let $\mu$ be a measure on the sample space that is relatively invariant under $G$, $\mu(kB)=\chi(k)\mu(B)$ with $\chi$ a homomorphism to $(\R^{+},\times)$, such that $e$ has density $p_e$ with respect to $\mu$. Then $z$ has density $\chi(g)^{-1}p_e(g^{-1}z)$. Let $\hat g(z)$ be equivariant, $\hat g(kz)=k\hat g(z)$, put $z_a=\hat g(z)^{-1}z$, which depends on $z$ through the maximal invariant $a$ only, and take the pivot $q=g^{-1}\hat g$. In the coordinates $(\hat g,a)$ the measure $\mu$ is $\chi(\hat g)\,\nu_L(d\hat g)\,\kappa(da)$ with $\nu_L$ the left Haar measure, so the density of $(\hat g,a)$ with respect to $\nu_L\otimes\kappa$ is $\chi(g)^{-1}\chi(\hat g)\,p_e(g^{-1}\hat gz_a)=\chi(q)\,p_e(qz_a)$, and by left invariance of $\nu_L$ the pivot $q$ has, given $a$, a density proportional to $\chi(q)p_e(qz_a)$ with respect to $\nu_L(dq)$ whatever $g$ is. The posterior under the right Haar prior $\nu_R$ is proportional to $\chi(g)^{-1}p_e(g^{-1}\hat gz_a)\,\nu_R(dg)$. Substitute $g=\hat gq^{-1}$: inversion turns $\nu_R$ into $\nu_L$, left translation by $\hat g$ multiplies it by a constant that does not involve $q$, and $\chi(g)^{-1}=\chi(\hat g)^{-1}\chi(q)$, so the posterior density of $q$ with respect to $\nu_L(dq)$ is proportional to $\chi(q)p_e(qz_a)$, the conditional sampling density of $q$ given $a$. A left Haar prior would leave a factor that depends on $q$, which is why it fails. The conclusion is as before: a set $\{g:g^{-1}\hat g\in A(a)\}$ of posterior probability $1-\alpha$ has coverage exactly $1-\alpha$, conditionally on $a$ and unconditionally.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{gr:thm:select}]
+Write $\ell_n$ for the log likelihood, $\hat\ell_G=\max_{F\in\mathcal S_G}\ell_n(F)$ and $W_n^G=\KL_w(L_n\,\|\,\mathcal S_G)$. Since cell $(x,t)$ holds $nw_{x,t}$ independent draws, $\ell_n(F)=-n\sum_{x,t}w_{x,t}\{\mathrm{Ent}(L_{n,x,t})+\KL(L_{n,x,t}\,\|\,F_{x,t})\}$ with $\mathrm{Ent}$ the entropy; maximizing $\ell_n$ over $\mathcal S_G$ therefore minimizes $\KL_w(L_n\,\|\,F)$, and
+\[
+\hat\ell_G-\hat\ell_H=n\,(W_n^H-W_n^G)
+\]
+exactly, because the entropy term is common to the two models. For each model, Laplace's method under the assumed smooth positive prior and nonsingular Hessian at the projection gives the marginal likelihood $m_G$ as $\log m_G=\hat\ell_G-\tfrac12d_G\log n+O_p(1)$, whether or not the model contains $F^{\circ}$. With $\pi_G$ the prior probability of model $G$, $\Pi(\mathcal S_G\mid\text{data})\propto\pi_Gm_G$, so
+\[
+\log\frac{\Pi(\mathcal S_G\mid\text{data})}{\Pi(\mathcal S_H\mid\text{data})}=n\,(W_n^H-W_n^G)-\tfrac12(d_G-d_H)\log n+O_p(1).
+\]
+By the strong law $L_n\to F^{\circ}$ almost surely, and $W_n^G\to D_G$ because $F\mapsto\KL_w(F\,\|\,\mathcal S_G)$ is continuous at $F^{\circ}$ (the projection is unique and interior). The Laplace remainders depend on the data through $L_n$ only, so they are $O(1)$ almost surely, which gives the almost sure limit. For the expansion, when $F^{\circ}\notin\mathcal S_G$ the statistic $W_n^G$ is a smooth function of $L_n$ near $F^{\circ}$ and $L_n-F^{\circ}=O_p(n^{-1/2})$, so $n(W_n^G-D_G)=O_p(\sqrt n)$ by the delta method. When $F^{\circ}\in\mathcal S_G$, $nW_n^G$ is half the deviance of $G$ against the saturated model and is $O_p(1)$. Hence the fluctuation of the log odds about $n(D_H-D_G)-\frac12(d_G-d_H)\log n$ is $O_p(\sqrt n)$, and $O_p(1)$ when both models contain $F^{\circ}$.
+\end{proof}
+
+\begin{proof}[Proof of Corollary~\ref{gr:cor:select}]
+All three parts are read off the last display of the preceding proof. (i) Since $D_{\mathrm{sat}}=0$, the unique group $G$ with $D_G=0$ has log odds $nD_H+O_p(\sqrt n)\to\infty$ against every other group $H$, and $\tfrac12(d_{\mathrm{sat}}-d_G)\log n+O_p(1)\to\infty$ against the saturated model, which also contains $F^{\circ}$, because $d_G<d_{\mathrm{sat}}$. So its posterior probability tends to one, with the stated exponential and polynomial rates. (ii) The latter log odds give order $n^{(d_{\mathrm{sat}}-d_G)/2}$ under the smooth positive prior, with $d_{\mathrm{sat}}-d_G=2J-(J+1)=J-1$. (iii) If no group contains $F^{\circ}$, let $G$ attain $D_{\min}=\min_HD_H>0$. The saturated model's log odds against $G$ are $nD_{\min}-\tfrac12(d_{\mathrm{sat}}-d_G)\log n+O_p(\sqrt n)\to\infty$, and likewise against every other group, so its posterior probability tends to one. The leading order weights $e^{-nD-\frac12d\log n}$, which leave out the $O_p(\sqrt n)$ fluctuation, cross where $nD_{\min}=\tfrac12(d_{\mathrm{sat}}-d_G)\log n$.
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{gr:prop:hstest}]
+Write $\sigma_J^2=\sigma^2J/n$ for the variance of each $\hat\psi_j$, let $U$ be a $J\times(J-1)$ matrix whose orthonormal columns span the contrasts, the vectors orthogonal to $(1,\dots,1)$, and put $z=U^{\top}\hat\psi/\sigma_J$, so that $|z|^2=\sum_j(\hat\psi_j-\bar{\hat\psi})^2/\sigma_J^2$ with $\bar{\hat\psi}$ the mean of the $\hat\psi_j$. Given the scales $\lambda=(\lambda_j)$ and $\gscale$, $\hat\psi\sim N(\psi\mathbf 1,\sigma_J^2I+\gscale^2\Lambda^2)$ with $\Lambda=\operatorname{diag}(\lambda_j)$. A flat prior on $\psi$ integrates the likelihood to the density of the contrasts $U^{\top}\hat\psi\sim N\{0,\sigma_J^2(I+u^2B)\}$ times $J^{-1/2}$, where $u=\gscale/\sigma_J$ and $B=U^{\top}\Lambda^2U$, and the factor $J^{-1/2}$ is the same under stability, $u=0$. So the ratio of the integrated likelihood of the alternative to that of stability, at $(u,\lambda)$, is
+\[
+R(u,\lambda,z)=|I+u^2B|^{-1/2}\exp\Bigl\{\tfrac12z^{\top}u^2B(I+u^2B)^{-1}z\Bigr\},
+\]
+which depends on the data through $z$ alone, and $\mathrm{BF}_{10}=\int_0^\infty r(u)\,p(\sigma_Ju)\,\sigma_J\,du$ with $r(u)=\E_\lambda R(u,\lambda,z)$ and $p$ the prior density of $\gscale$. Since $u^2B(I+u^2B)^{-1}\preceq I$ and $|I+u^2B|\ge1$, $R\le e^{|z|^2/2}$ for every $u$ and $\lambda$. Under stability $z\sim N(0,I_{J-1})$ whatever $n$ and $\sigma$.
+
+(i) Take prior A, $p(\gscale)=2/\{\pi(1+\gscale^2)\}$, so that $p(\sigma_Ju)\le2/\pi$ and $p(\sigma_Ju)\to2/\pi$ as $n\to\infty$ for each $u$. Let $J\ge3$; it remains to show that $r$ is integrable, so that dominated convergence applies. Since $UU^{\top}=I-J^{-1}\mathbf 1\mathbf 1^{\top}$, Sylvester's identity and the matrix determinant lemma give
+\[
+|I+u^2B|=\frac1J\sum_{k=1}^J\prod_{j\ne k}(1+u^2\lambda_j^2)\ge\frac1J\prod_{j=1}^{J-1}(1+u^2\lambda_j^2).
+\]
+With $m(u)=\E(1+u^2\lambda^2)^{-1/2}$ for a half Cauchy $\lambda$, independence of the local scales yields $r(u)\le e^{|z|^2/2}\sqrt J\,m(u)^{J-1}$, and splitting the integral defining $m$ at $\lambda=1$ gives $m(u)\le(2/\pi)(3/2+\log u)/u$ for $u\ge1$. Since $J-1\ge2$, $(\log u/u)^{J-1}$ is integrable at infinity, and $r(u)\le e^{|z|^2/2}$ near zero, so $0<\int_0^\infty r(u)\,du<\infty$. By dominated convergence $\sigma_J^{-1}\mathrm{BF}_{10}\to(2/\pi)\int_0^\infty r(u)\,du$, so $\sigma_J\mathrm{BF}_{01}$ converges in distribution to the positive finite random variable $\pi/\{2\int_0^\infty r(u)\,du\}$, which says $\mathrm{BF}_{01}\asymp_p\sqrt n/\sigma$ for fixed $J$. For $J=2$ there is one contrast and $B=(\lambda_1^2+\lambda_2^2)/2$. Then $u\,r(u)\to c(z)=e^{z^2/2}\E B^{-1/2}$ as $u\to\infty$ by dominated convergence, since $u(1+u^2B)^{-1/2}\le B^{-1/2}$ and $\E B^{-1/2}<\infty$ (polar coordinates in $(\lambda_1,\lambda_2)$, whose density is bounded). Splitting the integral at $u=1$ and writing $\varepsilon=\sigma_J$, $\int_0^\infty r(u)\,p(\varepsilon u)\,du=\{1+o(1)\}(2/\pi)\,c(z)\log(1/\varepsilon)$, because $\int_1^\infty u^{-1}(1+\varepsilon^2u^2)^{-1}du=\log(1/\varepsilon)+O(1)$ and the part over $[0,1]$ is at most $e^{z^2/2}$. So $\mathrm{BF}_{10}=\{1+o(1)\}\,\sigma_J\,c(z)\log n/\pi$, using $\log(1/\sigma_J)=\tfrac12\log n+O(1)$, and $\mathrm{BF}_{01}\asymp_p\sqrt n/(\sigma\log n)$. For $J=1$ there is no contrast and stability cannot be tested.
+
+(ii) Write $\hat\psi_j=\psi+\eta_j+\sigma_J\xi_j$ with $\xi_j$ standard normal. Then $z=U^{\top}\eta/\sigma_J+\xi'$ with $\xi'\sim N(0,I_{J-1})$ and $|U^{\top}\eta|^2=\sum_j(\eta_j-\bar\eta)^2=:\Delta^2>0$, so $|z|^2=\{1+o_p(1)\}\Delta^2/\sigma_J^2=\{1+o_p(1)\}\,n\Delta^2/(J\sigma^2)$. Prior A integrates to one, so $R\le e^{|z|^2/2}$ gives $\log\mathrm{BF}_{10}\le|z|^2/2$. For the lower bound fix $\delta\in(0,1)$ and $a\in(0,1)$, and choose $u_0$ with $u_0^2a^2\ge1/\delta$. On the event $\{\lambda_j\in[a,1]\text{ for all }j\}$, which has positive prior probability $\varpi_a$ under the half Cauchy law, every eigenvalue of $B$ lies in $[a^2,1]$, because $B$ is the compression of $\Lambda^2$ to a subspace. For $u\in[u_0,2u_0]$ on that event, $z^{\top}u^2B(I+u^2B)^{-1}z\ge(1-\delta)|z|^2$ and $|I+u^2B|\le(1+4u_0^2)^{J-1}$, so $R\ge(1+4u_0^2)^{-(J-1)/2}e^{(1-\delta)|z|^2/2}$. Hence
+\[
+\mathrm{BF}_{10}\ge\varpi_a(1+4u_0^2)^{-(J-1)/2}e^{(1-\delta)|z|^2/2}\int_{\sigma_Ju_0}^{2\sigma_Ju_0}p(\gscale)\,d\gscale,
+\]
+and the last integral is at least $c\,\sigma_J$ for a constant $c>0$ and $n$ large. So $\log\mathrm{BF}_{10}\ge(1-\delta)|z|^2/2-O(\log n)$, and $\log n=o(|z|^2)$ because $|z|^2\asymp n$. Since $\delta$ is arbitrary, $\log\mathrm{BF}_{10}=\{1+o_p(1)\}\,|z|^2/2=\{1+o_p(1)\}\,\dfrac{n}{2J\sigma^2}\sum_j(\eta_j-\bar\eta)^2$.
+
+(iii) With $\psi$ known, dividing $\hat\psi_j-\psi=\eta_j+\sigma_J\xi_j$ by $\sigma_J$ gives the sparse normal means model with unit noise and, under prior B, the horseshoe with global scale $\gscale/\sigma_J$ on a half Cauchy law truncated to $[1/J,1]$. Van der Pas, Szab\'o and van der Vaart (2017a, Theorem~3.7 and Example~3.3) give squared error contraction for $\eta$ at rate $(\sigma^2J/n)\,s\log J$ for $s=o(J)$ and $s\ge C\log J$, of the order of the minimax rate $(\sigma^2J/n)\,s\log(J/s)$ whenever $s\le J^{1-c}$ for some $c>0$. For a deterministic global scale $(s/J)^{\alpha}$ in noise units, with $\alpha\ge1$, van der Pas, Kleijn and van der Vaart (2014) give the minimax rate. Both theorems need $s\to\infty$ and $s=o(J)$, and neither covers an unknown common level, which is why (iii) takes $\psi$ known.
+
+(iv) Under prior B, $\mathrm{BF}_{10}=\int_{1/J}^{1}r(u)p_B(u)\,du$, where $p_B$ is the normalized half Cauchy density on $[1/J,1]$. Thus $\mathrm{BF}_{01}=1/\mathrm{BF}_{10}$ depends on the data through $z$ alone, whose law under stability is independent of $n$ and $\sigma$.
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{gr:prop:effect}]
+Let $\ell_p(\psi)$ be the log likelihood maximized over the baselines for fixed $\psi$. With $J_G$ defined at the empirical law, $nJ_G(\psi)=\hat\ell_G-\ell_p(\psi)$ by the identity for $\ell_n$ in the proof of Theorem~\ref{gr:thm:select}. The posterior density of $\psi$ is the integral of the likelihood and the prior over the baselines. By Laplace's method it equals
+\[
+\exp\{\ell_p(\psi)\}\,(2\pi/n)^{(d_G-1)/2}s(\psi)\{1+O_p(n^{-1})\},
+\]
+where $s$ is the prior density at the conditional maximum divided by the square root of the determinant of the baseline information, smooth and bounded above and below on compact sets. So the density is proportional to $e^{-nJ_G(\psi)}s(\psi)$. By the regularity assumed in the statement, $J_G$ is smooth, vanishes only at $\hat\psi$, increases away from it with $J_G'(\psi)\neq0$ for $\psi\neq\hat\psi$, and has $J_G''(\hat\psi)>0$, the positive information about the effect. Integrating over a bounded $A$ gives $e^{-n\inf_AJ_G}$ times a factor polynomial in $n$, and the normalizing constant is of order $n^{-1/2}$ because $J_G$ has a nondegenerate minimum at $\hat\psi$. An unbounded $A$, such as $\{\psi\le0\}$, needs a bound on its tail, and the profile likelihood gives one: the likelihood at any $(\psi,\gamma)$ is at most $e^{\ell_p(\psi)}=e^{\hat\ell_G-nJ_G(\psi)}$, so before normalization the part of $A$ outside a compact set contributes at most $e^{\hat\ell_G-n\inf_AJ_G}$, since the prior has total mass one, against a marginal likelihood of $e^{\hat\ell_G}$ times a factor polynomial in $n$, and the rate is unchanged. This is the first statement.
+
+For the second, put $v(\psi)=\operatorname{sign}(\psi-\hat\psi)\sqrt{2J_G(\psi)}$, a smooth increasing coordinate near $\hat\psi$ with $r(\psi)=\sqrt n\,v(\psi)$. In it the posterior density is proportional to $e^{-nv^2/2}m(v)$ with $m(v)=s(\psi)\,d\psi/dv$ smooth and positive. With $v_0=v(\psi_0)$, the expansion $m(v)=m(0)+m'(0)v+O(v^2)$ gives
+\[
+\Pi(\psi\le\psi_0\mid\text{data})=\Phi(r(\psi_0))-\frac{m'(0)}{m(0)}\,n^{-1/2}\varphi(r(\psi_0))+O(n^{-1}),
+\]
+with $\varphi$ the standard normal density, when $r(\psi_0)=O(1)$, that is, when $\psi_0-\hat\psi=O(n^{-1/2})$, and the relative error of $\Phi(r(\psi_0))$ is then $O(n^{-1/2})$. 
+
+For $\psi_0<\hat\psi$ and $v_0<0$ bounded away from zero as $n$ grows, $J_G'\neq0$ off $\hat\psi$ makes $v$ a smooth coordinate on $[\psi_0,\hat\psi]$. With $m$ smooth and positive, Laplace's method at the endpoint and minimum gives
+\begin{align*}
+\int_{-\infty}^{v_0}e^{-nv^2/2}m(v)\,dv&=\frac{m(v_0)e^{-nv_0^2/2}}{n|v_0|}\{1+O(n^{-1})\},\\
+\int e^{-nv^2/2}m(v)\,dv&=m(0)\sqrt{\frac{2\pi}n}\{1+O(n^{-1})\},
+\end{align*}
+while $\Phi(r(\psi_0))\sim e^{-nv_0^2/2}/(\sqrt{2\pi n}\,|v_0|)$. The ratio of the posterior probability to $\Phi(r(\psi_0))$ therefore tends to $m(v_0)/m(0)$, which in terms of the original quantities is
+\[
+\frac{s(\psi_0)}{s(\hat\psi)}\,\frac{\sqrt{2J_G''(\hat\psi)J_G(\psi_0)}}{|J_G'(\psi_0)|}.
+\]
+The ratio equals one exactly when $m(v_0)=m(0)$, as it does for every $\psi_0$ under a prior flat in the signed root coordinate, for example when $s$ is constant and $J_G$ quadratic. In general the relative error for fixed $\psi_0$ is $O(1)$, not $o(1)$.
+\end{proof}
+
+

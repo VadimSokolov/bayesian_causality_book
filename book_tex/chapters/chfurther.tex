@@ -1,0 +1,24 @@
+\chapter*{Further Reading}
+\addcontentsline{toc}{chapter}{Further Reading}
+\markboth{Further Reading}{Further Reading}
+
+For other positions on causal inference, or more depth, start with the works below.\index{data set|seealso{401(k) plan; British doctors study; castle doctrine laws; college proximity instrument; Infant Health and Development Program; kidney stone data; LaLonde benchmark; Lanarkshire milk experiment; NHEFS; Thornton HIV incentive experiment}}
+% The see also line of the index entry "data set" sits here, after the last page that entry cites (Table tab:data in Appendix F), so that the index prints it after the page numbers.
+
+\paragraph{Potential outcomes.} Imbens and Rubin's \emph{Causal Inference for Statistics, Social, and Biomedical Sciences} is the standard treatment of potential outcomes, including Rubin's Bayesian view. Holland's 1986 review remains the clearest short introduction.
+
+\paragraph{Graphs and structural models.} Pearl's \emph{Causality} develops the graphical approach, the do calculus and the probabilities of causation; Tian and Pearl's 2000 paper is the source for Chapter~\ref{ch:tianpearl}. Hern\'an and Robins's \emph{Causal Inference: What If} combines graphs with potential outcomes and covers time varying treatments, which Section~\ref{fw:sec:gmethods} introduces.
+
+\paragraph{Double machine learning.} The 2018 paper of Chernozhukov and coauthors is essential reading for anyone engaging with this book's argument, and the \texttt{DoubleML} documentation gives worked examples. Kang and Schafer's 2007 paper, with its discussion, is the best account of what double robustness does and does not deliver.
+
+\paragraph{Bayesian nonparametric causal inference.} Hill's 2011 paper started the tree based approach, Hahn, Murray and Carvalho's 2020 paper with its discussion developed it, and the review by Hill, Linero and Murray surveys BART as a whole. Dorie and coauthors' account of the 2016 competition is the best empirical comparison of methods on data with known truth.
+
+\paragraph{Shrinkage.} Carvalho, Polson and Scott introduced the horseshoe; Polson and Scott's ``Shrink globally, act locally'' develops the theory of global local priors; and Piironen and Vehtari explain how to set the global scale in practice.
+
+\paragraph{Generative Bayesian computation.} Polson and Sokolov's \emph{Generative Bayesian Computation} treats at book length the quantile networks, summaries and checks of Chapter~\ref{ch:computation}, and Polson, Ruggeri and Sokolov's 2024 paper applies the method to maximum expected utility, the problem of Chapter~\ref{ch:cdt}.
+
+\paragraph{Partial identification and sensitivity.} Manski's bounds papers founded partial identification and his monograph collects them, Gustafson's book gives the Bayesian treatment, and Rosenbaum's \emph{Observational Studies} is the classic on sensitivity analysis. Cinelli and Hazlett's paper makes benchmarking against observed covariates routine.
+
+\paragraph{History.} Student's 1931 paper on the milk experiment is short and still a pleasure to read. Cornfield and coauthors' 1959 review and Bradford Hill's 1965 lecture are the two essential documents of the smoking controversy, and Fisher's 1959 pamphlet states the other side in his own words. LaLonde's 1986 paper and the Dehejia and Wahba reanalysis are the starting point for the benchmark of Section~\ref{sec:lalonde}.
+
+\paragraph{Applied texts.} Cunningham's \emph{Causal Inference: The Mixtape} and Huntington Klein's \emph{The Effect} are accessible applied introductions whose data sets we have used; they cover regression discontinuity and synthetic control, which we treat only briefly.

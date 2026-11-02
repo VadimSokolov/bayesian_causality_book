@@ -1,0 +1,189 @@
+\chapter{Smoking and Lung Cancer}\label{ch:smoking}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+Fisher was right that observation cannot exclude every common cause and wrong about which way the evidence pointed. Cornfield's inequality, dose response, cessation and Mendelian randomization each constrain the alternatives, and a Bayesian synthesis would combine them with the assumptions in view.
+\end{tcolorbox}
+
+The smoking controversy\index{smoking and lung cancer|textbf} is the best known causal argument in the history of statistics. It pitted Fisher, the founder of modern experimental design, against observational evidence that proved right. It produced the first sensitivity analysis\index{sensitivity analysis}, an influential set of criteria for observational causation, and, later, the canonical example of Pearl's front door\index{front door criterion} criterion. 
+
+\section{The evidence}
+
+In 1950 Wynder and Graham in the United States and Doll and Hill in London published case control studies\index{case control study|textbf} comparing lung cancer patients with other hospital patients. Both found lung cancer patients far more likely to be heavy smokers\index{smoking and lung cancer!the evidence|textbf}.
+
+Case control studies are open to bias in the choice of controls, in recall of past smoking, and in who reaches hospital, so Doll and Hill began a prospective study. In 1951 they wrote to the doctors of Britain, recorded their smoking habits, and followed their deaths. The British doctors study\index{British doctors study|textbf} reported first results in 1954 and ran for fifty years. Hammond and Horn (1958) ran a larger American cohort for the American Cancer Society. Both found a strong dose response: the more cigarettes smoked, the higher the lung cancer death rate, and risk fell among those who stopped.
+
+A case control study starts from the outcome and looks back at exposure. It is efficient for a rare disease, since lung cancer patients are collected rather than waited for, but controls must come from the population that produced the cases, and recall must not depend on diagnosis. A cohort study records exposure and waits for the outcome. Recall cannot be coloured by diagnosis, though habits can still be misreported, and comparison within the cohort removes the choice of controls. Neither design assigns smoking: the doctors' smokers and nonsmokers were self selected groups, which was Fisher's opening.
+
+Case control and cohort studies estimate the same risk ratio under different sampling designs and biases. The case control odds ratio approximates it because lung cancer is rare\index{rare disease assumption|textbf}. A combined model needs a bias term for each design. The dose response and the fall in risk after quitting are not further estimates of that number; they are features of the data that any alternative explanation must reproduce.
+
+\section{Fisher's objection}
+
+Fisher entered the debate\index{Fisher, Ronald A.!objection to the smoking evidence|textbf} in 1957. He made three arguments\index{smoking and lung cancer!Fisher's objection|textbf}.
+
+First, an observational association can always be explained by a common cause. Fisher proposed a constitutional hypothesis\index{constitutional hypothesis|textbf}: a genetic disposition that inclined people both to smoke and to develop lung cancer.
+
+Second, using data on twins, he showed that identical twins were more alike in their smoking habits than fraternal twins, as a genetic hypothesis would predict.
+
+Third, he pointed to anomalies, including the finding in Doll and Hill's case control study that inhalers did not show the expected higher risk.
+
+Fisher consulted for the Tobacco Manufacturers' Standing Committee from 1956 (Stolley 1991). We do not think it explains his position. Randomization was the deepest commitment of his scientific life, and here randomization was impossible. He saw correctly that observation alone could not exclude every common cause, but he was wrong about which way the evidence pointed.
+
+\section{Cornfield's answer}
+
+Cornfield\index{Cornfield inequality@Cornfield's inequality}'s 1959 review, discussed in Section~\ref{sec:sensitivity}, turned Fisher's possibility into a quantitative requirement. If smokers had nine times the lung cancer risk of nonsmokers, a constitutional factor, coded so that $U = 1$ raises the risk of lung cancer, would need to be at least nine times as common among smokers. For heavy smokers, those smoking more than two packs a day, with a risk ratio against nonsmokers of about 60, it would need to be some sixty times as common.
+
+Three further facts told against the constitutional hypothesis. A binary genotype could produce the steep dose response only by being far more common among the heaviest smokers than among nonsmokers, and a fixed genotype could explain the fall in risk after quitting only if it were also associated with who quits, and when. And lung cancer rates had risen sharply over a few decades, tracking cigarette consumption with a lag, far too fast for any genetic change in a population.
+
+The 1964 report of the United States Surgeon General's committee\index{Surgeon General report|textbf} concluded that cigarette smoking is causally related to lung cancer in men. 
+
+\section{The twin studies}
+
+Fisher's second argument rested on twins\index{twin study|textbf}\index{twins}. Concordance in smoking bears on one side of Cornfield's requirement, how much more common a genotype is among smokers than among nonsmokers. It says nothing about whether the same genotype raises the risk of lung cancer, so concordance alone cannot show that genes confound the link between smoking and cancer.
+
+A direct test compares monozygotic twins discordant for smoking. Within a pair the genotype is fixed, so the constitutional hypothesis alone predicts no excess lung cancer in the smoking twin. Other common causes can still differ within pairs. Hjelmborg and coauthors (2017) made this comparison in four Nordic twin cohorts, 43,512 monozygotic and 71,895 same sex dizygotic twins whose smoking was recorded before any cancer diagnosis, followed for a median of 28.5 years. In pairs discordant for smoking, the hazard ratio for lung cancer of the twin who had ever smoked against the twin who never had was 5.4 (95\% interval 2.1 to 14.0) in monozygotic pairs and 5.0 (3.2 to 7.9) in dizygotic pairs. The smoking twins show the excess that the constitutional hypothesis forbids.
+
+\section{The inhalation paradox}
+
+Fisher made much of a puzzle\index{inhalation paradox|textbf} in Doll and Hill's case control data: smokers who reported inhaling showed no higher lung cancer risk than those who did not, although inhalers should be at greater risk if smoke causes cancer by reaching the lungs.
+
+Reported inhalation is a crude measure, and smokers may not know whether they inhale deeply. Inhalers may smoke cigarettes down to shorter butts or choose different tobacco. And deeply inhaled smoke may deposit carcinogens in different parts of the respiratory tract.
+
+Substantial measurement error can hide an association even when the underlying quantity is causally important. Fisher read absence of association as evidence of absence. What the null excludes depends on misclassification rates and whether they differ between cases and controls. A Bayesian measurement error\index{measurement error} model, with validation data or stated priors on those rates, would show how wide a range of inhalation effects the data allow.
+
+\section{The front door}
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[node distance=16mm]
+\node[v] (S) {$S$};
+\node[v,right=of S] (M) {$M$};
+\node[v,right=of M] (C) {$C$};
+\node[h,above=10mm of M] (U) {$U$};
+\draw[e] (S) -- (M); \draw[e] (M) -- (C); \draw[e] (U) -- (S); \draw[e] (U) -- (C);
+\end{tikzpicture}
+\caption{The front door graph: smoking $S$ affects cancer $C$ only through tar $M$, and a hidden genotype $U$, dashed, affects smoking and cancer but not tar.}
+\label{fig:dagfd}
+\end{figure}
+
+
+Pearl illustrated front door identification\index{front door criterion|textbf} with smoking\index{front door criterion!application to smoking|textbf} (Pearl 2009; Pearl and Mackenzie 2018). Suppose smoking $S$ causes lung cancer $C$ only through tar deposits $M$ in the lungs, and a hidden genotype $U$ affects both $S$ and $C$ but not $M$ directly (Figure~\ref{fig:dagfd}). If also every pair of values $(s, m)$ has positive probability, the effect of $S$ on $C$ is identified although $U$ is unmeasured\index{front door criterion!formula|textbf}:
+\begin{equation}
+\Prob(c \mid do(s)) = \sum_m \Prob(m \mid s) \sum_{s'} \Prob(c \mid m, s')\Prob(s').
+\label{eq:frontdoor}
+\end{equation}
+The inner sum is the effect of tar on cancer, adjusted for smoking, which blocks the back door path from tar through the genotype to cancer. The outer sum chains it with the effect of smoking on tar, unconfounded because the genotype does not affect tar directly.
+
+A worked example shows how the formula removes the genotype. The numbers are illustrative. Let $\Prob(S=1)=0.5$, $\Prob(M=1\mid S=1)=0.9$ and $\Prob(M=1\mid S=0)=0.1$, and let the cancer rates $\Prob(C=1\mid m,s)$ be $0.15, 0.10, 0.10, 0.05$ for $(m,s)=(1,1),(1,0),(0,1),(0,0)$. The observational contrast is $\Prob(C=1\mid S=1)-\Prob(C=1\mid S=0)=0.145-0.055=0.09$. The inner sums in \eqref{eq:frontdoor} are $0.5\cdot0.15+0.5\cdot0.10=0.125$ for $m=1$ and $0.5\cdot0.10+0.5\cdot0.05=0.075$ for $m=0$, so
+\begin{align*}
+\Prob(C=1\mid do(S=1)) &= 0.9(0.125)+0.1(0.075)=0.12,\\
+\Prob(C=1\mid do(S=0)) &= 0.1(0.125)+0.9(0.075)=0.08,
+\end{align*}
+a causal risk difference of $0.04$. More than half of the observational contrast, $0.05$ of the $0.09$, is confounding by the genotype.
+
+We simulated this structure with 20,000 people and binary variables: the genotype is present in 30\%, $\Prob(S = 1 \mid U) = \expit(-0.5 + 2U)$, $\Prob(M = 1 \mid S) = \expit(-2 + 4S)$ and $\Prob(C = 1 \mid M, U) = \expit(-3 + 1.5M + 1.5U)$, so about half the population smokes and a fifth develops cancer. The true effect, the risk difference $\Prob(C = 1 \mid do(S = 1)) - \Prob(C = 1 \mid do(S = 0))$, is 0.145. Over 100 replications the naive contrast between smokers and nonsmokers averaged 0.227, inflated by the genotype. The front door formula \eqref{eq:frontdoor} gave 0.145. Figure~\ref{fig:frontdoor} shows the errors.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{frontdoor.pdf}
+\caption{Estimate minus the exact population risk difference, 0.145, for the smoker versus nonsmoker contrast and for the front door formula, boxplots over 100 replications of 20,000 people in a simulated population with a hidden genotype.}
+\label{fig:frontdoor}
+\end{figure}
+
+The front door estimates above plug sample proportions into \eqref{eq:frontdoor}. A Bayesian version gives independent uniform, $\mathrm{Beta}(1,1)$, priors to the seven probabilities of the binary model: $\Prob(S=1)$, the two values of $\Prob(M=1\mid S=s)$ and the four values of $\Prob(C=1\mid M=m,S=s)$. Each posterior is a Beta updated with its own counts of successes and failures, and each joint posterior draw, pushed through the formula at $s=1$ and at $s=0$, gives a draw of the risk difference. This is the accounting thesis of the book in miniature: the effect is a functional of the model, so a posterior for the model is a posterior for the effect. In one simulated data set of 20,000 people the posterior mean of the risk difference is 0.153 and the 95\% interval runs from 0.140 to 0.165, which covers the truth 0.1445; across 500 further data sets such intervals covered it 95\% of the time. The naive contrast, 0.233 with interval 0.222 to 0.243, misses it.
+
+The front door assumptions are strong: tar must carry the whole effect of smoking, the genotype must not affect tar, and nothing but smoking may confound tar and cancer. The first two are not literally true: smoking affects cancer through many pathways, and genes affect how tar is cleared. But identification can come from structure as well as adjustment, and in a Bayesian analysis structural assumptions are part of the model, to be relaxed with priors when doubted.
+
+\section{A model first analysis}
+
+Here is how a Bayesian would approach the question today\index{smoking and lung cancer!model first analysis|textbf} with cohort data like the British doctors study\index{British doctors study}.
+
+\paragraph{The model.} Model the hazard of lung cancer death as a function of age, cumulative smoking, time since quitting and other covariates, with flexible terms for the dose response and horseshoe priors on interactions. 
+
+\paragraph{The accounting.} The effect of smoking is any of several functionals: the difference in lifetime risk between a lifelong smoker and a never smoker of the same birth cohort; the risk reduction from quitting at age 40; the population attributable fraction\index{population attributable fraction|textbf}, the share of lung cancer deaths avoided if no one smoked. Each is a functional of the fitted model under a chosen covariate law $Q$; the attributable fraction also needs the share of smokers at each covariate value. Smokers also die earlier of other causes, so a lifetime risk of lung cancer death is a cumulative incidence (Andersen et al. 2012). For a given covariate profile and smoking history, let $\lambda_C(t)$ and $\lambda_O(t)$ be the hazards of lung cancer death and of death from other causes under that history. The risk of lung cancer death by time $t$ is
+\[
+F_C(t)=\int_0^t \lambda_C(v)\exp\left[-\int_0^v\{\lambda_C(u)+\lambda_O(u)\}\,du\right]dv,
+\]
+so the lifetime risk needs a model for death from other causes as well as for lung cancer.
+
+\paragraph{The confounding.} Fisher's genotype enters as an unmeasured binary $U$ with a prior on its prevalence ratio between smokers and nonsmokers and on its effect on cancer. Twin studies of smoking concordance inform the first. 
+
+\paragraph{The attribution.} For an individual smoker with lung cancer, $\PN$ is bounded below by $1 - 1/\mathrm{RR}$ under exogeneity (Chapter~\ref{ch:tianpearl}). With a risk ratio\index{risk ratio} of 9, that is about 0.89. Figure~\ref{fig:pnbound} plots the bound against the risk ratio: it passes one half, the civil standard of more probable than not, at a risk ratio of 2, and for heavy smokers, with a risk ratio near 60, it is 0.98. The bound applies to a smoker drawn at random from the lung cancer cases of the group whose risk ratio it uses. For a plaintiff with known dose or other characteristics, use the matching group's risk ratio and exogeneity assumption; the population ratio can put her bound too high or too low (Exercise~\ref{ex:ch13:6}).
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.85\linewidth]{pn_bound.pdf}
+\caption{The lower bound $1 - 1/\mathrm{RR}$ on the probability of necessity under exogeneity, against the risk ratio on a log scale.}
+\label{fig:pnbound}
+\end{figure}
+
+Without exogeneity, the Tian and Pearl bounds widen, and the Bayesian posterior for $\PN$ depends on the prior for $U$.
+
+
+
+\paragraph{A modern Bayesian synthesis.} A Bayesian synthesis would combine in one model cohort dose responses and quitting effects, case control risk ratios through the odds ratios, a prior on genetic confounding informed by twins, and Mendelian randomization evidence on smoking heaviness. Each source would have its own likelihood, bias model and assumptions. The conclusion, which no serious analyst doubts, would not change; the synthesis would show how it depends on each source and assumption.
+
+\paragraph{A computed illustration.} The numbers below come from stated priors, and no cohort data enter. Let $U$ be carried by a fraction $f_1$ of smokers and $f_0 = f_1/\mathrm{PR}$ of nonsmokers, let it multiply the risk of lung cancer by $R$ in both groups, and suppose smoking is unconfounded within levels of $U$. If $r_{s0}$ is the risk at smoking status $s$ when $U=0$, the observed risk in group $s$ is $r_{s0}\{1+f_s(R-1)\}$, so
+\[
+\mathrm{RR}=\frac{r_{10}}{r_{00}}\,B,\qquad B=\frac{1+f_1(R-1)}{1+f_0(R-1)},\qquad \tau=\log\frac{r_{10}}{r_{00}}=\log\frac{\mathrm{RR}}{B}.
+\]
+Here $B$ is the factor in Cornfield's proof and $\tau$ is the log risk ratio of smoking within levels of $U$. With the observed risk ratio RR fixed at 9 or 60, as a large cohort would fix it, and with $(f_1, \mathrm{PR}, R)$ a priori independent of the observed risks, the posterior of $\tau$ is the prior on $(f_1, \mathrm{PR}, R)$ pushed through $B$ (Proposition~\ref{prop:partial}), restricted to values that keep every stratum risk between zero and one. At the nonsmoker risk 0.0002 of Table~\ref{tab:smokingbayes} the restriction removes at most $1.4 \times 10^{-4}$ of the prior mass. Under a continuous prior the event $\tau = 0$ has probability zero, so we report the probability of no positive effect, $\Prob(\tau\leq 0)=\Prob(B\geq\mathrm{RR})$, the prior mass of Cornfield's region. Because $B\leq\min(\mathrm{PR},R)$, that region needs both PR and $R$ to be at least as large as RR.
+
+Both priors make $f_1$ uniform and $\log \mathrm{PR}$ and $\log R$ independent and half normal. The sceptical prior gives PR and $R$ each a median of 3.8 and a 95th percentile of 50. The twin informed prior keeps that for $R$ and gives PR a median of 1.6 and a 95th percentile of 4. The 4 is illustrative, not elicited.
+
+\input{chapters/smoking_bayes_table}
+
+At a risk ratio of 9 (Table~\ref{tab:smokingbayes}) the probability of no positive effect is 0.022 under the sceptical prior and $4.4 \times 10^{-5}$ under the twin informed one, and it is 0.0023 if the twin informed 95th percentile for PR is 9 instead of 4. At 60 the probabilities are $2.5 \times 10^{-4}$ and below $10^{-6}$. Without exogeneity the Tian and Pearl lower bound on $\PN$ follows from the cell probabilities each draw implies, and in this model it reduces to $L=\max\{0,\,1-B/\mathrm{RR}\}=\max\{0,\,1-e^{-\tau}\}$, the exogeneity bound $1-1/\mathrm{RR}$ with the risk ratio within levels of $U$ in place of the observed one. The upper bound can fall below one, but it equals one on every draw we checked, about 4,000,000 for each prior and risk ratio, at smoker shares from 0.2 to 0.8 and nonsmoker risks from $10^{-4}$ to $10^{-3}$. The table gives $\PN$ a uniform position between the bounds, independently of each parameter draw, so its summaries depend on both this prior and the prior for $U$. At a risk ratio of 9 under the sceptical prior $L$ has posterior mean 0.77, against 0.89 under exogeneity, and exceeds one half with probability 0.92.
+
+\section{Bradford Hill's considerations as prior information}
+
+Bradford Hill\index{Hill, Austin Bradford|see{Bradford Hill's considerations}}'s 1965 lecture listed nine considerations\index{Bradford Hill considerations@Bradford Hill's considerations|textbf} for judging whether an association is causal. He insisted they were not a checklist and that none was necessary or sufficient. A Bayesian can say what each contributes.
+
+\paragraph{Strength.} A large risk ratio requires a strong confounder to explain it, Cornfield's point. Under any fixed prior on confounding strength, a larger risk ratio pushes the posterior probability of a real effect toward one.
+
+\paragraph{Consistency.} Agreement across populations, designs and investigators makes a single source of bias less likely. In a hierarchical model across studies, consistency shows up as small between study variance and a posterior for the common effect that is robust to dropping any one study.
+
+\paragraph{Specificity.} An exposure that causes one disease rather than many is easier to believe. Smoking, which causes many diseases, seemed to violate it, though Hill (1965) saw specificity in the size of the lung cancer association, and he rightly gave the criterion little weight.
+
+\paragraph{Temporality.} The cause must precede the effect. We take this as logically necessary, whatever Hill's warning: a model constraint rather than evidence within it.
+
+\paragraph{Biological gradient.} Suppose a binary $U$ explains the whole dose response\index{dose response}, smoking itself having no effect, and let $f_d$ be its prevalence among smokers at dose $d$ and $f_0$ its prevalence among nonsmokers. Cornfield's inequality holds at every dose level, so $f_d/f_0\geq\mathrm{RR}(d)$ at every $d$. Since $f_d\leq 1$, a risk ratio near 60 for the heaviest smokers gives $f_0\leq 1/60$: at most one nonsmoker in sixty could carry $U$. Smoothness adds little on its own, since a prevalence that rises smoothly with dose reproduces any smooth gradient; the constraint is the size of the ratios, and it tightens only if the model also limits how $f_d$ can vary with dose.
+
+\paragraph{Plausibility and coherence.} Agreement with known biology is prior information: animal experiments showing that tobacco tar induces tumours raise the prior probability of a causal effect.
+
+\paragraph{Experiment.} The fall in risk after quitting is the semi-experimental evidence Hill had in mind, and evidence against any time invariant confounder not associated with who quits (Exercise~\ref{ex:ch13:5}). Quitting data also give a second Cornfield condition: a genotype explaining the whole risk gap between continuing smokers and long-term quitters must have a prevalence ratio between those groups at least as large as their observed risk ratio.
+
+\paragraph{Analogy.} Similar exposures with known effects make an effect more plausible; this too is prior information.
+
+\section{Mendelian randomization}
+
+Chapter~\ref{ch:iv} introduced Mendelian randomization\index{Mendelian randomization}. For smoking, variants in the nicotinic acetylcholine receptor cluster on chromosome 15 are associated with cigarettes smoked per day among smokers (Thorgeirsson et al. 2008; Tobacco and Genetics Consortium 2010). Assigned at conception, these variants give variation in smoking heaviness unrelated to most of the social and behavioural confounders of smoking.
+
+Fisher's constitutional hypothesis said that genes confound the association; Mendelian randomization uses genes as instruments for smoking. A gene causing both smoking and cancer by separate pathways, as Fisher supposed, would violate the exclusion restriction. Modern analyses use many variants and allow for pleiotropy. Larsson et al. (2020) combined more than 340 variants associated with starting to smoke, checked the main estimate against estimators that tolerate some invalid instruments, and found an odds ratio for lung cancer of 1.80 (95\% interval 1.59 to 2.03) per standard deviation of genetically predicted smoking initiation in the International Lung Cancer Consortium data, and 2.26 in UK Biobank.
+
+A second check looks at never smokers: a variant affecting cancer only through smoking should have no effect there, and an association would favour Fisher's separate pathway. The check is not clean. If the variant also affects smoking initiation, restricting to never smokers selects on a collider, a common effect of the variant and other causes of smoking (Section~\ref{fw:sec:pearl}); if any of those causes also affects cancer, selection can create or hide an association (Gkatzionis and Burgess 2019).
+
+Pooled analyses find no association between the chromosome 15 variants and lung cancer among never smokers. The International Lung Cancer Consortium found none, while white ever smokers there show an odds ratio of 1.26 per risk allele (Truong et al. 2010), and Wang et al. (2011) report an odds ratio of 1.09 (95\% interval 0.94 to 1.28) from 2,405 never smokers with lung cancer and 7,622 controls. That interval does not exclude an effect as large as the one in smokers, and an early genome wide report had found similar risks whatever the smoking status (Hung et al. 2008), so the check favours Fisher's critics without settling the question on its own.
+
+\section{In practice}
+
+\paragraph{The target.} Each posterior draw of the hazard model and confounding parameters gives the population attributable fraction and benefit of quitting\index{smoking and lung cancer!benefit of quitting|textbf} by averaging fitted risks over the appropriate population. For an individual's probability of necessity, compute the Tian and Pearl bounds from each draw and draw a position within them. The same draws give a lifelong smoker's lifetime risk.
+
+\paragraph{What the analyst does differently.} Before fitting anything, write down the alternative explanation, as Fisher did, and ask what the data require of it; here the requirement is Cornfield's. Fit a risk model with a flexible dose response and a term for time since quitting, give the unmeasured confounder a prior calibrated to what is known, and report the posterior probability of no positive effect under that prior and under a sceptical one. For a plaintiff, report the bound $1 - 1/\mathrm{RR}$ for the group matching her dose and other known characteristics, say that it assumes exogeneity within that group, then give the posterior without that assumption. Fit a measurement error model for a crudely measured variable such as inhalation rather than reading a null association as evidence of no effect.
+
+\paragraph{Against DML.} DML's guarantees for the cohort comparison assume all confounders are measured, precisely the point in dispute. Its instrumental variable score (Chapter~\ref{ch:iv}) replaces this with an exclusion restriction, which for a genetic instrument is the one Fisher's genotype would break. Either way the output is one number with an asymptotic interval, which by itself answers neither Fisher's objection nor the court's question. The sensitivity bounds that carry Cornfield's argument to DML (Section~\ref{sec:sensitivity}) quantify the confounding needed to overturn the estimate, meeting part of Fisher's objection, but give a threshold where the court asks for a probability. DML has no place for a prior on the genotype informed by the twin studies or for the dose response as evidence against an alternative, and it cannot combine cohort, case control, twin and Mendelian randomization evidence in one posterior. It is adequate for a single average effect with rich measured covariates and no serious unmeasured confounder, perhaps a comparison within a cohort adjusting for age and occupation. The full smoking question asks what the data say against a named alternative, and the Bayesian synthesis would answer it with the assumptions in view.
+
+\section*{Notes}
+
+The case control studies of 1950 are Wynder and Graham (1950) and Doll and Hill (1950), and the British doctors study first reported in Doll and Hill (1954). Fisher's letters and short book are Fisher (1957, 1958, 1959). Cornfield's inequality appears in Cornfield and coauthors (1959), the nine considerations in Hill (1965), and the Surgeon General's report is United States Department of Health, Education, and Welfare (1964).
+
+For the front door see Pearl (1995, 2009) and Pearl and Mackenzie (2018); Appendix~\ref{app:graphs} derives the formula with the do calculus. Chapter~\ref{ch:tianpearl} develops Tian and Pearl's (2000) bounds and the sensitivity methods of VanderWeele and Ding (2017), Rosenbaum (2002), and McCandless, Gustafson and Levy (2007). The computed illustration integrates over bias parameters as McCandless, Gustafson and Levy do; Gustafson (2015) treats its partial identification setting. Chapter~\ref{ch:iv} gives the assumptions of Mendelian randomization (Katan 1986; Davey Smith and Ebrahim 2003).
+
+The chapter reanalyses no historical data. The hazard model of the model first analysis, the measurement error model for inhalation and the twin cohorts are described and not fitted; what we compute is the front door simulation and the prior to posterior illustration of Cornfield's region.
+
+\begin{exercises}
+\item\label{ex:ch13:1} Derive the front door formula \eqref{eq:frontdoor} from the structural assumptions using the rules of the do calculus in Appendix~\ref{app:graphs}, justifying each step by the separation it needs in the graph.
+\item\label{ex:ch13:2} In the simulation of Figure~\ref{fig:frontdoor}, add a direct effect of the genotype on tar and show how the front door estimate becomes biased.
+\item\label{ex:ch13:3} Write the population attributable fraction as a functional of a fitted risk model, and explain why it depends on the law $Q_{SX}$ of smoking status and covariates in the population of interest, and not on the covariate law $Q$ alone.
+\item\label{ex:ch13:4} Fisher's twin argument showed that smoking habits were more concordant in identical twins. Explain how such data could be used to set a prior on the genotype prevalence ratio in a Bayesian sensitivity analysis.
+\item\label{ex:ch13:5} Among people who smoked before a common decision age, let $A$ indicate quitting at that age, $H$ the prior smoking and health history, and $Y$ lung cancer over a fixed follow up period with complete follow up. Suppose smoking has no effect on lung cancer, a fixed binary genotype $U$ raises the risk, and, given $U$ and $H$, quitting carries no further information about risk: $\Prob(Y=1\mid A,U,H)=r(U,H)$ with $r(1,h)>r(0,h)$. Show that, within a history stratum containing both quitters and continuing smokers, their risks can differ only if $U$ is associated with $A$ in that stratum, and give an example showing that the claim fails without the assumption on $r$. Construct an example in which $U$ has no effect on the decision to quit but is associated with it among smokers, because $U$ and some cause of quitting both lead people to start smoking. Then show that $U\indep A\mid H$ implies equal risks for quitters and continuing smokers within each history stratum, and say which implication of this can be tested without measuring $U$.
+\item\label{ex:ch13:6} A cohort of smokers has dose specific risk ratios $\mathrm{RR}(d)$ against a common nonsmoker risk, and a share $w_d$ of the smokers is at dose $d$. Show that the average of the lower bounds $1 - 1/\mathrm{RR}(d)$ over the smokers who develop cancer equals $1 - 1/\mathrm{RR}$ for the single risk ratio $\mathrm{RR} = \sum_d w_d \mathrm{RR}(d)$, and say for which plaintiffs the dose specific bound exceeds the single ratio bound.
+\end{exercises}

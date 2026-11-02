@@ -1,0 +1,236 @@
+\chapter{Causal Questions}\label{ch:predictive}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+Causal questions are predictions about outcomes that were not observed. De Finetti's theorem turns a judgement of exchangeability into a model with a prior, ignorability says which part of that model the data inform, and every causal target, from the average effect to an individual attribution, is a functional of one posterior.
+\end{tcolorbox}
+
+In the spring of 1930 the Department of Health for Scotland gave about 10,000 schoolchildren in Lanarkshire\index{Lanarkshire milk experiment} three quarters of a pint of milk a day, from February to June, and kept about 10,000 more as controls. Every child was weighed and measured at the start and the end, so each child's growth is seen with milk or without it, and never both. Children were to be allocated by ballot or by alphabet, but teachers could substitute children when the groups looked unbalanced, and at the start the controls were already ahead by about three months' growth in weight and four in height. The gap in growth between the two groups mixes what milk does with how the teachers chose\index{confounding|textbf}\index{confounder|see{confounding}} (Section~\ref{sec:milk} tells the story at length).
+
+A health authority deciding whether to pay for milk next year wants a forecast of next year's growth with milk and without it. A parent wants to know whether milk made the difference for her own child. One posterior answers both once we say which children are exchangeable and how they were assigned, though the parent's answer leans on a prior for something no experiment can show.
+
+
+
+
+
+\section{Potential outcomes}\label{sec:potential}
+
+Consider units $i = 1, \ldots, n$. Each unit has covariates $X_i$, receives a binary treatment $T_i \in \{0,1\}$, and has two potential outcomes\index{potential outcomes|textbf}\index{Rubin causal model|see{potential outcomes}}, $Y_i(1)$ if treated and $Y_i(0)$ if not. Only one of the two is ever observed:
+\begin{equation}
+Y_i = T_i Y_i(1) + (1 - T_i) Y_i(0).
+\label{eq:consistency}
+\end{equation}
+Equation~\eqref{eq:consistency}, the consistency assumption\index{consistency assumption|textbf}, says the observed outcome equals the potential outcome for the treatment actually received. Implicit in the notation is the stable unit treatment value assumption: unit $i$'s outcomes do not depend on other units' treatments, and each treatment has only one version.
+
+The missing outcome is the whole problem, what Holland\index{Holland, Paul W.!fundamental problem of causal inference|textbf} called the fundamental problem of causal inference\index{fundamental problem of causal inference|textbf}. Rubin\index{Rubin, Donald B.|textbf}'s insight was that this is a missing data\index{missing data|textbf} problem, and a Bayesian treats missing data through its posterior predictive distribution given everything observed.
+
+\begin{definition}[Unit level and population effects]
+The unit level effect\index{unit level effect|textbf} is $\tau_i = Y_i(1) - Y_i(0)$. The finite population\index{finite population|textbf} average treatment effect is
+\[
+\tau_{\mathrm{fp}} = \frac{1}{n}\sum_{i=1}^n \{Y_i(1) - Y_i(0)\}.
+\]
+For a superpopulation\index{superpopulation|textbf} with law $P$ on $(X, Y(0), Y(1))$, the average treatment effect\index{average treatment effect|textbf}\index{ATE|see{average treatment effect}}\index{population average treatment effect|see{average treatment effect}} is $\tau = \E_P\{Y(1) - Y(0)\}$ and the conditional average treatment effect\index{conditional average treatment effect|textbf}\index{CATE|see{conditional average treatment effect}}\index{conditional effect|see{conditional average treatment effect}} at covariate value $x$ is $\tau(x) = \E_P\{Y(1) - Y(0) \mid X = x\}$.
+\end{definition}
+
+The finite population effect $\tau_{\mathrm{fp}}$ is a property of the $n$ units in hand, a function of quantities half of which are missing; $\tau$ is a property of the law that generated them. A Bayesian can report a posterior for either, and the two differ, because the finite population effect holds the observed half of the table fixed and is uncertain only about the missing half (Section~\ref{gr:sec:urn}).
+
+\section{Exchangeability as the bridge}\label{sec:exchangeability}
+
+The law $P$ has to come from somewhere. A frequentist posits it. A Bayesian builds it from a symmetry judgement about the units.
+
+\begin{definition}[Exchangeability]
+A sequence of random quantities $Z_1, Z_2, \ldots$ is exchangeable\index{exchangeability|textbf} if for every $n$ and every permutation $\sigma$ of $\{1, \ldots, n\}$,
+\[
+(Z_1, \ldots, Z_n) \overset{d}{=} (Z_{\sigma(1)}, \ldots, Z_{\sigma(n)}).
+\]
+\end{definition}
+
+\begin{theorem}[de Finetti]
+If $Z_1, Z_2, \ldots$ is an infinite exchangeable sequence\index{exchangeable sequence|see{exchangeability}} taking values in a Polish space, there is a unique probability measure $\Pi$ on the space of probability laws\index{de Finetti theorem@de Finetti's theorem|textbf}\index{de Finetti representation|see{de Finetti's theorem}}\index{representation theorem|see{de Finetti's theorem}} such that
+\[
+\Prob(Z_1 \in A_1, \ldots, Z_n \in A_n) = \int \prod_{i=1}^n F(A_i) \, \Pi(dF)
+\]
+for every $n$ and every measurable $A_1, \ldots, A_n$. The random law $F$ is the almost sure weak limit of the empirical distribution of $Z_1, \ldots, Z_n$.
+\end{theorem}
+
+The binary case is de Finetti (1937) and Appendix~\ref{app:background} states it; the general case is Hewitt and Savage (1955), and a proof of the statement above, including the limit of the empirical distribution, is in Kallenberg (2002).
+
+Take $Z_i = (X_i, Y_i(0), Y_i(1))$. If we judge the units exchangeable\index{potential outcomes!and exchangeability|textbf} before treatment is assigned, they behave as independent draws from an unknown law $F$ with prior $\Pi$, and causal estimands\index{estimand} are functionals of $F$: $\tau = \tau(F)$, $\tau(x) = \tau(F; x)$, and so on. Exchangeability already implies the model.
+
+When $F$ is indexed by a finite dimensional parameter $\theta$ we write the representation\index{de Finetti theorem@de Finetti's theorem} in the familiar form
+\begin{equation}
+p(z_1, \ldots, z_n) = \int \prod_{i=1}^n f(z_i \mid \theta) \, \pi(d\theta).
+\label{eq:definetti}
+\end{equation}
+The predictive distribution of an unobserved potential outcome integrates $f$ against the posterior for $\theta$.
+
+\begin{remark}
+Exchangeability of the full triples is a different judgement from exchangeability of the observed records\index{exchangeability!of the observed records|textbf} $(X_i, T_i, Y_i)$: before treatment, nothing distinguishes the units except their covariates. Partial exchangeability\index{exchangeability!partial|textbf}, within groups defined by covariates, is the natural weakening and the judgement behind every regression model. Section~\ref{gr:sec:transform} adds the restriction that the treatment acts in the same way in every covariate cell, which gives the effect a group structure.
+\end{remark}
+
+Two other weakenings are common. Units may be exchangeable within schools, hospitals or regions, with the groups themselves exchangeable, which gives hierarchical models with group level parameters drawn from a common law. And regression coefficients may be exchangeable, or exchangeable within blocks, the judgement behind shrinkage priors such as the horseshoe (Chapter~\ref{ch:horseshoe}). Each judgement can be challenged, and the challenge is always substantive. A critic who doubts that two schools are exchangeable must say how they differ, and the answer becomes a covariate or a stratum in the model; disagreements about the model are then disagreements about the world.
+
+\section{Assignment and ignorability}\label{sec:ignorability}
+
+To learn about $F$ we must know how treatment was assigned. Write the assignment mechanism\index{assignment mechanism|textbf}\index{treatment assignment|see{assignment mechanism}} as $p(T \mid X, Y(0), Y(1), \phi)$, where $\phi$ indexes it.
+
+\begin{definition}[Ignorability]\label{def:ignorability}
+Treatment assignment is strongly ignorable\index{ignorability!strong|textbf}\index{ignorability}\index{strong ignorability|see{ignorability}} given $X$ if
+\[
+\{Y(0), Y(1)\} \indep T \mid X \quad\text{and}\quad 0 < e(x) < 1 \text{ for all } x,
+\]
+where $e(x) = \Prob(T = 1 \mid X = x)$ is the propensity score\index{propensity score|textbf}\index{overlap|textbf}\index{common support|see{overlap}}\index{positivity|see{overlap}}\label{def:propensity}.
+\end{definition}
+
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[node distance=18mm]
+\node[v] (X) {$X$};
+\node[v,below left=of X] (T) {$T$};
+\node[v,below right=of X] (Y) {$Y$};
+\draw[e] (X) -- (T); \draw[e] (X) -- (Y); \draw[e] (T) -- (Y);
+\end{tikzpicture}
+\caption{Confounding by measured covariates. Ignorability holds given $X$, and every superpopulation and conditional effect is a functional of the law of $Y$ given $(X, T)$ averaged over a law of $X$.}
+\label{fig:dagconf}
+\end{figure}
+
+For a Bayesian, ignorability\index{ignorability|textbf}\index{unconfoundedness|see{ignorability}} (Figure~\ref{fig:dagconf}) has a precise consequence. If the assignment vector depends on the potential outcomes only through the covariates, $p(t \mid x, y(0), y(1), \phi) = p(t \mid x, \phi)$, the joint density of the observed data factorizes as
+\[
+p(y, t \mid x, \theta, \phi) = p(t \mid x, \phi) \prod_{i=1}^n f(y_i \mid x_i, t_i, \theta).
+\]
+The assignment factor need not be a product over units; complete randomization, which fixes the number treated, is not. If $\theta$ and $\phi$ are a priori independent, the posterior for $\theta$ does not involve the assignment mechanism at all:
+\begin{equation}
+\pi(\theta \mid y, t, x) \propto \pi(\theta) \prod_{i=1}^n f(y_i \mid x_i, t_i, \theta).
+\label{eq:ignorable}
+\end{equation}
+Rubin called this the ignorability of the assignment mechanism for Bayesian inference. Its most famous criticism\index{Robins and Ritov example} hinges on the phrase ``a priori independent'' (Section~\ref{sec:rrw}). When the analyst knows how selection relates to outcomes, the prior should say so, and then \eqref{eq:ignorable} no longer holds in that form.
+
+\section{Three kinds of causal target}\label{sec:targets}
+
+Three families of target\index{estimand|textbf}\index{estimand!choice of|textbf}\index{causal target|see{estimand}}\index{target of inference|see{estimand}} recur throughout the book.
+
+\paragraph{Population averages.} The average treatment effect\index{average treatment effect} $\tau$, the effect on the treated $\E\{Y(1) - Y(0) \mid T = 1\}$, and their finite population versions average contrasts over units. The superpopulation versions are identified under ignorability and overlap. The finite population versions are not functionals of the law of the observed data: their posteriors also depend on the association between $Y(0)$ and $Y(1)$, which the data do not inform (Section~\ref{sec:imputation}).
+
+\paragraph{Conditional and distributional effects.} The conditional effect $\tau(x)$, the quantile treatment effect\index{quantile treatment effect|textbf}\index{QTE|see{quantile treatment effect}}\index{quantile effect|see{quantile treatment effect}} $F_{Y(1)}^{-1}(u) - F_{Y(0)}^{-1}(u)$, and effects on any other feature of the marginal laws\index{distributional target|textbf} describe heterogeneity. They too are identified under ignorability, though estimating them well needs much more data than $\tau$.
+
+\paragraph{Individual attributions.} The probability that treatment was necessary for an outcome\index{probabilities of causation}, $\Prob\{Y(0) = 0 \mid T = 1, Y = 1\}$, or that it was both necessary and sufficient, $\Prob\{Y(1) = 1, Y(0) = 0\}$, depend on the joint law of $Y(0)$ and $Y(1)$. No experiment observes both potential outcomes for one unit, so without further assumptions such as monotonicity they are not identified and can only be bounded; Chapter~\ref{ch:tianpearl} is devoted to them.
+
+Suppose a randomized experiment\index{randomized experiment|textbf}\index{randomized trial|see{randomized experiment}} shows $p_1 = \Prob\{Y(1) = 1\} = 0.6$ and $p_0 = \Prob\{Y(0) = 1\} = 0.3$. The probability of necessity and sufficiency\index{probability of necessity and sufficiency}, $\mathrm{PNS} = \Prob\{Y(1) = 1, Y(0) = 0\}$, then satisfies
+\[
+\max(0, p_1 - p_0) \le \mathrm{PNS} \le \min(p_1, 1 - p_0),
+\]
+which here is $0.3 \le \mathrm{PNS} \le 0.6$. The lower end, $p_1 - p_0$, is the proportion helped minus the proportion harmed, and PNS reaches it when treatment harms no one; the upper end holds because PNS cannot exceed the probability of either event it combines. The experiment fixes the two margins and leaves their coupling free, so an interval of width 0.3 is all it can say. Section~\ref{gr:sec:margins} says which quantities the two margins identify and which they leave free.
+
+A framework with no way to state the third kind of question is, in our view, incomplete. Courts ask it daily: was this plaintiff's cancer caused by the defendant's product? The answer depends on the joint law of the two potential outcomes, which the data never reveal, so double machine learning (DML) has no point to estimate. It can estimate the identified bounds (Chapter~\ref{ch:tianpearl}); a posterior over a joint model can also represent what is known and what is not.
+
+\section{A first worked example}\label{sec:firstexample}
+
+Consider the Gaussian linear model\index{Gaussian linear model|textbf}
+\[
+Y(t) = \alpha + \tau t + \beta^\top X + \varepsilon_t, \qquad \varepsilon_t \sim N(0, \sigma^2),
+\]
+with treatment assigned completely at random. Place a flat prior\index{prior distribution!flat|textbf} on $(\alpha, \tau, \beta)$ and Jeffreys' prior\index{prior distribution!Jeffreys|textbf} on $\sigma^2$. The marginal posterior of $\tau$ is then a scaled Student $t$ distribution centred at the least squares coefficient, with $n - p - 2$ degrees of freedom, where $p$ is the dimension of $X$. The posterior is proper when the design matrix with rows $(1, T_i, X_i^\top)$ has full column rank, $n > p + 2$ and the least squares residuals are not all zero, and its variance is finite when $n > p + 4$.
+
+This is classical analysis of covariance\index{analysis of covariance|textbf}\index{ANCOVA|see{analysis of covariance}}. With no interactions, $\tau(x) = \tau$ for all $x$, so the posterior of $\tau$ is the posterior of the average treatment effect for any covariate population. Add an interaction $\gamma^\top X t$ and $\tau(x) = \tau + \gamma^\top x$, so the coefficient $\tau$ is now the effect at $x = 0$ and the average treatment effect depends on which population of $x$ we average over. The data have not changed; the model has, and with it the accounting. A new covariate law $Q$ needs no new fit, only a new average at each posterior draw:
+\[
+\tau_Q = \int \tau(x)\,Q(dx) = \tau + \gamma^\top \E_Q X.
+\]
+
+
+
+\section{Prediction, decision and policy}\label{sec:policyvalue}
+
+Causal questions are asked in order to act. The health authority of the opening must decide whether to pay for milk for everyone, for no one, or for a targeted subgroup, and wants next year's growth under each policy; a patient deciding whether to quit smoking wants her own risk under each choice. Both are predictive distributions for future observables under an intervention, forecasts that are scored when the outcomes arrive.
+
+Dawid's decision theoretic account uses a regime indicator\index{regime indicator} $F_T$ that is $\emptyset$ for the observational regime and $t$ when treatment is set to $t$: the causal effect compares $p(Y \mid F_T = 1)$ with $p(Y \mid F_T = 0)$, and ignorability says the conditional law of $Y$ given $X$ and $T$ is the same in the observational and interventional regimes (Chapter~\ref{ch:frameworks}). Superpopulation and conditional effects need no counterfactuals, since each is a feature of the law of an observable under a regime that could in principle be run; the finite population effect, individual attributions and natural direct and indirect effects do.
+
+Each policy $\delta$ maps covariates to treatment, and its value\index{policy value|textbf}\index{treatment policy|see{policy value}} is the expected outcome of a future patient under the policy,
+\[
+V(\delta) = \int \E\{Y(\delta(x)) \mid X = x\}\,Q(dx),
+\]
+where $Q$ is the covariate law of future patients. Under ignorability, and if the conditional law of the outcome carries over from the study to the future patients (Section~\ref{fw:sec:transport}), given $\theta$ it is $V(\delta;\theta) = \int \mu_{\delta(x)}(x;\theta)\,Q(dx)$, with $\mu_t(x;\theta) = \E(Y \mid X = x, T = t, \theta)$ the outcome regression. Evaluating $V(\delta;\theta)$ at each posterior draw gives its posterior; averaging gives the posterior predictive mean outcome under $\delta$. The Bayes optimal policy\index{policy value!optimal policy|textbf} maximizes posterior expected value, possibly penalized by cost.
+
+In the worked example of Section~\ref{sec:firstexample}, let treating a patient cost $c$ on the outcome scale. Given $\theta$ and without an interaction, every policy that treats a fraction $w$ of the population has value net of cost $\alpha + \beta^\top \E_Q X + w(\tau - c)$, and the best policy treats everyone if $\tau$ exceeds $c$ and no one otherwise; the average effect is all that matters. With the interaction $\gamma^\top X t$, treating the subgroup\index{subgroup effect|textbf} $\{x : \delta(x) = 1\}$ adds $\int_{\delta = 1} (\tau + \gamma^\top x - c)\,Q(dx)$ to the value net of cost of treating no one, and the best policy given $\theta$ treats exactly those $x$ at which $\tau + \gamma^\top x$ exceeds $c$. The Bayes policy replaces $\tau + \gamma^\top x$ by its posterior mean (Exercise~\ref{ex:ch01:7}). A method that reports only $\tau$ cannot find that policy, and a method that reports $\tau(x)$ without its posterior uncertainty cannot say how confident the authority should be in the boundary it draws. The posterior draws $\theta^{(s)}$ give both: for each draw, the value of every candidate policy, and across draws, the probability that one policy beats another.
+
+\section{Posterior predictive imputation}\label{sec:imputation}
+
+The Bayesian computation of a finite population effect\index{finite population effect|textbf}\index{sample average treatment effect|see{finite population effect}} is an imputation\index{imputation|textbf}\index{imputation!posterior predictive|textbf}\index{posterior predictive imputation|see{imputation}} algorithm.
+
+\begin{enumerate}
+\item Specify a joint model $f(y(0), y(1) \mid x, \theta)$ for the pair of potential outcomes given covariates, and a prior $\pi(\theta)$.
+\item Under ignorability, obtain draws $\theta^{(1)}, \ldots, \theta^{(S)}$ from the posterior, which depends only on the observed outcome of each unit and the marginal of $f$ for that arm.
+\item For each draw $s$ and each unit $i$, draw the missing potential outcome\index{imputation!of missing potential outcomes|textbf} from its conditional law given the observed one: $Y_i^{\mathrm{mis}} \sim f(y(1 - T_i) \mid y(T_i) = Y_i, x_i, \theta^{(s)})$.
+\item Compute any finite population\index{finite population} summary of the completed table, for example $\tau_{\mathrm{fp}}^{(s)} = n^{-1}\sum_i\{Y_i(1) - Y_i(0)\}^{(s)}$.
+\end{enumerate}
+
+Step 3 needs the conditional law of one potential outcome given the other, which depends on their association, and that association is not identified (Section~\ref{sec:ot}). Superpopulation targets skip step 3, since $\tau(\theta)$ depends only on the marginals. Chapter~\ref{ch:computation} shows how to obtain the draws of step 2, by Markov chain Monte Carlo or by the Generative Bayesian Computation of Polson and Sokolov (2026a). No sampler helps with step 3: the association is absent from the observed data likelihood, so when its prior is independent of the marginal parameters its posterior is that prior.
+
+\begin{proposition}
+Under ignorability, in the bivariate normal model with $Y(t) \mid x \sim N(\mu_t(x), \sigma_t^2)$ and correlation $\rho$ between $Y(0)$ and $Y(1)$, the conditional posterior variance of $\tau_{\mathrm{fp}}$ given $\theta$ is
+\[
+\frac{1}{n^2}\sum_{i=1}^n \sigma_{1 - T_i}^2(1 - \rho^2).
+\]
+\end{proposition}
+
+\begin{proof}
+Given $\theta$, the missing outcome of unit $i$, with $t = T_i$, is
+\[
+Y_i^{\mathrm{mis}} \mid \theta, Y_i \sim N\!\left(\mu_{1-t}(x_i) + \rho\,\frac{\sigma_{1-t}}{\sigma_t}\{Y_i - \mu_t(x_i)\},\ \sigma_{1-t}^2(1 - \rho^2)\right),
+\]
+independently across units. Each missing outcome enters $\tau_{\mathrm{fp}}$ with coefficient $\pm 1/n$; the observed outcomes are fixed, so the variances add.
+\end{proof}
+
+At $\rho = \pm 1$ the conditional variance above vanishes, because the observed outcome determines the missing one; at $\rho = 0$ it is largest. The posterior of $\theta$ adds the variance of the conditional mean of $\tau_{\mathrm{fp}}$, and in the two arm model without covariates, with known variances and flat priors on the two means, the two pieces sum to
+\[
+\mathrm{Var}(\tau_{\mathrm{fp}} \mid \text{data}) = \mathrm{Var}(\tau \mid \text{data}) - \frac{\sigma_1^2 + \sigma_0^2 - 2\rho\sigma_0\sigma_1}{n},
+\]
+as Exercise~\ref{ex:ch01:3} derives. The subtracted term is the variance of the unit effects divided by $n$. Thus the posterior variance of $\tau_{\mathrm{fp}}$ is no larger than that of $\tau$\index{average treatment effect!posterior of|textbf} and increases with $\rho$. With known variances and $n_t$ units in arm $t$, Neyman's conservative variance\index{Neyman conservative variance estimator@Neyman's conservative variance estimator|textbf}, $\sigma_1^2/n_1 + \sigma_0^2/n_0$, equals $\mathrm{Var}(\tau \mid \text{data})$. The finite population variance reaches this bound only when $\rho = 1$ and $\sigma_0 = \sigma_1$. With unequal standard deviations, even its maximum at $\rho = 1$ falls below the bound by $(\sigma_1-\sigma_0)^2/n$. For binary outcomes Proposition~\ref{gr:prop:sharpvar} shows that the bound is never sharp when $0 < |\tau_{\mathrm{fp}}| < 1$.
+
+Take $n = 100$ with 50 units in each arm and both standard deviations equal to 1. The posterior variance of $\tau$ is $1/50 + 1/50 = 0.040$, and that of $\tau_{\mathrm{fp}}$ is $0.040 - 0.02(1 - \rho)$, which is $0$, $0.010$, $0.020$, $0.030$ and $0.040$ at $\rho = -1$, $-0.5$, $0$, $0.5$ and $1$. At $\rho = -0.5$ the posterior standard deviation of $\tau_{\mathrm{fp}}$ is half that of $\tau$. The data cannot say which of these values applies, so the Bayesian states a prior for $\rho$ and reports the finite population interval under it; Neyman's conservative interval is the one for $\rho = 1$.
+
+\section{Interference}\label{sec:interference}
+
+The stable unit treatment value assumption\index{stable unit treatment value assumption|textbf}\index{SUTVA|see{stable unit treatment value assumption}} fails whenever one unit's treatment affects another's outcome\index{interference|textbf}. Three examples recur.
+
+\paragraph{Vaccination.} A vaccinated person protects the unvaccinated people around her. The effect of vaccinating one person depends on how many others are vaccinated, so the population effect of a campaign is not the sum of individual effects.
+
+\paragraph{Classrooms.} If milk made treated Lanarkshire children more energetic or attentive, their untreated classmates might have been affected too, and the experiment was not designed to detect such spillovers\index{spillover|see{interference}}.
+
+\paragraph{Markets.} A training programme that raises some workers' skills may lower the wages of untrained workers who compete with them. The partial equilibrium effect from a small trial can differ from the general equilibrium effect of scaling up.
+
+A Bayesian handles interference by modelling it. Potential outcomes become functions of the whole treatment vector, $Y_i(t_1, \ldots, t_n)$, and the model restricts the dependence, for example to the proportion treated in the unit's cluster. If units are exchangeable within clusters and the clusters themselves are exchangeable, and both judgements extend to arbitrarily many units and clusters, de Finetti's theorem\index{de Finetti theorem@de Finetti's theorem} applied to the clusters gives a hierarchical model, as in Section~\ref{sec:exchangeability}.
+
+Assume interference only within clusters. A coverage $a \in (0,1)$ is an allocation policy: each unit in a cluster is treated independently with probability $a$. Write $\bar Y(t; a)$ for the mean outcome of a unit given treatment $t$ while its clustermates are assigned under coverage $a$, averaged over units and over the clustermates' assignments. Three targets adapt those of Hudgens and Halloran (2008), whose two stage design fixes the number treated in each cluster: the direct effect $\bar Y(1; a) - \bar Y(0; a)$, the spillover (their indirect) effect $\bar Y(0; a') - \bar Y(0; a)$ of raising coverage from $a$ to $a'$, and the overall effect
+\[
+\bar Y(a') - \bar Y(a), \qquad \bar Y(a) = a\,\bar Y(1; a) + (1 - a)\,\bar Y(0; a).
+\]
+Randomizing clusters to coverages and then units within clusters (two stage randomization) identifies each $\bar Y(t; a)$ as an observed arm mean at that coverage; individual level ignorability alone does not. A model for $Y_i$ given its own treatment and its cluster's coverage then gives each target as a functional of its posterior draws.
+
+\section{In practice}\label{sec:inpractice}
+
+\paragraph{The target.} Given posterior draws $\theta^{(1)}, \ldots, \theta^{(S)}$ and an outcome model $f(y \mid x, t, \theta)$, every target in this chapter is a function of those draws. The conditional effect at $x$ is $\mu_1(x;\theta^{(s)}) - \mu_0(x;\theta^{(s)})$, with $\mu_t$ the outcome regression of Section~\ref{sec:policyvalue}; the superpopulation effect averages it over the covariate law of the superpopulation; the finite population effect imputes the missing outcomes and averages the completed table; an individual attribution also needs a joint model for the pair of potential outcomes, and its posterior carries the prior on the part the data cannot inform.
+
+\paragraph{What the analyst does differently.} The analyst states three things before fitting anything. The exchangeability judgement: which units are exchangeable with which, and given what covariates, since that judgement is the model. The assignment mechanism: for randomized assignment or assignment based only on recorded covariates, \eqref{eq:ignorable} applies if the prior keeps $\theta$ and $\phi$ independent. If selection is known to relate to outcomes, the prior must link $\theta$ and $\phi$. If assignment depended on unrecorded predictors of the outcome, the assignment model stays in the likelihood and its unidentified part calls for a sensitivity analysis (Section~\ref{sec:sensitivity}). And the target, including the population $Q$ it averages over. She then fits one model and checks it by its posterior predictive against the observed outcomes, a check that can reject the outcome model but cannot confirm ignorability or inform $\rho$. She reports the posterior of each target the decision needs, labelling the finite population effect and any individual attribution as depending on an unidentified association ($\rho$ in the Gaussian example).
+
+\paragraph{Against DML.} DML takes the identification of this chapter as given and estimates one functional, usually $\tau$, with a confidence interval. For that one number in a large sample with ignorable assignment it is adequate and cheap. The same cross fitted nuisance estimates can also value a fixed subgroup policy through doubly robust scores, as in Athey and Wager (2021), and stacking scores gives joint intervals for a few functionals named in advance; each needs its own score and its own asymptotic argument.  An unrestricted conditional effect curve $\tau(x)$ with uncertainty joint with $\tau$ needs a separate nonparametric estimator, the value of a policy chosen from the same data needs further conditions, and the finite population effect and individual attributions depend on the coupling of the potential outcomes, which no score identifies. In the Bayesian analysis each is one more functional of the same posterior draws, with the coupling stated as a prior where the target needs it.
+
+The Bayesian analysis is not automatically efficient, and with many covariates it needs a prior built for the dimension and, where selection matters, perhaps a propensity aware prior; Chapters~\ref{ch:critique} and~\ref{ch:horseshoe} test that with numbers. In our designs with five strong confounders among 50, 150 and 300 covariates (Section~\ref{sec:ricsim}), the horseshoe coupled to a fitted treatment regression gains over the independent horseshoe at $p = 50$, a gain the simulations do not resolve at $p = 150$ or $300$, and DML is more accurate than either for the average effect in all three, so the case for the Bayesian analysis rests on what it returns, a posterior for every target, and not on accuracy for one number.
+
+\section*{Notes}
+
+Potential outcomes for randomized experiments are due to Neyman (1923, translated 1990), and Rubin (1974) carried the notation to observational studies. The Bayesian reading of this chapter, in which missing outcomes are imputed from their posterior predictive distribution and an ignorable assignment mechanism drops out of the posterior, is Rubin (1978). Rosenbaum and Rubin (1983) introduced strong ignorability, and Holland (1986) named the fundamental problem of causal inference. Imbens and Rubin (2015) develop the finite population and superpopulation views, with Neyman's conservative variance, at book length.
+
+Diaconis and Freedman (1980) bound how far the first few variables of a long finite exchangeable sequence are from a mixture of independent and identically distributed ones (Exercise~\ref{ex:ch01:4}). Heath and Sudderth (1976) give the urn form used in Section~\ref{gr:sec:urn}. The regime indicator is from Dawid (2002, 2015, 2021); Athey and Wager (2021) study the value of a policy learned from observational data. Tian and Pearl (2000) derive the bounds on the probability of necessity and sufficiency. Robins and Ritov (1997) criticize Bayesian ignorability. Hudgens and Halloran (2008) define direct and spillover effects under interference confined to clusters.
+
+
+
+\begin{exercises}
+\item\label{ex:ch01:1} Show that under complete randomization the difference in sample means is unbiased for $\tau_{\mathrm{fp}}$ over the randomization distribution, and derive Neyman's conservative variance estimator.
+\item\label{ex:ch01:2} In the Gaussian model with interaction $\gamma^\top X t$, with a flat prior on all coefficients and Jeffreys' prior on $\sigma^2$, write down the posterior of the average treatment effect for the covariate law $Q$ and show that its posterior variance depends on $Q$ only through the mean of $X$ under $Q$.
+\item\label{ex:ch01:3} Let $Y(0)$ and $Y(1)$ be bivariate normal with standard deviations $\sigma_0$ and $\sigma_1$ and correlation $\rho$. Show that the posterior variance of $\tau_{\mathrm{fp}}$ given $\theta$ is decreasing in $|\rho|$, that in the two arm model without covariates, with known variances and flat priors on the means, its unconditional posterior variance is that of $\tau$ minus $(\sigma_1^2+\sigma_0^2-2\rho\sigma_0\sigma_1)/n$, and identify which value of $\rho$ makes Neyman's variance estimator exact when $\sigma_1 = \sigma_0$.
+\item\label{ex:ch01:4} Give an example of a finite exchangeable sequence that is not a mixture of independent and identically distributed sequences, and explain why this does not affect the argument of Section~\ref{sec:exchangeability} when the units in hand are few relative to the population, and why it does matter for a target that averages over the whole population.
+\item\label{ex:ch01:6} Construct a two unit example in which the stable unit treatment value assumption fails, and show that $\tau_i$ is then not well defined without specifying the treatment of the other unit.
+\item\label{ex:ch01:7} In the Gaussian model with interaction $\gamma^\top X t$, let treating a patient cost $c$ and judge a policy $\delta$ by its value net of cost. Show that the policy with the highest posterior expected value treats exactly the patients $x$ with $\E(\tau + \gamma^\top x \mid \text{data}) > c$. For this policy $\delta^\ast$ and any fixed policy $\delta$, show that $V(\delta^\ast) - V(\delta)$ is affine in $(\tau, \gamma)$, and write the posterior probability that $\delta^\ast$ beats treating no one, first for a normal posterior of $(\tau, \gamma)$ and then as an average over posterior draws.
+\item\label{ex:ch01:8} Let $p_1 = \Prob\{Y(1) = 1\}$ and $p_0 = \Prob\{Y(0) = 1\}$. Show that $\max(0, p_1 - p_0) \le \Prob\{Y(1) = 1, Y(0) = 0\} \le \min(p_1, 1 - p_0)$, that each end is reached by some joint law of $(Y(0), Y(1))$ with these margins, and that when $p_1 \ge p_0$ the lower end is the value exactly when no unit has $Y(1) = 0$ and $Y(0) = 1$.
+\item\label{ex:ch01:9} Take a two arm table with $n = 100$ and 50 units in each arm, any observed outcomes, flat priors on the two means and known standard deviations $\sigma_1 = \sigma_0 = 1$. For $\rho$ in $\{-1, -0.5, 0, 0.5, 1\}$, draw $(\mu_0, \mu_1)$ from their posterior, impute each missing outcome from its conditional law given the observed one, and record the variance across draws of $\tau_{\mathrm{fp}}$ and of $\tau = \mu_1 - \mu_0$. Compare both with the formula of Section~\ref{sec:imputation} and Exercise~\ref{ex:ch01:3}, and repeat with $\sigma_0 = 2$ to see that the two variances differ even at $\rho = 1$.
+\end{exercises}

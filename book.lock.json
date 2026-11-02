@@ -1,0 +1,460 @@
+{
+ "edition": "1",
+ "pdf": {
+  "bytes": 6667981,
+  "file": "pdf/bayesian_causality_book.pdf",
+  "pages": 702,
+  "parts": [
+   {
+    "first_page": "i",
+    "key": "",
+    "last_page": "4",
+    "pages": 46,
+    "title": "Front matter"
+   },
+   {
+    "first_page": "6",
+    "key": "1",
+    "last_page": "17",
+    "pages": 12,
+    "title": "Chapter 1. Causal Questions"
+   },
+   {
+    "first_page": "18",
+    "key": "2",
+    "last_page": "40",
+    "pages": 23,
+    "title": "Chapter 2. Frameworks for Causal Inference"
+   },
+   {
+    "first_page": "41",
+    "key": "3",
+    "last_page": "60",
+    "pages": 20,
+    "title": "Chapter 3. Models, Accounting and Randomization"
+   },
+   {
+    "first_page": "61",
+    "key": "4",
+    "last_page": "89",
+    "pages": 29,
+    "title": "Chapter 4. Groups, Urns and Information"
+   },
+   {
+    "first_page": "91",
+    "key": "5",
+    "last_page": "110",
+    "pages": 20,
+    "title": "Chapter 5. What Double Machine Learning Assumes"
+   },
+   {
+    "first_page": "111",
+    "key": "6",
+    "last_page": "135",
+    "pages": 25,
+    "title": "Chapter 6. The Inverse Weighting Lineage"
+   },
+   {
+    "first_page": "136",
+    "key": "7",
+    "last_page": "163",
+    "pages": 28,
+    "title": "Chapter 7. Orthogonality Is Not Enough"
+   },
+   {
+    "first_page": "165",
+    "key": "8",
+    "last_page": "195",
+    "pages": 31,
+    "title": "Chapter 8. The Horseshoe and the Coupled Prior"
+   },
+   {
+    "first_page": "196",
+    "key": "9",
+    "last_page": "222",
+    "pages": 27,
+    "title": "Chapter 9. Computing the Posterior"
+   },
+   {
+    "first_page": "223",
+    "key": "10",
+    "last_page": "246",
+    "pages": 24,
+    "title": "Chapter 10. Generative Treatment Effects and Joint Potential Outcomes"
+   },
+   {
+    "first_page": "247",
+    "key": "11",
+    "last_page": "264",
+    "pages": 18,
+    "title": "Chapter 11. Bayesian Nonparametrics for Causal Inference"
+   },
+   {
+    "first_page": "266",
+    "key": "12",
+    "last_page": "286",
+    "pages": 21,
+    "title": "Chapter 12. Instruments"
+   },
+   {
+    "first_page": "287",
+    "key": "13",
+    "last_page": "304",
+    "pages": 18,
+    "title": "Chapter 13. Bounds and Sensitivity"
+   },
+   {
+    "first_page": "305",
+    "key": "14",
+    "last_page": "316",
+    "pages": 12,
+    "title": "Chapter 14. Smoking and Lung Cancer"
+   },
+   {
+    "first_page": "318",
+    "key": "15",
+    "last_page": "334",
+    "pages": 17,
+    "title": "Chapter 15. Difference in Differences with the Horseshoe"
+   },
+   {
+    "first_page": "335",
+    "key": "16",
+    "last_page": "350",
+    "pages": 16,
+    "title": "Chapter 16. Two Benchmarks"
+   },
+   {
+    "first_page": "351",
+    "key": "17",
+    "last_page": "362",
+    "pages": 12,
+    "title": "Chapter 17. Two Applications in Health"
+   },
+   {
+    "first_page": "363",
+    "key": "18",
+    "last_page": "369",
+    "pages": 7,
+    "title": "Chapter 18. A Workflow for Applied Bayesian Causal Inference"
+   },
+   {
+    "first_page": "371",
+    "key": "19",
+    "last_page": "389",
+    "pages": 19,
+    "title": "Chapter 19. Causal Decisions"
+   },
+   {
+    "first_page": "390",
+    "key": "20",
+    "last_page": "435",
+    "pages": 46,
+    "title": "Chapter 20. The Causal Effect of a Merger"
+   },
+   {
+    "first_page": "436",
+    "key": "21",
+    "last_page": "464",
+    "pages": 29,
+    "title": "Chapter 21. Open Problems"
+   },
+   {
+    "first_page": "465",
+    "key": "A",
+    "last_page": "478",
+    "pages": 14,
+    "title": "Appendix A. Mathematical Background"
+   },
+   {
+    "first_page": "479",
+    "key": "B",
+    "last_page": "496",
+    "pages": 18,
+    "title": "Appendix B. Theory"
+   },
+   {
+    "first_page": "497",
+    "key": "C",
+    "last_page": "511",
+    "pages": 15,
+    "title": "Appendix C. Posterior Guarantees"
+   },
+   {
+    "first_page": "512",
+    "key": "D",
+    "last_page": "604",
+    "pages": 93,
+    "title": "Appendix D. Solutions to the Exercises"
+   },
+   {
+    "first_page": "605",
+    "key": "E",
+    "last_page": "618",
+    "pages": 14,
+    "title": "Appendix E. Notation"
+   },
+   {
+    "first_page": "619",
+    "key": "F",
+    "last_page": "623",
+    "pages": 5,
+    "title": "Appendix F. Code and Data"
+   },
+   {
+    "first_page": "624",
+    "key": "",
+    "last_page": "625",
+    "pages": 2,
+    "title": "Further Reading"
+   },
+   {
+    "first_page": "626",
+    "key": "",
+    "last_page": "648",
+    "pages": 23,
+    "title": "Bibliography"
+   },
+   {
+    "first_page": "649",
+    "key": "",
+    "last_page": "660",
+    "pages": 12,
+    "title": "Index"
+   }
+  ],
+  "sha256": "53aaffb06fcc236d14d44ea020e7aebd1ebf22b0620ea206cd21eeb7b1829f74"
+ },
+ "results": {
+  "alignment_of_errors_under_retained_lasso_shrinkage": {
+   "environment": "proposition",
+   "file": "book_tex/chapters/m04b.tex",
+   "fingerprint": "0367438e0843",
+   "label": "crit:prop:alignment",
+   "number": "7.2",
+   "page": "140",
+   "printed": "Proposition 7.2",
+   "verified_fingerprint": "0367438e0843",
+   "verified_on": "2026-11-02"
+  },
+  "attenuation_representation": {
+   "environment": "theorem",
+   "file": "book_tex/chapters/m04b.tex",
+   "fingerprint": "fd84583f6041",
+   "label": "crit:thm:atten",
+   "number": "7.5",
+   "page": "142",
+   "printed": "Theorem 7.5",
+   "verified_fingerprint": "fd84583f6041",
+   "verified_on": "2026-11-02"
+  },
+  "average_effect_range_under_case_mix": {
+   "environment": "proposition",
+   "file": "book_tex/chapters/m02b.tex",
+   "fingerprint": "1c5f1b41daef",
+   "label": "gr:prop:range",
+   "number": "4.3",
+   "page": "64",
+   "printed": "Proposition 4.3",
+   "verified_fingerprint": "1c5f1b41daef",
+   "verified_on": "2026-11-02"
+  },
+  "bayes_rule_for_merger_review": {
+   "environment": "proposition",
+   "file": "book_tex/chapters/m15.tex",
+   "fingerprint": "5d8173deea13",
+   "label": "blp:prop:decision",
+   "number": "20.15",
+   "page": "403",
+   "printed": "Proposition 20.15",
+   "verified_fingerprint": "5d8173deea13",
+   "verified_on": "2026-11-02"
+  },
+  "complete_shrinkage_bias": {
+   "environment": "proposition",
+   "file": "book_tex/chapters/m04b.tex",
+   "fingerprint": "6c7ec93541da",
+   "label": "crit:prop:ric",
+   "number": "7.10",
+   "page": "152",
+   "printed": "Proposition 7.10",
+   "verified_fingerprint": "6c7ec93541da",
+   "verified_on": "2026-11-02"
+  },
+  "cross_fitted_variance_identity": {
+   "environment": "proposition",
+   "file": "book_tex/chapters/m04b.tex",
+   "fingerprint": "64f60fe1e6a2",
+   "label": "crit:prop:cfvar",
+   "number": "7.7",
+   "page": "146",
+   "printed": "Proposition 7.7",
+   "verified_fingerprint": "64f60fe1e6a2",
+   "verified_on": "2026-11-02"
+  },
+  "effect_transport_bound_by_total_variation": {
+   "environment": "proposition",
+   "file": "book_tex/chapters/m02b.tex",
+   "fingerprint": "c72c2934fcb5",
+   "label": "gr:prop:dv",
+   "number": "4.27",
+   "page": "80",
+   "printed": "Proposition 4.27",
+   "verified_fingerprint": "c72c2934fcb5",
+   "verified_on": "2026-11-02"
+  },
+  "exact_error_decomposition_of_the_robinson_estimator": {
+   "environment": "lemma",
+   "file": "book_tex/chapters/m03.tex",
+   "fingerprint": "f01cbf8c9709",
+   "label": "dml:lem:exact",
+   "number": "5.3",
+   "page": "96",
+   "printed": "Lemma 5.3",
+   "verified_fingerprint": "f01cbf8c9709",
+   "verified_on": "2026-11-02"
+  },
+  "falsifying_a_conduct_model_under_logit": {
+   "environment": "proposition",
+   "file": "book_tex/chapters/m15.tex",
+   "fingerprint": "c98949a9c416",
+   "label": "blp:prop:conduct",
+   "number": "20.7",
+   "page": "399",
+   "printed": "Proposition 20.7",
+   "verified_fingerprint": "c98949a9c416",
+   "verified_on": "2026-11-02"
+  },
+  "first_order_flatness_at_zero_heterogeneity": {
+   "environment": "proposition",
+   "file": "book_tex/chapters/m15.tex",
+   "fingerprint": "f60ac7e5b064",
+   "label": "blp:prop:flat",
+   "number": "20.11",
+   "page": "400",
+   "printed": "Proposition 20.11",
+   "verified_fingerprint": "f60ac7e5b064",
+   "verified_on": "2026-11-02"
+  },
+  "identified_estimands_are_functions_of_the_margins": {
+   "environment": "corollary",
+   "file": "book_tex/chapters/m02b.tex",
+   "fingerprint": "72a9d0fb6371",
+   "label": "gr:cor:complete",
+   "number": "4.9",
+   "page": "68",
+   "printed": "Corollary 4.9",
+   "verified_fingerprint": "72a9d0fb6371",
+   "verified_on": "2026-11-02"
+  },
+  "markup_pressure_exceeds_guppi_under_logit": {
+   "environment": "lemma",
+   "file": "book_tex/chapters/m15.tex",
+   "fingerprint": "a9411c6be1f9",
+   "label": "blp:lem:pressure",
+   "number": "20.13",
+   "page": "401",
+   "printed": "Lemma 20.13",
+   "verified_fingerprint": "a9411c6be1f9",
+   "verified_on": "2026-11-02"
+  },
+  "merger_effect_depends_only_on_demand_and_conduct": {
+   "environment": "proposition",
+   "file": "book_tex/chapters/m15.tex",
+   "fingerprint": "16fd2108ac3a",
+   "label": "blp:prop:ident",
+   "number": "20.5",
+   "page": "398",
+   "printed": "Proposition 20.5",
+   "verified_fingerprint": "16fd2108ac3a",
+   "verified_on": "2026-11-02"
+  },
+  "model_averaging_over_conduct_variance": {
+   "environment": "proposition",
+   "file": "book_tex/chapters/m15.tex",
+   "fingerprint": "186d0c200081",
+   "label": "blp:prop:bma",
+   "number": "20.16",
+   "page": "403",
+   "printed": "Proposition 20.16",
+   "verified_fingerprint": "186d0c200081",
+   "verified_on": "2026-11-02"
+  },
+  "no_uniformly_valid_interval_of_finite_length": {
+   "environment": "proposition",
+   "file": "book_tex/chapters/m04b.tex",
+   "fingerprint": "cecc1fc45fae",
+   "label": "crit:prop:dufour",
+   "number": "7.8",
+   "page": "149",
+   "printed": "Proposition 7.8",
+   "verified_fingerprint": "cecc1fc45fae",
+   "verified_on": "2026-11-02"
+  },
+  "posterior_selects_the_group": {
+   "environment": "theorem",
+   "file": "book_tex/chapters/m02b.tex",
+   "fingerprint": "cc5908c5d821",
+   "label": "gr:thm:select",
+   "number": "4.19",
+   "page": "74",
+   "printed": "Theorem 4.19",
+   "verified_fingerprint": "cc5908c5d821",
+   "verified_on": "2026-11-02"
+  },
+  "separability_of_functionals_on_frechet_class": {
+   "environment": "theorem",
+   "file": "book_tex/chapters/m02b.tex",
+   "fingerprint": "818644ce6222",
+   "label": "gr:thm:sep",
+   "number": "4.8",
+   "page": "68",
+   "printed": "Theorem 4.8",
+   "verified_fingerprint": "818644ce6222",
+   "verified_on": "2026-11-02"
+  },
+  "sharp_rate_condition_for_dml": {
+   "environment": "theorem",
+   "file": "book_tex/chapters/m04b.tex",
+   "fingerprint": "319a84d21b5b",
+   "label": "crit:thm:sharp",
+   "number": "7.1",
+   "page": "139",
+   "printed": "Theorem 7.1",
+   "verified_fingerprint": "319a84d21b5b",
+   "verified_on": "2026-11-02"
+  },
+  "stratified_urns_and_the_reversal": {
+   "environment": "proposition",
+   "file": "book_tex/chapters/m02b.tex",
+   "fingerprint": "aa4fc3b52abb",
+   "label": "gr:prop:strat",
+   "number": "4.11",
+   "page": "69",
+   "printed": "Proposition 4.11",
+   "verified_fingerprint": "aa4fc3b52abb",
+   "verified_on": "2026-11-02"
+  },
+  "two_channels_of_the_dml_bias": {
+   "environment": "corollary",
+   "file": "book_tex/chapters/m03.tex",
+   "fingerprint": "1cd7e0eecdcc",
+   "label": "dml:cor:channels",
+   "number": "5.4",
+   "page": "98",
+   "printed": "Corollary 5.4",
+   "verified_fingerprint": "1cd7e0eecdcc",
+   "verified_on": "2026-11-02"
+  }
+ },
+ "updated": "2026-11-02",
+ "zenodo": {
+  "draft": {
+   "doi": "10.5281/zenodo.23899019",
+   "html": "https://zenodo.org/deposit/23899019",
+   "id": 23899019,
+   "reserved_on": "2026-11-02",
+   "version": "1.0.0"
+  }
+ }
+}

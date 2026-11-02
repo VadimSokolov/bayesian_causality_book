@@ -1,0 +1,347 @@
+\chapter{Causal Decisions}\label{ch:cdt}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+A causal decision maximizes expected utility under an intervention, and the posterior does the averaging, so the Bayes action depends on the whole posterior and not only on the average effect.
+\end{tcolorbox}
+
+The central questions of economics are causal: whether a rise in the minimum wage reduces employment, whether a training programme raises earnings, whether monetary tightening lowers inflation. Each needs a model of how the world responds to an action, which a correlation does not supply.
+
+Causal decision theory\index{causal decision theory|textbf} supplies the formal apparatus. In its philosophical form a rational agent chooses the act that causes the best outcome in expectation, weighting consequences by causal rather than evidential probabilities. In its statistical form, due principally to Dawid, it recasts causal inference as a decision problem: when, and how, data gathered under one regime recover the distribution of outcomes under the regime we would create by acting. The Bayesian position developed so far (model the science, compute decisions as posterior expected utilities under interventions) is the statistical form of a principle economists already use, often implicitly. Chapter~\ref{ch:blp} works one decision, merger review, in full.
+
+\section{Evidential versus causal expected utility}\label{cdt:sec:core}
+
+For an act $A$, a state $\omega$ and utility $\mathcal{U}(A,\omega)$, expected utility\index{expected utility} is
+\begin{equation}\label{cdt:eq:eu}
+\mathrm{EU}(A) = \sum_{\omega} P(\omega \mid A)\, \mathcal{U}(A, \omega),
+\end{equation}
+and the whole question is how to read $P(\omega \mid A)$. Evidential decision theory\index{evidential decision theory|textbf}\index{decision theory} takes it to be the ordinary conditional probability: the agent conditions on the news that $A$ was chosen. Causal decision theory\index{causal decision theory} takes it to be the interventional probability of $\omega$ when the agent brings about $A$, whatever the correlation between $A$ and $\omega$ in background data\index{expected utility!causal versus evidential|textbf}. In the notation of Chapter~\ref{ch:frameworks},
+\[
+\mathrm{EU}_{\mathrm{CDT}}(A) = \sum_\omega P(\omega \mid \mathrm{do}(A))\,\mathcal{U}(A,\omega).
+\]
+The two differ whenever the choice is correlated with the state for noncausal reasons. In Newcomb's problem\index{Newcomb problem@Newcomb's problem|textbf}, the canonical illustration, a reliable predictor has filled an opaque box with a fortune only if it predicted that the agent would take that box alone. Taking only the opaque box is good news about its contents, so evidential reasoning recommends it; but the contents are already fixed, so causal reasoning recommends taking both boxes, the opaque one and a transparent one that holds a smaller sure sum. The Lucas critique, discussed below, is its economic counterpart. Gibbard and Harper (1978), Lewis (1981) and Joyce (1999) develop the philosophical theory.
+
+\paragraph{Counterfactual and regime formulations.} Lewis and Stalnaker formalize the causal probability with counterfactual conditionals: $P(A \mathbin{\Box\!\!\to} \omega)$ is the probability that $\omega$ obtains in the closest world in which $A$ is true, the reading behind potential outcomes. Dawid (2002, 2021) avoids counterfactuals with a regime indicator $F_X$, equal to $\emptyset$ in the observational regime and to $x$ when $X$ is set to $x$, defining
+\[
+P(Y = y \mid \mathrm{do}(X = x)) = P(Y = y \mid F_X = x),
+\]
+so that whether the right side can be recovered from observational data becomes a conditional independence question on an augmented graph. Smith (2010) embeds the same structure in influence diagrams\index{influence diagram|textbf}, whose chance, decision and utility nodes make the causal architecture of a decision explicit and supply an algorithm for the optimal policy.
+
+\paragraph{The Bayesian version.} When the agent is uncertain about the causal model, with parameter $\theta$ and posterior $\pi(\theta\mid D)$, the causal expected utility is
+\begin{equation}\label{cdt:eq:bayes}
+\mathrm{EU}(a\mid D) = \int\!\!\int \mathcal{U}(a, y)\, p(y \mid \theta, \mathrm{do}(a))\,\pi(\theta\mid D)\,dy\,d\theta .
+\end{equation}
+The posterior is learned from data gathered under one regime; the predictive $p(y\mid\theta,\mathrm{do}(a))$ states what happens under another. Every identification result of earlier chapters is a condition under which the first can inform the second.
+
+\section{Policy evaluation}\label{cdt:sec:policy}
+
+With potential outcomes $Y_i(1)$ and $Y_i(0)$ and treatment $T_i$, the average treatment effect and the effect on the treated\index{policy evaluation|textbf} are $\tau = \E[Y(1)-Y(0)]$ and $\tau_{\mathrm{ATT}} = \E[Y(1)-Y(0)\mid T=1]$. Random assignment identifies them by a difference in means; in observational data units select into treatment on characteristics that also affect outcomes, the selection problem of Chapter~\ref{ch:frameworks}.
+
+Each of the three quasi experimental designs of empirical economics is a statement about the do operator. An instrument (Chapter~\ref{ch:iv}) affects the outcome only through treatment; under monotonicity it identifies the local average treatment effect, what outcomes would be for compliers if we intervened on their treatment. A regression discontinuity identifies the effect at a threshold under continuity of the potential outcome means in the running variable, a causal assumption that holds, for example, when units cannot precisely manipulate that variable (Lee 2008). Difference in differences (Chapter~\ref{ch:did}) identifies the effect on the treated under parallel trends, an assumption about the counterfactual path of the treated group. 
+
+\section{Structural estimation and the Lucas critique}\label{cdt:sec:lucas}
+
+Lucas (1976) argued that econometric relations estimated under one policy regime cannot predict outcomes under another, because agents' expectations and behaviour adjust to the policy\index{Lucas critique|textbf}. Conditioning on historical correlations is evidential reasoning; changing the policy rule is an intervention. The inflation and unemployment correlation of the 1960s reflected expectations formed under the monetary policy of the time; a different rule changes the joint law, and the old reduced form no longer describes it.
+
+The response is structural estimation\index{structural estimation|textbf}: one estimates deep parameters (preferences, technology, information) that are invariant to policy, and simulates counterfactual policies by solving the model forward. If $\theta$ denotes the structural parameters and $\rho$ the policy rule, the model specifies $P(Y\mid\theta,\rho)$; data under the historical rule $\rho_0$ inform $\theta$, and the prediction under a new rule $\rho_1$ is
+\[
+P(Y\mid D,\rho_1) = \int P(Y\mid\theta,\rho_1)\,p(\theta\mid D,\rho_0)\,d\theta ,
+\]
+Dawid's interventional distribution under $\rho_1$, averaged over posterior uncertainty in $\theta$. Haavelmo's (1944) autonomy requires $\theta$ to be invariant to the policy change (Chapter~\ref{ch:frameworks}), as does modularity for a merger (Chapter~\ref{ch:blp}).
+
+Dynamic stochastic general equilibrium models, the central bank form of this programme, specify optimizing households and firms, market clearing, structural shocks and a monetary policy rule, typically a Taylor rule. Changing the rule's coefficients changes the equilibrium law of motion of every endogenous variable. Identifying structural shocks from vector autoregressions requires restrictions, such as a contemporaneous causal ordering, signs or long run effects, and an impulse response is exactly as credible as those restrictions.
+
+\section{Games and strategic interaction}\label{cdt:sec:games}
+
+\paragraph{Nash equilibrium.} A Nash equilibrium\index{Nash equilibrium|textbf} embeds a causal assumption: each player best responds to the others' strategies, treating them as fixed and uninfluenced by her own choice. In games with Newcomb structure that assumption bites. In a prisoner's dilemma against a twin known to choose as one does, cooperation is evidence that the twin cooperates, so evidential reasoning recommends cooperating; holding the twin's choice fixed, defection dominates, so causal reasoning recommends defecting. 
+
+\paragraph{Correlated equilibrium.} Aumann (1974) introduced correlated equilibrium, and Aumann (1987) showed that Bayesian rationality implies it when players share a common prior. A mediator sends correlated recommendations. A distribution $\sigma^\ast$ over action profiles is a correlated equilibrium\index{correlated equilibrium|textbf} if no player gains by deviating from her recommendation when the others follow theirs:
+\[
+\sum_{a_{-i}} \sigma^\ast(a_i, a_{-i})\bigl\{\mathcal{U}_i(a_i', a_{-i}) - \mathcal{U}_i(a_i, a_{-i})\bigr\} \le 0
+\quad \text{for all } i,\ a_i,\ a_i'.
+\]
+The reasoning is causal: player $i$ evaluates deviating while the others' responses to their own signals stay fixed. The signal correlates actions, but no player's action causes another's.
+
+\paragraph{Multi agent influence diagrams.} Koller and Milch (2003) put several agents' decision nodes, information sets and utilities in one graph\index{influence diagram}, and Hammond and coauthors (2023) develop the causal reading. Each agent reasons causally about her own decision node, and the graph records how agents' information and decisions interlock. The formalism has been used to study the incentives of artificial agents.
+
+\section{Industrial organization}\label{cdt:sec:io}
+
+Prices are endogenous\index{industrial organization|textbf}: firms set them in response to unobserved demand shocks. Cost shifters identify the demand slope using price variation that does not pass through those shocks, the Wrights' argument in Chapter~\ref{ch:frameworks}. Berry, Levinsohn and Pakes (1995) built this into a structural model of demand for differentiated products, and merger simulation\index{merger simulation} (Nevo 2000) uses the estimated model to predict prices after a merger, a market structure not yet in the data. That is a causal question with no treated unit; Chapter~\ref{ch:blp} develops its Bayesian treatment, including uncertainty about the form of competition itself.
+
+\section{Mechanism design}\label{cdt:sec:mechanism}
+
+Mechanism design\index{mechanism design|textbf} reverses the causal question: the designer asks not what outcome a given structure produces but what structure will produce a desired outcome in equilibrium. A direct mechanism maps reported types to outcomes, and the revelation principle\index{revelation principle|textbf} (Myerson 1979) says that any equilibrium outcome of any mechanism can be reproduced by a direct mechanism in which truth telling is a Bayesian Nash equilibrium. A mechanism is incentive compatible if truth telling is a best response and individually rational if participation is weakly preferred to the outside option. The Vickrey, Clarke and Groves mechanism\index{Vickrey Clarke Groves mechanism|textbf} makes truth telling dominant: whatever the others report, the payment rule makes the causal effect of misreporting on one's own utility weakly negative. Dominance is the strongest causal robustness: the recommendation does not depend on beliefs about how one's type correlates with others'.
+
+Market design applies these ideas to matching. Abdulkadiro\u{g}lu and S\"onmez (2003) used deferred acceptance for school choice, under which truthful ranking is dominant for students, and Roth, S\"onmez and \"Unver (2004) designed kidney exchange among incompatible donor and patient pairs. 
+
+\section{Targeting and cost effectiveness}\label{cdt:sec:targeting}
+
+\paragraph{Optimal allocation.} Heterogeneous effects make the conditional effect $\tau(x)$ directly relevant to policy. With a budget for treating at most a fraction $\kappa$ of the population, the optimal rule when $\tau$ is known treats the units with the largest positive effects\index{targeting|textbf},
+\[
+\pi^\ast(x) = \one\bigl\{\tau(x) \ge \max(q_{1-\kappa}, 0)\bigr\},
+\]
+with $q_{1-\kappa}$ the $1-\kappa$ quantile of $\tau(X)$, provided $\tau(X)$ has no atom at the threshold; with an atom at a positive threshold, the units there are treated at random, with the probability that uses up the budget. When $\tau$ is uncertain, the Bayes rule\index{Bayes decision rule!treatment allocation|textbf} under a linear utility replaces $\tau(x)$ by its posterior mean, in the threshold as well.  Athey and Wager (2021) study the frequentist counterpart, policy learning with regret guarantees.
+
+\paragraph{Cost effectiveness.} Health economics allocates resources with the incremental cost effectiveness ratio\index{cost effectiveness|textbf}
+\[
+\mathrm{ICER} = \frac{\E[C(1)] - \E[C(0)]}{\E[E(1)] - \E[E(0)]},
+\]
+where $C$ is cost and $E$ a health outcome such as quality adjusted life years. Both are causal contrasts. With willingness to pay $\lambda$ per unit of health and a positive incremental effect, an intervention is adopted if the ICER is below $\lambda$, that is, if the net monetary benefit\index{net monetary benefit|textbf} $\lambda\Delta E - \Delta C$ is positive. Because a ratio of uncertain quantities behaves badly, Bayesian health economics works with the posterior of net benefit and reports the probability that it is positive across values of $\lambda$, the cost effectiveness acceptability curve\index{cost effectiveness acceptability curve|textbf}. The curve does not by itself choose the action. With $\mathrm{NB}=\lambda\Delta E-\Delta C$ at a fixed $\lambda$, adoption is the Bayes action under a linear utility when $\E[\mathrm{NB}\mid D]>0$, and a programme that is cost effective with posterior probability 0.99 still has negative expected net benefit if the other 1\% carries a large enough loss. Read at the decision maker's $\lambda$, the curve gives the posterior chance that the decision is wrong, $1-\Prob(\mathrm{NB}>0\mid D)$ after adoption and $\Prob(\mathrm{NB}>0\mid D)$ after rejection. The expected value of perfect information, $\E[\max(0,\mathrm{NB})\mid D]-\max(0,\E[\mathrm{NB}\mid D])$, bounds what further research could be worth (Claxton 1999).
+
+\section{Climate and fiscal policy}\label{cdt:sec:macro}
+
+\paragraph{The social cost of carbon.} The social cost of carbon\index{social cost of carbon|textbf} is the present value of the damages caused by emitting one more tonne of carbon dioxide today, and an optimal carbon tax equals it. Computing it requires an integrated assessment model of the causal chain from emissions to concentration to temperature to damages. Writing $D_s$ for damages at time $s$ and $E_t$ for emissions at time $t$,
+\[
+\mathrm{SCC}_t = \int_t^\infty e^{-r(s-t)}\, \frac{\partial D_s}{\partial E_t}\, ds ,
+\]
+where the derivative is the marginal causal effect of an emission at $t$ on damages at $s$ through the climate and damage models. Uncertainty about climate sensitivity, the damage function and the discount rate becomes uncertainty about the social cost, and a Bayesian decision maker averages over it. Because damages are convex and the uncertainty is right skewed, the posterior mean can greatly exceed the value at the most likely parameters, the substance of the fat tail argument of Weitzman (2009) in the climate debate.
+
+\paragraph{Fiscal multipliers.} The fiscal multiplier\index{fiscal multiplier|textbf}, the output change caused by a unit of government spending, is not a structural constant: it depends on the monetary and exchange rate regimes and the business cycle. Structural vector autoregressions identify it by restrictions such as a contemporaneous ordering, signs, long run effects or external instruments, and estimates near the zero lower bound, where monetary policy does not offset the stimulus, differ from estimates when it does. 
+
+\section{Behavioural departures}\label{cdt:sec:behavioural}
+
+Causal decision theory assumes that agents identify the causal structure of their problem and maximize causal expected utility. Behavioural economics documents systematic departures\index{behavioural departures|textbf}, several of which read naturally as causal errors. Correlation neglect\index{correlation neglect|textbf} (Enke and Zimmermann 2019) treats correlated signals as independent and overstates the information in positively correlated reports; the agent misreads the common cause structure of her evidence. Two newspapers that draw on the same wire service are one signal, not two, and an agent who counts them twice forms a posterior that is too confident in the direction of the shared source. Projection bias (Loewenstein, O'Donoghue and Rabin 2003) projects current preferences onto future states: the hungry shopper buys for the appetite of the moment, and the model of tomorrow's self that the purchase relies on is wrong. Present bias can be read, for a naive agent, as misjudging the effect of today's choice on tomorrow's behaviour. A sophisticated agent forecasts that behaviour correctly and is still time inconsistent, which is why she demands commitment devices (Laibson 1997). For the errors of belief, the remedy is a better model of the agent's own causal situation.
+
+These departures belong in the model. A policy based on textbook responses to incentives will miss its target if agents neglect correlation or discount the near future too steeply, so a structural model should carry the behavioural parameters that govern the response, with a prior wide enough to admit the documented departures. The analyst is an agent too. Treating cross fitted estimates from overlapping samples as independent evidence is correlation neglect in professional dress. The Bayesian discipline of writing the joint model down, including the common causes, is the same remedy applied to the analyst's own evidence.
+
+\section{The credibility revolution}\label{cdt:sec:credibility}
+
+The credibility revolution\index{credibility revolution|textbf} in applied economics (Angrist and Pischke 2010) reads as the discipline's commitment to causal decision theory. It insists that empirical claims rest on identification strategies (random assignment, quasi random variation, structural models with testable restrictions) that support a causal interpretation, and it separates identification, under what assumptions the parameter of interest is recovered from the joint distribution of observables, from estimation, how to learn it from finite data.
+
+The book's position adds a third step and changes the second. Estimation, given identification, is computing a posterior for a model of the science; the decision is the action that maximizes posterior expected utility under the intervention, \eqref{cdt:eq:bayes}. Separating identification from estimation is right; separating estimation from the decision is not, because the decision often needs a probability (that a merger raises prices by more than five percent, that net benefit is positive, that a policy helps the worst off) which no point estimate and no confidence interval supplies.
+
+\section{Risk sensitive decisions from a posterior}\label{gbc:sec:decisions}
+
+Earlier chapters argued that the posterior is the object of inference and the average treatment effect one functional of it, chosen by the user. A decision maker needs a different functional. A ministry deciding whether to fund school milk, a regulator deciding whether to challenge a merger, a physician deciding whether to treat: each needs the best action given what is known, and often how badly that action could turn out\index{risk sensitive decisions|textbf}.
+
+The posterior draws may come from generative Bayesian computation\index{generative Bayesian computation}\index{generative Bayesian computation!for risk sensitive decisions|textbf} (GBC, Chapter~\ref{ch:computation}) or any sampler, a Gibbs chain included. Utilities under $\mathrm{do}(a)$ and their quantile functions follow from those draws, or are learned by a network trained on simulated utilities. The choice among means, quantiles, risk adjusted values and inequality measures is where the decision maker's attitude to risk enters.
+
+The expected utility formulation is developed in Polson, Ruggeri and Sokolov (2024), and the causal use follows Nareklishvili, Polson and Sokolov (2023a), whose generative treatment effects are the subject of Chapter~\ref{ch:gente}. How well a trained network or a finite chain approximates the posterior is a question for the checks of Section~\ref{comp:sec:checks}.
+
+\subsection{From posterior to decision}\label{gbc:sec:intro}
+
+Let $\theta$ be the parameter of a structural causal model\index{structural causal model!in decision theory|textbf} for covariates $X$, treatment $W$ and outcome $Y$,
+\[
+X = f_X(U_X;\theta),\qquad W = f_W(X, U_W;\theta),\qquad Y = f_Y(X, W, U_Y;\theta),
+\]
+with prior $\pi(\theta)$. The intervention $\mathrm{do}(W=w)$ replaces $f_W$ by the constant $w$, and the potential outcome is $Y(w) = f_Y(X, w, U_Y;\theta)$. Under the conditions of Chapter~\ref{ch:predictive} (ignorability, overlap and consistency), the data identify the parts of $\theta$ that govern $Y(w)$ given $X$, and the posterior $\pi_N = \pi(\theta\mid D_N)$ learned from observational data predicts outcomes under intervention.
+
+An action $a\in\cA$ (a treatment, a targeting rule, a regulatory decision) has utility $\mathcal{U}(a,\theta,Y(a))$. The Bayes action\index{Bayes action|see{Bayes decision rule}}\index{Bayes policy|see{Bayes decision rule}}\index{Bayes decision rule|textbf} maximizes posterior expected utility,
+\begin{gather}\label{gbc:eq:meu}
+a^\ast = \arg\max_{a\in\cA} \EU(a\mid D_N),\\
+\EU(a\mid D_N) = \int\!\!\int \mathcal{U}(a,\theta,y)\,p(y\mid\theta,\mathrm{do}(a))\,dy\;\pi_N(d\theta).\notag
+\end{gather}
+Reporting the average treatment effect uses $\mathcal{U}(a,\theta,y)=-\{a-\tau(\theta)\}^2$, whose Bayes action is the posterior mean $\E[\tau(\theta)\mid D_N]$. Targeting, risk aversion and regulatory thresholds require other functionals of the same posterior (Chapter~\ref{ch:mccullagh}).
+
+Write $Z(a) = \mathcal{U}(a,\theta,Y(a))$ for the utility of action $a$, random through both $\theta\sim\pi_N$ and $Y(a)$, and $\Qz$ for its quantile function. Then
+\begin{equation}\label{gbc:eq:quantileidentity}
+\EU(a\mid D_N) = \E[Z(a)] = \int_0^1 \Qz(u)\,du ,
+\end{equation}
+because $\Qz(U)$ has the law of $Z(a)$ when $U$ is uniform on $(0,1)$. 
+
+\paragraph{The decision phase.} Given $R$ posterior draws $\theta^{(r)}$ at summary $s$ (Section~\ref{comp:sec:algorithm}), simulate $Y^{(r)}(a)$ under $\mathrm{do}(a)$ given $\theta^{(r)}$ for each action and form $Z^{(r)}(a)=\mathcal{U}(a,\theta^{(r)},Y^{(r)}(a))$. Below, $\Qz(\cdot\mid s)$ is their empirical quantile function or a network's quantile function learned from simulated utilities (Polson, Ruggeri and Sokolov 2024).
+\begin{enumerate}[leftmargin=*]
+\item For each $a$, estimate $\EU(a)$ by averaging the $Z^{(r)}(a)$, or by integrating $\Qz(\cdot\mid s)$ as in \eqref{gbc:eq:quantileidentity}.
+\item\label{gbc:step:distort} For a distortion $\beta$, compute $\hat V_\beta(a) = K^{-1}\sum_{k=1}^K \Qz(\beta(\tilde u_k)\mid s)$ with $K$ levels $\tilde u_k$ drawn uniformly on $(0,1)$ (Section~\ref{gbc:sec:risk}).
+\item Return $a^\ast = \arg\max_a \hat V_\beta(a)$.
+\end{enumerate}
+
+\subsection{Risk sensitive decisions}\label{gbc:sec:risk}
+
+Risk sensitive criteria\index{risk sensitive decisions} reweight the quantile level: expected utility is the area under the quantile function, and a risk attitude is a change in the measure against which that area is taken.
+
+\subsubsection{Expected utility and the dual theory}
+
+Expected utility theory (von Neumann and Morgenstern 1944) ranks actions by $\E[v(Z)]$, with concave $v$ for risk aversion. It rests on the independence axiom, which the Allais paradox and the experiments behind prospect theory\index{prospect theory|textbf} (Kahneman and Tversky 1979; Tversky and Kahneman 1992) show is systematically violated. Yaari's dual theory\index{Yaari dual theory@Yaari's dual theory|textbf} (Yaari 1987) replaces independence with an axiom on mixtures of quantile functions and ranks actions by a distorted expectation\index{distorted value|textbf}: utility enters linearly and the probabilities are transformed. In the computational form of Dabney, Ostrovski, Silver and Munos (2018), a distortion\index{distortion|textbf} is a continuous increasing map $\beta:[0,1]\to[0,1]$ applied to the sampled quantile level,
+\begin{equation}\label{gbc:eq:yaari}
+\Vbeta(a) = \E\bigl[\Qz(\beta(V))\bigr] = \int_0^1 \Qz(u)\,dG_\beta(u),
+\end{equation}
+with $V$ uniform on $(0,1)$ and $G_\beta(u) = \Prob\{\beta(V)\le u\}$. Where $\beta$ maps onto $[0,1]$, $G_\beta = \beta^{-1}$; for CVaR below, $G_\beta(u) = \min(u/\eta, 1)$.
+The identity $\beta(u)=u$ gives the mean. A distortion with $\beta(u)\le u$ samples lower quantiles more often and is risk averse; one with $\beta(u)\ge u$ is risk seeking. Yaari applies a weighting function $f$ to decumulative probabilities, $\Vbeta(a) = \int z\,d\{-f(\Prob(Z(a)>z))\}$; the two conventions are related by $f(p) = 1 - G_\beta(1-p)$.
+
+\subsubsection{Distortions}
+
+Table~\ref{gbc:tab:distortions} lists common distortions in the sampling convention of \eqref{gbc:eq:yaari}.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabular}{@{}L{0.95in}L{1.45in}L{1.75in}@{}}
+\toprule
+Name & $\beta(u)$ & Behaviour \\
+\midrule
+Risk neutral & $u$ & the mean \\
+CVaR & $\eta u$, $\eta\in(0,1]$ & mean of the worst fraction $\eta$ of outcomes \\
+Wang & $\Phi(\Phi^{-1}(u)+\eta)$ & risk averse for $\eta<0$, seeking for $\eta>0$ \\
+Power, averse & $1-(1-u)^{1/(1+\eta)}$, $\eta>0$ & moves sampled levels down \\
+Power, seeking & $u^{1/(1+\eta)}$, $\eta>0$ & moves sampled levels up \\
+CPW & $u^\eta/\{u^\eta+(1-u)^\eta\}^{1/\eta}$ & samples the middle; underweights both tails \\
+\bottomrule
+\end{tabular}
+\caption{Distortions in the sampling convention $\Vbeta(a) = \E\,\Qz(\beta(V))$. CPW is the probability weighting function of Tversky and Kahneman (1992), with $\eta = 0.71$ the estimate of Wu and Gonzalez (1996); used as a sampling distortion, as by Dabney, Ostrovski, Silver and Munos (2018), its effect on the tails is the reverse of its effect as a weight on probabilities.}
+\label{gbc:tab:distortions}
+\end{table}
+
+The conditional value at risk\index{conditional value at risk|textbf}\index{CVaR|see{conditional value at risk}} at level $\eta$ samples $u$ uniformly on $[0,\eta]$, so $V_\beta(a) = \eta^{-1}\int_0^\eta \Qz(u)\,du$, the expected utility in the worst fraction $\eta$ of outcomes. It suits a regulator concerned with tail harm. Because $Z(a)$ is random through both $\theta$ and $Y(a)$, its worst outcomes mix bad luck about $\theta$ with the recipients who fare worst; a planner protecting the worst off recipients computes the same functional from the law of utility across recipients at each posterior draw, as for the Gini coefficient below. The Wang distortion\index{Wang distortion|textbf} (Wang 2000) is a parallel shift on the normal probability scale with an actuarial pedigree. Applied to probabilities, the CPW function reproduces the empirical probability weighting of human subjects; applied to sampled quantile levels it does the opposite: its slope is infinite at 0 and 1, so the sampled level rarely falls in either tail, and the criterion discounts extreme outcomes in both directions.
+
+\subsubsection{One network, many criteria}
+
+The key computational observation, made by Dabney, Ostrovski, Silver and Munos (2018) for the implicit quantile network\index{implicit quantile network}, is that \eqref{gbc:eq:yaari} requires only the quantile function. Changing the criterion changes the law from which $u$ is sampled, not the network of Section~\ref{comp:sec:network} or the draws it supplies.
+
+\begin{remark}[GBC and implicit quantile networks]\label{gbc:prop:iqn}
+Let $\beta$ be a continuous increasing distortion. Then:
+\begin{enumerate}[label=(\roman*)]
+\item The distorted GBC value $\hat V_\beta(a)$ of step~\ref{gbc:step:distort} of the decision phase is the analogue, for causal utilities, of the risk sensitive policy of the implicit quantile network.
+\item Any distortion available to the implicit quantile network is available to GBC at no training cost.
+\item The utility draws in GBC come from $\mathrm{do}(a)$ simulations of an identified structural model, not from returns observed under the policy being followed, so $\Vbeta(a)$ is a risk measure of the interventional distribution.
+\end{enumerate}
+\end{remark}
+
+Part (iii) carries the causal content. A reinforcement learner observes rewards under the policy it follows, so its return distribution is identified by construction. A causal analyst observes one potential outcome per unit under a possibly confounded assignment, and the utility distribution under $\mathrm{do}(a)$ is available only through an identified model.
+
+\subsubsection{An illustration}
+
+Figure~\ref{gbc:fig:distort} compares two programmes with simulated utilities, 200,000 draws each, with $\theta$ held fixed so that the spread is across recipients. Programme A delivers a modest, reliable benefit: its utility is normal with mean 1.00 and standard deviation 0.35. Programme B delivers more typically but harms about 12\% of recipients: its utility is normal with mean 1.35 and standard deviation 0.35 for 88\% of recipients and normal with mean $-0.9$ and standard deviation 0.5 for the other 12\%, so its mean is 1.08. A risk neutral planner prefers B. Under CVaR at level 0.25 the values are 0.56 for A and $-0.02$ for B; under the Wang distortion with $\eta = -0.75$ they are 0.74 and 0.41; under the averse power distortion with $\eta = 1$, 0.80 and 0.68. All three risk averse criteria reverse the ranking, though not every risk averse criterion would: conditional value at risk at levels above about 0.75 still prefers B (Exercise~\ref{ex:chgbc:4}). The CPW criterion, applied as a sampling distortion, prefers B (0.97 against 1.15): it samples the bottom 12\% of outcomes only about 6\% of the time, and the more so the further into the tail, so B's harm is discounted rather than feared. The ranking depends on attitude to the tails, which no average effect expresses.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\linewidth]{fig_gbc_distort.pdf}
+\caption{Top: quantile functions of utility for two programmes. Bottom: distorted values $\Vbeta$ under six criteria of Table~\ref{gbc:tab:distortions}. B has the higher mean; the three risk averse criteria prefer A.}
+\label{gbc:fig:distort}
+\end{figure}
+
+\paragraph{Inequality of benefit.} For a nonnegative utility with positive mean, the quantile function also gives the Lorenz curve\index{Lorenz curve|textbf} and Gini coefficient\index{Gini coefficient|textbf} of the benefit,
+\[
+L_a(p) = \frac{1}{\EU(a)}\int_0^p \Qz(u)\,du,\qquad G(a) = 1 - 2\int_0^1 L_a(p)\,dp .
+\]
+The bottom fraction $p$ of outcomes holds the fraction $L_a(p)$ of total benefit. Computed from $\Qz$, these mix uncertainty about $\theta$ with differences between recipients: if every recipient gets the same benefit given $\theta$ and $\theta$ is uncertain, $G(a)$ is positive although no recipient is favoured. Computed at each posterior draw from the quantile function of utility across recipients, the Lorenz curve and the Gini coefficient have posterior distributions, and a Gini coefficient that is large with high posterior probability means the benefit is concentrated in few recipients. A planner can trade expected benefit against that coefficient along the frontier the posterior supplies. When utilities can be negative, as for programme B, the Lorenz curve loses its reading as shares of benefit (it can dip below zero, and the Gini coefficient can exceed one), and the conditional value at risk, computed the same way, is the measure of the lower tail.
+
+\subsection{Asymptotics of the policy}\label{gbc:sec:asymptotics}
+
+Let $\Pi$ be a class of policies, $V_\theta(\pi) = \E_\theta[\mathcal{U}(\pi,\theta,Y(\pi))]$ the value of $\pi$ under parameter $\theta$, $\theta_0$ the truth, $\pi_0^\ast = \arg\max_\Pi V_{\theta_0}(\pi)$ the oracle policy and $\hat\pi_N = \arg\max_\Pi \int V_\theta(\pi)\,\pi_N(d\theta)$ the Bayes policy\index{Bayes decision rule!asymptotics of the Bayes policy|textbf}.
+
+\begin{proposition}[Regret of the Bayes policy]\label{gbc:prop:regret}
+Suppose that $\sup_{\pi\in\Pi}\lvert V_\theta(\pi) - V_{\theta_0}(\pi)\rvert \le L\,\lVert\theta-\theta_0\rVert$ for all $\theta$, and that the posterior satisfies $\int \lVert\theta-\theta_0\rVert\,\pi_N(d\theta) \le \varepsilon_N$. Then the regret\index{regret|textbf} satisfies
+\[
+V_{\theta_0}(\pi_0^\ast) - V_{\theta_0}(\hat\pi_N) \le 2L\varepsilon_N .
+\]
+If moreover $V_{\theta_0}(\pi_0^\ast) - V_{\theta_0}(\pi) \ge c\lVert\pi - \pi_0^\ast\rVert^2$ for all $\pi\in\Pi$, then $\lVert\hat\pi_N - \pi_0^\ast\rVert^2 \le 2L\varepsilon_N/c$.
+\end{proposition}
+\begin{proof}
+Write $\bar V(\pi) = \int V_\theta(\pi)\,\pi_N(d\theta)$. The Lipschitz condition gives $\sup_\pi\lvert\bar V(\pi)-V_{\theta_0}(\pi)\rvert\le L\varepsilon_N$. Since $\hat\pi_N$ maximizes $\bar V$,
+\[
+\begin{aligned}
+V_{\theta_0}(\pi_0^\ast)-V_{\theta_0}(\hat\pi_N)
+&\le \bar V(\pi_0^\ast)-\bar V(\hat\pi_N)+2L\varepsilon_N\\
+&\le 2L\varepsilon_N.
+\end{aligned}
+\]
+The second claim follows from the margin condition.
+\end{proof}
+
+In a regular parametric model the posterior mean of $\lVert\theta-\theta_0\rVert$ is $O_P(N^{-1/2})$ when the tails of the posterior are controlled (contraction at that rate does not give it alone, since a vanishing posterior mass far from $\theta_0$ can keep the mean large), so the regret is $O_P(N^{-1/2})$, the rate of the policy learning bounds of Athey and Wager (2021) for finite complexity classes.
+
+A plug in rule can do better. For incremental value $V_\theta(\pi)=\E[\pi(X)\tau_\theta(X)]$ under a fixed covariate law, with every measurable rule allowed and no budget, the oracle is $\pi_0^\ast(x)=\one\{\tau(x)>0\}$, where $\tau=\tau_{\theta_0}$. If $\bar\tau_N(x)=\E[\tau_\theta(x)\mid D_N]$ satisfies $\sup_x\lvert\bar\tau_N(x)-\tau(x)\rvert\le\delta_N$ and $\tau(X)$ has a bounded density near zero, then $\hat\pi_N(x)=\one\{\bar\tau_N(x)>0\}$ disagrees with the oracle only where $\lvert\tau(X)\rvert\le\delta_N$, and loses $\lvert\tau(X)\rvert$ there, so
+\[
+\begin{aligned}
+V_{\theta_0}(\pi_0^\ast)-V_{\theta_0}(\hat\pi_N)&=\E\bigl[\lvert\tau(X)\rvert\,\one\{\hat\pi_N(X)\ne\pi_0^\ast(X)\}\bigr]\\
+&\le\delta_N\Prob\{\lvert\tau(X)\rvert\le\delta_N\}=O(\delta_N^2),
+\end{aligned}
+\]
+the fast rate of plug in classifiers (Audibert and Tsybakov 2007).
+
+When $\theta$ is infinite dimensional the condition can still hold in a suitable norm: for the incremental value $V_\theta(\pi)=\int\pi(x)\tau_\theta(x)\,H(dx)$ over a covariate law $H$, every policy with $0\le\pi\le1$ satisfies $\lvert V_\theta(\pi)-V_{\theta_0}(\pi)\rvert\le\lVert\tau_\theta-\tau_{\theta_0}\rVert_{L^1(H)}$, so $L=1$ however rich the policy class. The rate then rests on how fast the posterior mean of that distance shrinks, which depends on the prior and the smoothness of the effect surface (Ghosal and van der Vaart 2017).
+
+\subsection{Worked examples}\label{gbc:sec:examples}
+
+
+
+\subsubsection{Normal learning}\label{gbc:sec:normal}
+
+Let $Y_i\mid\theta\sim N(\theta,\sigma^2)$ with $\sigma$ known, $\theta\sim N(\mu_0,\sigma_0^2)$, and the action be a report $a$ with utility $-(a-\theta)^2$. The posterior is $N(\mu_N,\sigma_N^2)$ with
+\[
+\mu_N = \frac{\mu_0/\sigma_0^2 + N\bar Y/\sigma^2}{1/\sigma_0^2 + N/\sigma^2},\qquad
+\sigma_N^2 = \Bigl(\frac{1}{\sigma_0^2} + \frac{N}{\sigma^2}\Bigr)^{-1}.
+\]
+The Bayes action is $a^\ast=\mu_N$ with posterior expected loss $\sigma_N^2 = O(N^{-1})$. The loss $(a^\ast-\theta)^2$ is $\sigma_N^2$ times a chi squared variable on one degree of freedom, so its upper quantiles, which concern a risk averse reporter, come from the same draws as the mean.
+
+The example is trivial as inference and useful as a check. At the sufficient summary $s=\bar Y$ the posterior quantile function is $\mu_N(s)+\sigma_N\Phi^{-1}(u)$, the closed form used to check the network in Section~\ref{comp:sec:network}. Check conjugate special cases before trusting the computation elsewhere; when none exists, use simulation based calibration (Section~\ref{comp:sec:checks}).
+
+The same check can be run on a decision. Take a two arm trial with $n$ patients per arm, independent uniform priors on the success rates $p_0$ and $p_1$, and $K_w$ successes in arm $w$. The posterior of $\tau=p_1-p_0$ is the difference of independent $\mathrm{Beta}(K_1+1,n-K_1+1)$ and $\mathrm{Beta}(K_0+1,n-K_0+1)$ variables, and the value of treating, $\CVaR_\eta(\tau\mid D)-c$ against zero for not treating, can be computed by numerical integration; refining the integration grid moved it by at most $2.5\times10^{-4}$ in 200 checks for each $n$. We trained the network of Section~\ref{comp:sec:network} with the check loss on 300{,}000 simulated trials, 100{,}000 for each of $n=25$, 100 and 400, with $n$, $K_0$ and $K_1$ as inputs, for 40 passes and with five seeds, sorted its quantiles on 1{,}000 levels and read off the value for $\eta\in\{0.05,0.1,0.25,1\}$ and $c\in\{0,0.05,0.2\}$. On 10{,}000 fresh trials for each $n$, the same for all five seeds, the root mean squared error of the value at $\eta=0.05$ is 0.022 at $n=25$ and 0.005 at $n=400$, and about 0.002 at $\eta=1$, the posterior mean, with a spread across seeds of a tenth to a fifth of the error. Averaged over seeds, the network's action differs from the exact Bayes action in at most 2.3 percent of these trials (3.5 percent for the worst seed), at an average cost of about $3\times10^{-4}$ or less in the risk difference. Close calls are another matter. On separate samples of close calls, up to 1{,}000 count pairs for each $n$, $\eta$ and $c$ whose exact value lies within 0.02 of zero, the network's action under the tail criteria ($\eta<1$) differs from the exact one in 5 to 13 percent of trials at $n=400$, 10 to 21 percent at $n=100$ and 12 to 58 percent at $n=25$, where only 16 to 25 count pairs qualify; the average cost on those trials is at most 0.006. Before sorting, every curve crossed somewhere. The largest dip is typically 3 to 8 percent of the posterior sd, but in the worst trial at $n=400$ it is 1.1 to 1.4 sd, depending on the seed, because the posterior narrows with $n$ and the network's wobble does not. This is one conjugate design, a finite check on Problem 13 of Chapter~\ref{ch:open}, not a calibration result for the method.
+
+\subsubsection{A stylized supplement trial}
+
+In the Lanarkshire milk experiment\index{Lanarkshire milk experiment} (Section~\ref{sec:milk}), teachers' discretion in assigning children to milk or control left the controls taller and heavier at the start. Consider a stylized version in which $Z_i$ measures how undernourished child $i$ is at baseline, $W_i$ indicates supplementation, and
+\[
+Y_i(w) \sim N(\mu_w + \alpha_w Z_i, \sigma^2),\qquad \Prob(W_i=1\mid Z_i) = \expit(\gamma_0 + \gamma_1 Z_i),
+\]
+with $\gamma_1>0$ representing teachers who favour needier children. Because assignment depends on $Z$, the raw contrast is confounded, while the conditional model identifies $\tau(z) = (\mu_1-\mu_0) + (\alpha_1-\alpha_0)z$. From one network trained on prior simulations, GBC returns the posterior of the average effect over any chosen population of children, the posterior of $\tau(z)$, and the Bayes targeting rule $\one\{\E[\tau(z)\mid D] > \lambda\}$ for a cost $\lambda$ per child. If the posterior puts $\alpha_1-\alpha_0>0$, so that benefit grows with undernourishment, the rule treats children above a threshold of need; under CVaR the threshold moves to protect the children whose benefit is most uncertain. 
+
+\subsubsection{Smoking and the probability of causation}
+
+Let $W$ indicate heavy smoking and $Y$ lung cancer. The probability of necessity\index{probability of necessity}, $\PN = \Prob(Y(0)=0\mid W=1, Y=1)$, the probability that a smoker's cancer would not have occurred without smoking, is not point identified (Chapter~\ref{ch:tianpearl}). Under exogeneity of $W$, Tian and Pearl (2000) give the sharp bounds
+\[
+\max\Bigl\{0,\ 1 - \frac{1}{\mathrm{RR}}\Bigr\} \le \PN \le \min\Bigl\{1,\ \frac{\Prob(Y=0\mid W=0)}{\Prob(Y=1\mid W=1)}\Bigr\},
+\]
+where
+\[
+\mathrm{RR} = \frac{\Prob(Y=1\mid W=1)}{\Prob(Y=1\mid W=0)},
+\]
+and without exogeneity they combine observational and experimental distributions as in Chapter~\ref{ch:tianpearl}. A posterior for the cell probabilities induces one for the bounds, and a prior on the unidentified coupling of $Y(0)$ and $Y(1)$ induces a posterior for $\PN$ itself. Since exogeneity is exactly what Fisher disputed, an honest analysis reports the bounds under exogeneity alongside the sensitivity analysis of Section~\ref{sec:sensitivity}. A court asking whether smoking caused a particular plaintiff's cancer needs this quantity, not the average effect.
+
+In GBC the computation is direct. The summary is the two by two table of smoking and cancer counts, or the four cell proportions with the sample size. The network learns the joint posterior of the cell probabilities and the potential outcome coupling through the triangular map of Section~\ref{comp:sec:noise}. Each joint draw gives both bounds from the cells and $\PN$ from the cells and coupling, so all three posteriors come from the same draws with no further training. A network trained on $\PN$ alone would not supply the bounds. Under the court's more probable than not standard and equal losses for the two wrong findings, the Bayes rule finds causation when the posterior mean $\E[\PN\mid D]$ exceeds one half. The posterior probability that $\PN$ exceeds one half answers a different question, about the population parameter, closer to the rule some courts apply that the relative risk must exceed two (under exogeneity and monotonicity $\PN=1-1/\mathrm{RR}$, so $\PN>1/2$ exactly when $\mathrm{RR}>2$). Both are reported under exogeneity, each with how far it moves as the sensitivity parameter of Section~\ref{sec:sensitivity} is varied. A point estimate of the relative risk, however precise, does not answer the question put to the witness.
+
+\subsubsection{Targeting under a budget and portfolio choice}
+
+For the budget rule\index{Bayes decision rule!treatment allocation} of Section~\ref{cdt:sec:targeting}, replacing posterior means by the CVaR at level $0.1$ ranks units by expected benefit in the worst tenth of posterior outcomes, a criterion for a planner wary of harming a group. It is a separable criterion, the sum over treated units of each unit's CVaR, and not the CVaR of total benefit, because CVaR is not additive. With three equal groups whose effects are $(0,4)$, $(4,0)$ and $(1,1)$ in two equally likely posterior states and a budget for two groups, ranking by CVaR treats the third group and one other, for a total benefit whose CVaR is 1, while treating the first two gives a certain total of 4. The CVaR of total benefit needs joint posterior draws of the effects across groups.
+
+The mean ranking favours a group with a large but uncertain effect, because it is small or poorly represented in the data; the CVaR favours one with a modest, well determined effect. Each rule is optimal for its own criterion. Both rankings, their expected benefits and their Lorenz curves come from one set of posterior draws, in GBC from one trained network evaluated at the observed summary, so the planner can see the cost in expected benefit of the protection the CVaR rule buys. Chapter~\ref{ch:gente} develops the heterogeneous effect model that supplies $\tau(x)$.
+
+\paragraph{Portfolio choice.} Let $\theta = (\mu,\Sigma)$ be the mean and covariance of log returns $r$ on $K$ assets, with gross returns $R = \exp(r)$ taken coordinatewise, and let an investor choose long only weights $w$ ($w_k\ge0$ and $\sum_k w_k=1$, so that $w^\top R>0$) to maximize the expected power utility $\{(w^\top R)^\alpha-1\}/\alpha$ of gross portfolio return, with $\alpha<1$ and $\alpha\ne0$. Its limit as $\alpha\to0$ is logarithmic utility, the Kelly criterion, and $\alpha<0$, a relative risk aversion $1-\alpha$ above one, gives a more cautious allocation than Kelly. GBC simulates triples $(\theta,D,R)$ from the prior and model, with $D$ a history of returns, and learns the quantile function of utility given the summary of $D$ for each $w$ on a grid; evaluated at the observed history it gives the posterior predictive law of utility. The Wang distortion with $\eta<0$ yields a portfolio that hedges left tail returns while keeping upside, and the conditional value at risk a portfolio judged by the mean of its worst outcomes, both from the same network. Over a continuous set of weights, the representation $\CVaR_\eta(Z)=\max_t\{t-\eta^{-1}\E[(t-Z)_+]\}$ of Rockafellar and Uryasev (2000), computed from posterior predictive draws of $R$, makes the CVaR choice one concave maximization over $w$ and $t$, since utility is concave in $w$.
+
+\subsection{Dynamic treatment regimes}\label{gbc:sec:dynamic}
+
+With repeated decisions\index{dynamic treatment regime}, each period's transitions are causal: $p(X_{t+1}, Y_t\mid X_t, \mathrm{do}(W_t=a);\theta)$, with reward $\mathcal{U}(a,\theta,Y_t(a))$ and discount $\gamma\in[0,1)$. The g formula of Chapter~\ref{ch:frameworks} identifies the transitions under sequential ignorability. The parameter $\theta$ is fixed but unknown, and that persistence matters. Given $\theta$, the problem is a Markov decision process with value $V_\theta^\pi$ for policy $\pi$. The Bayes value of a policy that does not learn further is $\int V^\pi_\theta(s)\,\pi_N(d\theta)$, estimated by simulating whole trajectories, each with one posterior draw of $\theta$ held fixed, and averaging over draws. A policy that also learns from the outcomes it generates solves a Bayes adaptive decision process\index{Bayes adaptive decision process|textbf} whose state pairs the current covariates with the current posterior, $s_1=(X_1,\pi_N)$ in the first period. With $H_2=(s_1,w_1,Y_1,X_2)$ the history after the first action and $\mathcal{U}_t$ the utility in period $t$, a two period problem gives
+\[
+\begin{aligned}
+Q_2(h_2,w_2) &= \E\bigl[\mathcal{U}_2\mid h_2,\mathrm{do}(w_2)\bigr],\\
+Q_1(s_1,w_1) &= \E\Bigl[\mathcal{U}_1 + \gamma\max_{w_2}Q_2(H_2,w_2)\Bigm| s_1,\mathrm{do}(w_1)\Bigr],
+\end{aligned}
+\]
+where $h_2$ is a realized value of $H_2$ and the expectation in $Q_2$ is over $\theta\sim\pi(\theta\mid D_N,h_2)$, the posterior updated by the first period's outcome. GBC suits this well when the training simulations include the first period's outcome and the summary records it and the sample size: updating on $h_2$ is then one more evaluation of the network, with no new chain. A network trained for a fixed sample size returns the wrong posterior spread.
+
+A common shortcut averages the transition law over the current posterior and solves one Markov decision process with the operator
+\[
+(\mathcal T Q)(s,a) = \E_{\theta\sim\pi_N}\E\bigl[R(s,a;\theta) + \gamma\max_{a'} Q(S',a')\mid s,\mathrm{do}(a),\theta\bigr],
+\]
+a contraction in the supremum norm with modulus $\gamma$ when rewards are bounded. Its fixed point is the value of the posterior mean process, as if $\theta$ were redrawn every period. It ignores the persistence of $\theta$ and the value of learning, and should be checked against trajectory simulation. Replacing expectations by distorted values at each stage gives risk sensitive dynamic policies, but distorted criteria are not in general time consistent\index{risk sensitive decisions!time consistency}, so stagewise and whole horizon versions can differ.
+
+
+
+% moved to Chapter~\ref{ch:open}: the subsection "Open problems" is now Problems 11 to 14
+
+% In practice section moved here from the front of the chapter (comp phase 1)
+\section{In practice}
+
+\paragraph{The target.} The target of an economic decision is the causal expected utility \eqref{cdt:eq:bayes}: the utility of an action averaged over the interventional predictive and over the posterior of the structural parameters. Every quantity in this chapter is a functional of that posterior and inherits its properties: efficiency in the nonparametric model depends on the prior, for instance a propensity aware one (Part~III), not on computation or on the choice of criterion.
+
+\paragraph{What the analyst does differently.} Before fitting, the analyst states the regime and which parameters are invariant to the policy change. She fits a posterior over those parameters and simulates the counterfactual policy forward (Section~\ref{cdt:sec:lucas}). She treats continuity at the threshold, parallel trends and exclusion as modelling assumptions with a sensitivity analysis rather than as labels. And she reports the probability that the decision is right, the acceptability curve across $\lambda$ and the posterior of $\tau(x)$ over the population to be treated, not an interval for a ratio of means.
+
+\paragraph{Against DML.} Double machine learning estimates one reduced form contrast under the historical regime, and estimates it well: for an average effect in a large cross section with no policy change in view, its interval is adequate and cheaper than a structural posterior. A merger, a change in a Taylor rule coefficient or a carbon tax is a regime the data have never visited, and only a model of the invariant parameters predicts it. A risk neutral targeting rule needs only the sign of $\tau(x)$ against a threshold, and policy learning with cross fitted doubly robust scores (Athey and Wager 2021), or the R learner of Nie and Wager (2021) for $\tau(x)$ itself, delivers it without a posterior. The posterior adds the lower tail of $\tau(x)$ for a planner who will not risk harming a group, the joint posterior of $\Delta E$ and $\Delta C$ for the cost effectiveness decision, the distorted values of Section~\ref{gbc:sec:risk}, which can reverse the ranking the mean gives, and the probability that each decision is right. None of these is the contrast that a DML score estimates. With homogeneous effects, a fixed regime and squared error loss, DML and the posterior mean agree to first order in large samples if the posterior satisfies a semiparametric Bernstein von Mises theorem at the efficient variance in DML's model (Section~\ref{pg:sec:bvm}) and its rescaled draws $\sqrt N(\tau-\hat\tau_N)$, centred at the efficient estimator $\hat\tau_N$, are uniformly integrable in probability. Total variation convergence alone does not control the posterior mean. The prior can separate them in small samples. Their costs are comparable in the designs timed in Section~\ref{comp:sec:cost}, with DML ahead when covariates are numerous. When a decision turns on a probability, as the court's question about the probability of necessity does, the posterior supplies it.
+
+\section*{Notes}
+
+
+
+Dhaene and coauthors (2012) remark on quantiles and distortion risk measures. The sources for the quantile network, its check loss, distributional reinforcement learning and optimal transport are in the Notes of Chapter~\ref{ch:computation}.
+
+\begin{exercises}
+\item\label{ex:chcdt:1} In Newcomb's problem let the predictor be correct with probability $p$ whichever act the agent takes, let the opaque box contain $M$ if one box is predicted, let the transparent box contain $m<M$, and let $q$ be the agent's credence that the opaque box is full. Compute evidential and causal expected utilities of each act and find the values of $p$ for which the two theories disagree.
+\item\label{ex:chcdt:2} In the twin prisoner's dilemma with payoffs $(R,S,T,P)$, $T>R>P>S$, show that causal reasoning recommends defection for any belief about the twin, and, if the twin matches the agent's act with probability $p$ whichever act she takes, find the value of $p$ above which evidential reasoning recommends cooperation.
+\item\label{ex:chcdt:3} Show that the set of correlated equilibria of a finite game is a convex polytope, and that it contains every mixed Nash equilibrium.
+\item\label{ex:chcdt:4} A treatment has posterior net monetary benefit $\lambda\Delta E - \Delta C$ with $\Delta E\sim N(0.2, 0.1^2)$ and $\Delta C\sim N(5000, 2000^2)$ independent. Plot the probability of positive net benefit against $\lambda$ and compare the decision with the one based on the ratio of posterior means.
+\item\label{ex:chcdt:5} Explain why the Lucas critique is a failure of modularity in the sense of Chapter~\ref{ch:blp}, and state the modularity assumption for a change in a Taylor rule coefficient.
+
+\item\label{ex:chgbc:1} Prove that $\E[Z] = \int_0^1 Q_Z(u)\,du$ for any integrable $Z$, and that for $\beta(u)=\eta u$ the distorted value is $\eta^{-1}\int_0^\eta Q_Z(u)\,du$.
+\item\label{ex:chgbc:2} Show that the Wang distortion with $\eta<0$ satisfies $\beta(u)\le u$ and that, for $Z\sim N(m,s^2)$, $\Vbeta = m + \eta s$.
+\item\label{ex:chgbc:4} Compute the CVaR of programmes A and B at each level $\eta$, from simulated draws of the two utilities described in the text, and find the level at which the planner is indifferent between them. Compare it with the value computed from the exact distributions of the two programmes.
+\item\label{ex:chgbc:5} Show by example that a distorted criterion applied stage by stage in a two period problem can choose a different first period action from the same criterion applied to total utility.
+\end{exercises}

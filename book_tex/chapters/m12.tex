@@ -1,0 +1,205 @@
+\chapter{Two Applications in Health}\label{ch:nhefs}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+Quitting smoking causes about three and a half kilograms of extra weight gain over eleven years. Three different Bayesian models agree with each other and with Hern\'an and Robins, and the causal forest shows little heterogeneity by smoking intensity or age. In Thornton's randomized HIV trial, one logistic model gives a risk difference of 0.447 for any incentive and conditional and marginal odds ratios of 7.46 and 7.23, and the dose response jumps from 0.34 to about 0.62 at the smallest incentive.
+\end{tcolorbox}
+
+This chapter returns to smoking from the other side. Many smokers fear that quitting will make them gain weight, a real barrier to quitting. We ask how much weight quitting causes. The question is observational, since no one can randomize cessation, and we compare our estimates with those of Hern\'an and Robins's \emph{Causal Inference: What If}. Section~\ref{sec:thornton} applies the same accounting to a randomized trial, Thornton's HIV incentives experiment.
+
+\section{The data}
+
+The National Health and Nutrition Examination Survey Epidemiologic Followup Study, NHEFS\index{NHEFS|textbf}, measured American adults in 1971 and again in 1982. We use the 1,566 smokers in 1971 with complete data, 403 of whom had quit by 1982. The outcome is the change in body weight\index{NHEFS!weight change after quitting smoking|textbf}, in kilograms, between 1971 and 1982. Following Hern\'an and Robins, the confounders are sex, race, age, education, cigarettes per day, years of smoking, exercise, usual daily activity, and 1971 weight, with squares of the four continuous variables.
+
+The treatment is quitting at some time between the two surveys, a mixture of quit dates and later smoking histories, not eleven years without a cigarette, and the consistency assumption of Chapter~\ref{ch:predictive} is read with that version of treatment. The 63 smokers in the Hern\'an and Robins file with no 1982 weight are left out, so every estimate assumes that, given treatment and the covariates, whether a weight was recorded is unrelated to weight change; Hern\'an and Robins (2020) reweight for this censoring instead.
+
+Quitters differed in education and activity. On average quitters were 46.2 years old (nonquitters 42.8), smoked 18.6 cigarettes a day (21.2) for 26.0 years (24.1), and weighed 72.4 kilograms in 1971 (70.3). Their raw weight change was 4.5 kilograms, against 2.0 for nonquitters. Older people gain less weight, and lighter smokers gain differently from heavy ones, so a raw comparison is not causal.
+
+A smoker resolved to quit may also be resolved to eat less or exercise more, and that resolve is not in the 1971 covariates. We assume, as Hern\'an and Robins do and as the price of comparing methods on a common footing, that the nine covariates capture everything that drives both quitting and weight change; the squares of the four continuous ones belong to the regression, not to the assumption. Overlap\index{overlap} is good. In the Hern\'an and Robins logistic model the estimated propensities run from 0.05 to 0.78, the largest stabilized weight is 4.3, and the effective sample size of the weights is 1,446 of 1,566. With no thin tail of the kind that dominated the LaLonde benchmark of Section~\ref{sec:lalonde}, weighting and outcome modelling should agree, and the comparison isolates the error model and the prior rather than the handling of extreme weights.
+
+\section{Results}
+
+Table~\ref{tab:nhefs} and Figure~\ref{fig:nhefsate} report the estimated average effect of quitting on eleven year weight change\index{NHEFS!results|textbf}.
+
+\begin{table}[ht]
+\centering
+\caption{Effect of quitting smoking on weight gain from 1971 to 1982, kilograms. Intervals are 95\% confidence intervals for least squares and DML and 95\% posterior intervals for the Bayesian methods.}
+\label{tab:nhefs}
+\small
+\begin{tabular}{p{2.5in}cc}
+\toprule
+Method & Estimate & Interval \\
+\midrule
+Difference in means & 2.54 & \\
+Least squares, Hern\'an and Robins covariates & 3.46 & [2.60, 4.32] \\
+Inverse probability weighting, stabilized & 3.44 & \\
+DML, augmented weighting, forests & 3.71 & [2.59, 4.84] \\
+Horseshoe, coupled, with effect modifiers & 3.48 & [2.60, 4.34] \\
+BART, Hill's approach & 3.23 & [2.37, 4.09] \\
+Bayesian causal forest & 3.41 & [2.58, 4.28] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{nhefs_ate.pdf}
+\caption{Estimates and 95\% intervals of Table~\ref{tab:nhefs} for the average effect of quitting smoking on eleven year weight gain.}
+\label{fig:nhefsate}
+\end{figure}
+
+Adjustment raises the estimate from 2.5 to about 3.4 kilograms. Our inverse weighting estimate of 3.44 reproduces the value of about 3.4 reported by Hern\'an and Robins, which confirms that we use the same data and confounders. Our least squares row enters their covariates additively and gives 3.46; their standardization estimate of about 3.5 also lets the effect of quitting vary with cigarettes per day and averages over all 1,629 smokers in their file, including the 63 with no 1982 weight. 
+
+The horseshoe row of Table~\ref{tab:nhefs} uses the standardized Hern\'an and Robins basis (the four continuous covariates, their squares, and dummies for sex, race, education, exercise and activity) plus the effect modifiers, interactions of treatment with the four continuous covariates. Coupled means that treatment, the intercept and the estimated propensity are unpenalized (Chapter~\ref{ch:horseshoe}); the sampler runs 3,000 Gibbs iterations, 1,000 of them burn-in. BART takes treatment as a covariate and the causal forest uses the logistic propensity, both on the nine raw covariates with 20 warm-start sweeps and 1,000 MCMC draws. DML is the augmented score with five-fold cross fitting, forests of 500 trees (minimum leaf 5) for each arm's outcome and the propensity, propensities clipped to $[0.01, 0.99]$, and a normal interval from the score's standard deviation.
+
+\section{Heterogeneity}
+
+Does the effect of quitting grow with smoking intensity\index{NHEFS!heterogeneity|textbf}? Figure~\ref{fig:nhefshet} shows the Bayesian causal forest\index{Bayesian causal forest}'s posterior averaged within four groups of 1971 cigarettes per day, 1 to 10, 11 to 19, exactly 20 and 21 or more (406, 155, 563 and 442 smokers; more than a third report exactly 20, so equal fifths cannot be cut), and within quintiles of age. The effect rises slightly with intensity\index{heterogeneous treatment effects!by smoking intensity|textbf}, from about 3.1 kilograms among the lightest smokers to about 3.6 among the heaviest, but the intervals overlap heavily. With age the pattern is an inverted U, smallest in the oldest quintile (ages 56 to 74) at about 2.9 kilograms, interval 1.3 to 4.1.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{nhefs_het.pdf}
+\caption{Bayesian causal forest posterior of the effect of quitting on weight gain, averaged within four groups of 1971 cigarettes per day (left) and quintiles of age (right), plotted at the group medians, with 95\% intervals.}
+\label{fig:nhefshet}
+\end{figure}
+
+Under the causal forest, the effect on quitters is 3.36 kilograms, interval 2.56 to 4.21, and on nonquitters 3.43, interval 2.58 to 4.32. With modest heterogeneity, the choice of population matters little.
+
+\section{What the comparison shows}
+
+Every adjusted method agrees within about half a kilogram, well inside any interval. As in the LaLonde benchmark (Section~\ref{sec:lalonde}), Bayesian intervals are narrower than DML's: about 1.7 kilograms wide against 2.3. Least squares, also about 1.7 kilograms wide, shows that the gap is not a property of Bayes as such. It comes from fitting an outcome model, which pools across neighbouring covariate values and assumes a form for the regression, while the augmented score does not trust its outcome forests and adds back each residual divided by an estimated propensity. A narrower interval bought with a modelling assumption is worth having only if it keeps its coverage, which the widths alone cannot show.
+
+A simulation built on these data checks the coverage. It keeps the 1,566 covariate vectors, draws treatment from the fitted logistic propensities, takes the mean without quitting from the additive least squares fit, and adds an effect that is either constant at 3.5 kilograms or 3.5 plus a centred and scaled function of age and cigarettes per day ($\sin z_{\mathrm{age}} + z_{\mathrm{cig}}^2$ in standardized units, so its standard deviation is 1 kilogram); the sample average effect is 3.5 in every design. The errors have standard deviation 7.3 kilograms, close to the residual standard deviation of the fits, and are either Gaussian or Student $t$ on four degrees of freedom divided by $\sqrt{2}$, which has the same standard deviation. Each of the four designs has 500 replications, and least squares, DML, the horseshoe, BART and the causal forest are refitted to every replicate with the settings above, propensities included.
+
+Table~\ref{tab:nhefssim} gives the results. Least squares, the horseshoe and the causal forest cover between 93.8 and 96.2 percent with intervals 1.72 to 1.74 kilograms wide, against a Monte Carlo standard error of about one point. DML covers 93.4 to 98.0 percent with intervals of 2.07 to 2.10 kilograms, and its root mean squared error is 10 to 20 percent larger. BART, with treatment as a covariate, shrinks the effect by 0.15 to 0.25 kilograms and covers 91.4 percent when the effect is constant, which matches its lower estimate in Table~\ref{tab:nhefs}.
+
+The design is kinder than the data. A posterior predictive check of the horseshoe and the causal forest, with one replicated data set from each posterior draw at the draw's error variance, finds weight change more peaked among nonquitters, and with a longer right tail in both groups, than Gaussian errors allow: the largest observed changes are 47.5 and 48.5 kilograms, against replicated maxima near 27. Weight change is also more spread out among quitters (standard deviation 8.7, against 7.9 replicated by the horseshoe) than among nonquitters (7.4 against 7.8), while the simulated errors have one variance for everyone.
+
+\begin{table}[ht]
+\centering
+\caption{Simulation on the NHEFS covariates, 500 replications per design, true average effect 3.5 kilograms: coverage of nominal 95\% intervals (Monte Carlo standard error 0.006 to 0.013), the range of the bias over the four designs, and the mean interval width averaged over them, in kilograms.}
+\label{tab:nhefssim}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcccccc}
+\toprule
+ & & \multicolumn{2}{c}{Constant effect} & \multicolumn{2}{c}{Varying effect} & \\
+Method & Bias & Gaussian & $t_4$ & Gaussian & $t_4$ & Width \\
+\midrule
+Least squares & 0.00 to 0.10 & 0.940 & 0.952 & 0.962 & 0.946 & 1.73 \\
+DML & $-0.03$ to 0.02 & 0.934 & 0.972 & 0.980 & 0.960 & 2.08 \\
+Horseshoe & 0.00 to 0.09 & 0.940 & 0.954 & 0.960 & 0.946 & 1.74 \\
+BART & $-0.25$ to $-0.15$ & 0.914 & 0.914 & 0.946 & 0.942 & 1.70 \\
+Bayesian causal forest & $-0.10$ to $-0.01$ & 0.938 & 0.940 & 0.960 & 0.956 & 1.74 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The three Bayesian models, a fixed basis and two kinds of trees, agree within about a quarter of a kilogram. Functional form does not drive the number.
+
+All of this assumes that the measured covariates remove the confounding. The Bayesian form of the sensitivity analysis of Section~\ref{sec:sensitivity} carries over to a continuous outcome. Suppose an unmeasured confounder $U$ of unit variance adds $b$ kilograms of weight change per standard deviation, for quitters and nonquitters alike, and that its mean among quitters exceeds its mean among nonquitters by $a$ at every value of the measured covariates. Quitters and nonquitters with covariates $x$ then differ in expected weight change by $\tau(x) + ab$, so every estimate of the average effect is biased by $ab$, and each posterior draw is corrected by subtracting it.
+
+The data cannot update $a$ and $b$, so their priors are scaled by the strongest measured confounder. For each covariate we standardize its part of the least squares fit, its linear and squared terms together: $b$ is the standard deviation of that part in kilograms and $a$ the coefficient of quitting in its regression on quitting and the other covariates. Age has the largest product, $b = 2.47$ and $a = -0.10$, ahead of 1971 weight. With independent priors $a \sim N(0, m^2 a_{\mathrm{age}}^2)$ and $b \sim N(0, m^2 b_{\mathrm{age}}^2)$, a confounder $m$ times as strong as age on both links, each of 2,000 horseshoe draws and 1,000 causal forest draws of the effect is paired with 100 prior draws. Figure~\ref{fig:nhefssens} shows the posterior probability that the effect exceeds 0 and 1 kilogram. A prior centred at zero only widens the posterior: at $m = 1$ the horseshoe interval goes from 2.60 to 4.34 to 2.48 to 4.48, at $m = 2$ to 1.16 to 5.81 with probability 0.99 that the effect is positive, and at $m = 4$ that probability is 0.87. The right panel gives $a$ and $b$ the same scales but signs that inflate the estimate: the probability of a positive effect is still 0.99 at $m = 2$, with posterior mean 2.83 kilograms, and falls to 0.75 at $m = 4$, with mean 0.89. The causal forest gives nearly the same curves. The conclusion that quitting adds weight survives a hidden confounder twice as strong as age on both links; one four times as strong makes the sign uncertain.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{nhefs_sens.pdf}
+\caption{Posterior probability that the effect of quitting exceeds 0 kilograms (solid) and 1 kilogram (dashed) when an unmeasured confounder is $m$ times as strong as age on both links, for the horseshoe and the Bayesian causal forest, whose curves nearly coincide. Left: normal priors centred at zero on the two links. Right: the same scales with the signs that inflate the estimate.}
+\label{fig:nhefssens}
+\end{figure}
+
+A smoker asking how much weight quitting will likely add gets a posterior predictive answer for her age, sex and smoking history, from the horseshoe with effect modifiers of Table~\ref{tab:nhefs}. Her expected extra gain, the difference between her predictive means under quitting and under not quitting, is close to the average of about three and a half kilograms over eleven years, small against the very large risk reductions of Chapter~\ref{ch:smoking}. The two predictive distributions are far wider than that difference, because weight change varies a great deal between people with the same covariates, so they overlap heavily, and their right tails are too light, as the predictive check above found. Exercise~\ref{ex:chnhefs:4} asks for both, with a draw of the residual error at each draw's variance. The mean of her own gain from quitting is identified. Its spread is not, since it depends on the correlation between her two potential weight changes (Chapter~\ref{ch:gente}).
+
+\section[Incentives and learning HIV status]{Incentives and learning HIV status: accounting in a randomized trial}\label{sec:thornton}
+
+Rebecca Thornton's (2008) experiment\index{Thornton HIV incentive experiment|textbf} in rural Malawi asked whether small cash incentives would persuade people tested for HIV to return and learn their results. Incentives were assigned by lottery, so confounding is a small issue here, though the share offered an incentive differed by village, which the village intercepts below take into account. We use the experiment to show the model first argument on real data with a binary outcome: two logistic posteriors, one for any incentive and one for the amount, with every reported effect an accounting of one of them.
+
+A randomized trial is the setting where the case for a model seems weakest. When every unit has the same chance of treatment, the difference in proportions is unbiased and a confidence interval for it needs no model at all. The reason to fit one anyway is that the questions asked of a trial are rarely limited to the single difference. Thornton randomized not only whether an incentive was offered but how much, and respondents lived at different distances from the centres, so the natural questions are whether the effect depends on distance, how the response rises with the amount, and how a risk difference relates to the odds ratios that the epidemiological literature reports.
+
+\paragraph{The experiment.} Household survey respondents were offered free HIV tests at home. Each then received a voucher of randomly assigned value, possibly zero, redeemable on returning to a nearby centre to learn the result. The amounts take 27 distinct values, from 0 to 2.84 as coded in the data, and 21.9\% of respondents received none. Centres lay at varying distances from respondents' homes. The outcome is whether the respondent learned the result. We use the 2,816 respondents with a valid test result and complete data on outcome, incentive, distance and age.
+
+Of those who received any incentive, 78.9\% learned their result; of those who received none, 34.1\%. The incentive more than doubled the rate.
+
+\subsection{One logistic posterior}
+
+We fit the logistic model
+\begin{multline*}
+\logit\Prob(\text{learned} = 1) = \alpha + \tau\,\mathrm{any} + \beta_1\,\mathrm{dist} \\
++ \beta_2\,\mathrm{age} + \delta\,\mathrm{any}\times\mathrm{dist},
+\end{multline*}
+with distance and age standardized and independent normal priors of variance 10 on the coefficients, by Polya Gamma\index{Polya Gamma@P\'olya Gamma} Gibbs sampling (Chapter~\ref{ch:computation}). We retain 2,000 posterior\index{Thornton HIV incentive experiment!one logistic posterior|textbf} draws.
+
+\begin{table}[ht]
+\centering
+\caption{Accountings of one logistic posterior for the Thornton experiment.}
+\label{tab:thornton}
+\small
+\begin{tabular}{p{2.1in}cc}
+\toprule
+Summary & Posterior mean & 95\% interval \\
+\midrule
+Risk difference, sample average & 0.447 & [0.404, 0.486] \\
+Risk difference, nearest quarter by distance & 0.422 & [0.358, 0.486] \\
+Risk difference, farthest quarter by distance & 0.472 & [0.399, 0.540] \\
+Conditional odds ratio, at mean distance & 7.46 & [6.09, 9.08] \\
+Marginal odds ratio, sample & 7.23 & [5.90, 8.75] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The sample risk difference\index{risk difference|textbf} is 0.447: any incentive raised the probability of learning one's status by about 45 percentage points. The effect is somewhat larger for those farthest from the centre, 0.47, than for those nearest, 0.42, though the two intervals overlap.
+
+The lottery did not give every village the same odds. Among the 119 villages (2 to 127 respondents each, median 17) the share offered any incentive runs from none to all, and a chi squared test of equal shares gives 347 on 118 degrees of freedom, $p$ about $2 \times 10^{-24}$. The data file records the village but not Thornton's district, so as a robustness check we refit the model with a village intercept $u_j \sim N(0, \sigma^2)$, a half Cauchy prior with scale 1 on $\sigma$, and an intercept of its own for each of the four respondents with no village number; the dose model below gets the same intercepts. The Polya Gamma sampler draws the coefficients and the intercepts in one block, four chains of 4,000 iterations with 1,000 discarded. The village scale $\sigma$ is 0.60 on the logit scale (interval 0.43 to 0.80), and the sample risk difference, averaged over respondents with their own village effects, moves only from 0.447 to 0.438 (interval 0.40 to 0.48), with 0.41 for the nearest quarter and 0.46 for the farthest. Table~\ref{tab:thornton} and Figure~\ref{fig:thornton} report the model without village intercepts.
+
+\subsection{Noncollapsibility in real data}
+
+The conditional odds ratio\index{odds ratio!conditional and marginal|textbf}, $e^\tau$ at mean distance, is 7.46. At each draw, $p_{ti}$ is respondent $i$'s fitted probability of learning the result under $\mathrm{any} = t$ and $\bar p_t$ its sample average. The marginal odds ratio is
+\[
+\frac{\bar p_1/(1-\bar p_1)}{\bar p_0/(1-\bar p_0)},
+\]
+with posterior mean 7.23. They differ, and confounding plays no part in the gap: both are computed from the same fitted model over the same respondents. This is the noncollapsibility\index{noncollapsibility} of Chapter~\ref{ch:mccullagh} in real data\index{noncollapsibility!in real data|textbf}\index{Thornton HIV incentive experiment!noncollapsibility in real data|textbf}. The model also lets the effect vary with distance, so 7.46 is the conditional ratio at mean distance only, but the posterior puts that interaction near zero (mean 0.05, 95\% interval $-0.16$ to $0.26$), and the model without the interaction leaves almost the same gap, 0.21 against 0.23. In this model the difference is small because baseline risk varies only moderately with distance and age. Baseline risk also varies between villages, and with the village intercepts the conditional odds ratio, at mean distance in a typical village, rises to about 8.0 while the marginal one falls to 6.9, so the gap grows from 0.23 to about 1.1 (interval 0.6 to 1.7). Figure~\ref{fig:thornton} shows the two posteriors side by side.
+
+Both numbers are correct; they answer different questions. An analyst reporting an odds ratio from a trial should say which one it is, and a reader comparing trials should expect the conditional ratio from a regression with covariates and the marginal ratio from a two by two table to differ even when both trials are perfectly randomized. The risk difference of 0.447 is collapsible, since $\bar p_1 - \bar p_0$ is the average of the respondents' own differences $p_{1i} - p_{0i}$, which is one reason to report it first. Exercise~\ref{ex:chthornton:1} asks when the two ratios coincide.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{thornton.pdf}
+\caption{Left: posterior mean and 95\% band of the probability of learning one's HIV result as a function of the incentive amount, from a logistic model with a jump at zero and a dose response piecewise linear on the logit scale, averaged over the sample. Right: posteriors of the conditional and marginal odds ratios for any incentive.}
+\label{fig:thornton}
+\end{figure}
+
+\subsection{The dose response}
+
+The incentive amount was also randomized, so the experiment identifies a dose response\index{Thornton HIV incentive experiment!dose response|textbf}\index{dose response|textbf}. A second logistic model, adjusting for distance and age, has an indicator for any incentive, the amount, and a change in slope at one unit of the amount as coded in the data. The left panel of Figure~\ref{fig:thornton} shows the result: the probability of learning one's result is 0.34 with no incentive and jumps to about 0.62 with the smallest positive incentive, then rises more slowly, to about 0.80 at one unit and 0.88 at the largest amount, 2.84. With the village intercepts the curve starts at 0.36 and reaches 0.60 at the smallest incentive, a jump of 0.24 rather than 0.28, and from one unit up the two curves differ by less than 0.003.
+
+The shape matters for policy: most of the effect comes from offering any incentive at all, and larger amounts add less, as Thornton also concluded.
+
+A programme with a fixed budget cares about the expected number of additional people who learn their status per unit spent. Write $p(a)$ for the probability of learning one's result at amount $a$, averaged over the sample. At a positive amount that number is $\{p(a) - p(0)\}/\{a\,p(a)\}$, the rise above the no incentive rate divided by the expected payout per person, the amount times the probability of collecting it. The jump at zero makes the smallest positive incentive by far the most cost effective, and the slower rise thereafter means that each additional unit buys less. Among the amounts offered, the smallest positive one wins in every posterior draw, with or without village intercepts, so the best amount for this ratio sits at the lower edge of the range tried, with posterior probability close to one. Below that edge the jump would keep raising the ratio, but no one was offered less, and the model has no data there.
+
+A programme that values each additional person who learns her status at $V$ can instead maximize the net value $V\,[p(a) - p(0)] - a\,p(a)$ over the amount. The best amount has a posterior distribution that moves with $V$ (Exercise~\ref{ex:chthornton:3}). A programme that must commit to one amount takes the Bayes action of Chapter~\ref{ch:cdt}. The net value is linear in $p$, so this is the maximizer of $V\,[\bar p(a) - \bar p(0)] - a\,\bar p(a)$, with $\bar p$ the posterior mean curve of Figure~\ref{fig:thornton}, and it need not equal the mean or median of the posterior of the best amount. An analyst who reported only the average effect of any incentive, 0.447, would have told the policymaker that incentives work and nothing about how much to offer.
+
+\section{In practice}
+
+\paragraph{The target.} In the weight study each posterior draw of the causal forest gives $\tau(x_i)$ for every person, and averaging over all, over quitters, over nonquitters, or within a group of people gives a draw of each target. In the trial the targets are risk differences for chosen populations, conditional and marginal odds ratios, and the expected rate of learning under any incentive schedule, each a function of the logistic coefficients and covariates, evaluated at each posterior draw.
+
+\paragraph{What the analyst does differently.} The analyst first reproduces the standard estimates, 3.44 by stabilized inverse weighting and 3.46 by least squares, to confirm the data before claiming anything new. She then fits at least two Bayesian models of different form, here three, and reports their agreement as evidence that functional form does not drive the answer. She reports the effect on quitters and on nonquitters, says explicitly that heterogeneity is modest, and answers the question a smoker actually asks, the predictive weight change for her own covariates. In the trial she reports the risk difference first, since it is collapsible, and then says which odds ratio she means. She also checks the assignment: the offer rate differs by village, so she refits with village intercepts and reports that the risk difference barely moves while the two odds ratios move apart. She shows the dose response with its posterior band.
+
+\paragraph{Against DML.} DML with forests gives 3.71 with interval 2.59 to 4.84, compatible with every other adjusted row of Table~\ref{tab:nhefs}, and on the average effect it is adequate. The Bayesian case in the weight study rests on three things DML did not deliver. In this sample the interval was about 30 percent wider (2.25 kilograms against 1.74 for the horseshoe, 1.70 for the causal forest, and 1.72 for least squares, which also trusts its outcome model). The heterogeneity by intensity and age, and the effects on quitters and nonquitters, came from the fitted forest at no extra cost, as joint draws of one posterior. DML can reach the prespecified groups by averaging its score contributions within each group, and the effects on quitters and nonquitters by reweighting the same nuisance fits as in \eqref{eq:aipw:att}, but each is a separate estimate with its own interval. And the individual predictive answer has no DML analogue at all, because DML estimates a functional and not a model. In the trial a cross-fitted augmented estimator that knew the assignment probabilities would need no estimated propensity and would be unbiased for the risk difference whatever its outcome model. Here they differ by village and are not in the data file, so they would have to be estimated from the village offer rates, and the twelve villages in which everyone or no one was offered give no comparison. On that one number it is still adequate. The effect by distance, the two odds ratios and the dose response would each need a target and a score of their own, and the fitted logistic models give them from their posterior draws.
+
+\section*{Notes}
+
+Hern\'an and Robins (2020) use the NHEFS data to illustrate every classical method; they also treat the effect of quitting on mortality (Exercise~\ref{ex:chnhefs:3}) and time varying treatments (Section~\ref{fw:sec:gmethods}). The three Bayesian models are the horseshoe of Carvalho, Polson and Scott (2010) in the coupled form of Chapter~\ref{ch:horseshoe}, BART as a causal method from Hill (2011) and the Bayesian causal forest of Hahn, Murray and Carvalho (2020), the last two described in Chapter~\ref{ch:bart}. The DML comparison is the estimator of Chernozhukov and coauthors (2018).
+
+Thornton (2008) also asks whether learning one's status changed later behaviour (Exercise~\ref{ex:chthornton:4}). The Polya Gamma sampler is from Polson, Scott and Windle (2013); see Chapter~\ref{ch:computation}. Greenland, Robins and Pearl (1999) discuss noncollapsibility, and Chapter~\ref{ch:mccullagh} gives the model first reading of it. Rubin (1978) is the place to read how randomization enters a Bayesian analysis of causal effects. Exercise~\ref{ex:chthornton:2} takes the village random effects further.
+
+
+\begin{exercises}
+\item\label{ex:chnhefs:1} Reproduce the Hern\'an and Robins inverse probability weighting estimate and its confidence interval, and compare with the posterior intervals in Table~\ref{tab:nhefs}.
+\item\label{ex:chnhefs:2} Fit the coupled horseshoe without the effect modifier interactions and compare its posterior with the one reported here.
+\item\label{ex:chnhefs:3} Hern\'an and Robins also analyse the effect of quitting on mortality. Fit a Bayesian survival model and report the posterior of the difference in ten year survival probability.
+\item\label{ex:chnhefs:4} Using the horseshoe with effect modifiers, compute the posterior predictive distribution of weight change for a 45 year old woman who smoked 20 cigarettes a day for 25 years, with her other covariates at the sample medians, under quitting and not quitting.
+
+\item\label{ex:chthornton:1} Show that the marginal and conditional odds ratios in Table~\ref{tab:thornton} would coincide if baseline risk did not vary with distance or age and $\delta = 0$.
+\item\label{ex:chthornton:2} Refit the logistic model with village random effects, as in Section~\ref{sec:thornton}, and compare three risk differences: averaged over the respondents with their own village effects, over a new village drawn from the village distribution, and for a typical village with effect zero.
+\item\label{ex:chthornton:3} Using the dose response model, let $p(a)$ be the probability of learning one's status at amount $a$, averaged over the sample, let $V$ be the value, in the units of the amount, of each additional person who learns her status, and take $a$ in the range of amounts offered. Find the amount that maximizes $V\,[p(a) - p(0)] - a\,p(a)$, the value net of the expected payout $a\,p(a)$, and report how its posterior distribution changes with $V$.
+\item\label{ex:chthornton:4} Thornton also studied whether learning one's status changed later behaviour. Discuss what additional assumptions are needed to estimate that effect using the incentive as an instrument, in the framework of Chapter~\ref{ch:iv}.
+\end{exercises}

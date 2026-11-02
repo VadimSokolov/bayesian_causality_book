@@ -1,0 +1,10 @@
+# Python 3.11 or later. numpy, scipy and scikit-learn are pinned to the Hopper environment of the most recent runs (jobs 2917976 and 2918813); stochtree and polyagamma are pinned to the versions of the most recent runs; the rest are minimum versions.
+numpy==2.4.6
+scipy==1.17.1
+pandas>=2.1
+scikit-learn==1.9.1
+matplotlib>=3.8
+stochtree==0.4.5      # BART and Bayesian causal forests
+polyagamma==2.0.2     # Polya Gamma sampler
+torch>=2.0
+# Exception, Chapter 8: ric_hd150_table.tex and ric_hd300_table.tex were computed with Python 3.10.8, numpy 1.24.4, scipy 1.12.0 and scikit-learn 1.7.2 (Hopper system Python, jobs 2426528 and 2426529). With the pins above every horseshoe and least squares entry reproduces exactly; the lasso differs in 106 (p = 150) and 103 (p = 300) of 500 replications and DML in 10 and 33, which moves the lasso bias in the third decimal (0.3696 against the printed 0.3667 at p = 150).

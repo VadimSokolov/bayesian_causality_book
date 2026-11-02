@@ -1,0 +1,78 @@
+\chapter{Code and Data}\label{app:code}
+
+This book prints no code: a listing on a page goes stale when the package it calls renames an argument, and nobody can run a page. The code is released as source files in the public repository \coderepo, with the data it reads, the figures and numbers it writes, and the \LaTeX\ source of the book. Algorithms such as the horseshoe Gibbs sampler of Section~\ref{sec:hsregression} are written as sequences of distributions that can be programmed in any language.
+
+\section{What is in the repository}
+
+The analyses are Python scripts\index{code repository|textbf} that use NumPy, SciPy, pandas, scikit-learn\index{software!scikit-learn|textbf} and Matplotlib, with \texttt{stochtree}\index{stochtree} for Bayesian additive regression trees and causal forests and \texttt{polyagamma} for P\'olya Gamma draws. The scripts that train a quantile neural network also need PyTorch\index{software!PyTorch|textbf}, and the merger analysis of Chapter~\ref{ch:blp} has a folder and a README of its own. Each script fixes its random seeds, so a rerun gives the figures of the book up to the versions of the numerical libraries. The file \texttt{requirements.txt} records the minimum versions of the libraries and the exact versions of \texttt{stochtree} and \texttt{polyagamma}. The scripts that train quantile networks pin PyTorch to two threads, because the thread count sets the order of the sums inside the kernel and so changes the fitted network. At two threads the rank chi squared statistic of the average effect network of Chapter~\ref{ch:computation} is 8.12 on Intel Xeon (the printed value) and 7.80 on AMD, with $p$ values 0.52 and 0.55, so another processor family can move the rank statistics of the quantile network examples in their first or second decimal without changing a conclusion. Most scripts take minutes on two cores. The largest simulations, among them the DML rerun of Chapter~\ref{ch:dml} and the coverage checks of Chapter~\ref{ch:gente}, take hundreds of processor hours, the posterior arms of Chapter~\ref{ch:critique} about 4,600, and all of them were run as job arrays on a cluster. The script \texttt{tools/make\_numbers.py} rewrites eight of the book's table fragments from the saved results, and \texttt{ric\_sim.py}, \texttt{hbdml\_tables.py} and \texttt{smoking\_bayes.py} write their own.
+
+The 401(k) table of Chapter~\ref{ch:k401} uses one fixed partition; a second script gives the spread over twenty lasso and five random forest partitions.
+
+Except for the runs in Table~\ref{tab:chscripts}, the simulation numbers of Chapter~\ref{ch:critique} are quoted from the working paper of Polson and Sokolov (2026b), ``Orthogonality is not enough'', as are the comparisons on the three real data sets of Section~\ref{sec:crit:real}. Scripts for the quoted results are absent from this repository. The simulations of Chapter~\ref{ch:dml} use \texttt{dml\_baseline\_audit.py}, our rerun of that paper's lasso, post double selection and repeated split arms. The scripts behind many of the numbers in the solutions of Appendix~\ref{app:solutions} are in \texttt{book\_scripts/solutions/}, and the saved summaries of the full size reruns are in \texttt{results/solutions/}. Scripts for the other small simulations and refits quoted in that appendix are absent.
+
+The horseshoe experiment of Section~\ref{comp:sec:horseshoe} comes from \emph{Generative Bayesian Computation} (Polson and Sokolov 2026a), which holds the network training and evaluation code. Three files from that book's cache, with evaluation tables, the verdict on two criteria and Gibbs sampler running time, are in \texttt{results/gbc\_book\_hs}, with a README; \texttt{hs\_scale\_check.py} recomputes the prior scales.
+
+\section{From chapters to scripts}
+
+The repository README\index{code repository} names the figure or table each script in Table~\ref{tab:chscripts} writes.
+
+\begin{table}[!htb]
+\centering
+\small
+\begin{tabular}{@{}L{0.75in}L{3.5in}@{}}
+\toprule
+Chapter & Scripts \\
+\midrule
+Introduction & \texttt{deep\_401k.py}, \texttt{intro\_fig.py} \\
+\ref{ch:mccullagh} & \texttt{make\_figs.py}, \texttt{make\_figs2.py}, \texttt{milk\_unrecorded.py} (selection on an unrecorded score) \\
+\ref{ch:groups} & \texttt{groups\_urn\_tau.py} (the urn, Sanov and case mix figures), \texttt{groups\_kidney.py} (the kidney stone analyses) \\
+\ref{ch:dml} & \texttt{figs4.py}, \texttt{app401k\_book.py}, \texttt{k401\_checks.py}, \texttt{dml\_partitions.py} (the 401(k) example), \texttt{dml\_baseline\_audit.py} (the simulations of Section~\ref{sec:dml:practice}: five designs, 5,000 replications each) \\
+\ref{ch:ipw} & \texttt{make\_figs.py}, \texttt{ipw\_sim.py}, \texttt{health\_matching.py} (care management example, one synthetic file of 20,000 members), \texttt{ipw\_overlap\_coverage.py} (coverage of intervals under weak overlap, 20,000 replications per slope) \\
+\ref{ch:critique} & \texttt{figs4.py}, which reads the saved partitions of \texttt{dml\_partitions.py}; \texttt{critique\_refit\_bootstrap.py} (the bootstrap that refits the nuisance, 1,000 data sets per design, run as an array of jobs), \texttt{critique\_learners.py} (forests, boosting, the horseshoe and a stack as nuisance learners, Figure~\ref{fig:crit:learners}), \texttt{dml\_baseline\_audit.py} (the lasso, post double selection and repeated split arms of Tables~\ref{tab:crit:folds}, \ref{tab:crit:head} and~\ref{tab:crit:cmp}), \texttt{dml\_posterior\_audit.py} (on the same 5,000 data sets a design: the reduced form posterior and naive Bayes with four chains a replication and a convergence check, DML with a horseshoe nuisance at five and two folds, and the multiplier bootstrap; about 4,600 processor hours, run as an array of jobs), \texttt{dml\_posterior\_audit\_b.py} (the dense posterior, horseshoe and bootstrap arms, the cross fitted posterior, the horseshoe nuisance at 5,000 sweeps and the timings), \texttt{dml\_dpost\_row.py} (the dense posterior row of Table~\ref{tab:crit:head}, recomputed from \texttt{results/dml\_dpost}), \texttt{dml\_channels\_audit.py} (the channel and selection measurements of Sections~\ref{sec:crit:channels} and~\ref{sec:crit:align}) \\
+\ref{ch:horseshoe} & \texttt{figs3.py}, \texttt{make\_figs.py}, \texttt{make\_figs2.py}, \texttt{baipw\_rep.py}, \texttt{ric\_sim.py} (also the two designs with $p = 150$ and $p = 300$, and with \texttt{-{}-design weak30} the design with thirty weak confounders), \texttt{ric\_chain\_check.py} (split $\hat R$ and effective sample size of its chains, with \texttt{-{}-weak30} for the design with thirty weak confounders), \texttt{hbdml\_tables.py} and the folder \texttt{hbdml} (the simulations of the companion study with their saved replications) \\
+\ref{ch:computation} & \texttt{qnn\_book.py} (PyTorch), \texttt{open\_localsbc.py} (PyTorch), \texttt{exact\_localsbc.py}, \texttt{gbc\_ate.py} (PyTorch), \texttt{comp\_figs.py}, \texttt{time\_fits.py} (the timings of Section~\ref{comp:sec:cost}), \texttt{ric\_chain\_check.py} (the convergence checks of the same section), \texttt{hs\_scale\_check.py} \\
+\ref{ch:gente} & \texttt{make\_figs.py}, \texttt{deep\_401k.py} (PyTorch; 200 refits for each input set, run in shards, and the training seed check), \texttt{deep\_401k\_coverage.py} (the coverage checks of its bands: 1,000 data sets for the nine covariate fit, 200 for the high dimensional fits and for a truth outside the network family; PyTorch, about eleven minutes a data set on two threads, run as an array of jobs), \texttt{app401k\_book.py} (the DML estimates of Table~\ref{tab:k401}), \texttt{dml\_irm\_401k.py} (DML with the interactive score) \\
+\ref{ch:bart} & \texttt{figs3.py}, \texttt{sim\_bart.py} (Table~\ref{tab:simbart} and Figure~\ref{fig:simbart}: three designs, two sample sizes, 1,000 data sets each, run as an array of jobs), \texttt{figs4.py} \\
+\ref{ch:iv} & \texttt{iv\_card.py}, \texttt{iv\_weak2.py} (run \texttt{iv\_card.py} first, because \texttt{iv\_weak2.py} reads its saved results; both import the posterior computations of \texttt{iv\_exact.py}), \texttt{iv\_chain\_check.py}, \texttt{iv\_card\_ar.py}, \texttt{iv\_fig\_check.py}, \texttt{iv\_horseshoe.py} (Table~\ref{tab:ivmany}), \texttt{make\_figs.py} \\
+\ref{ch:tianpearl} & \texttt{make\_figs.py}, \texttt{make\_figs2.py}, \texttt{benchmark\_401k.py} (the partial $R^2$ values of the benchmarking paragraph), \texttt{bounds\_examples.py} (the probability of necessity from counts, and the sensitivity value of Hammond's pairs), \texttt{milk\_unrecorded.py} (Lanarkshire in numbers) \\
+\ref{ch:smoking} & \texttt{make\_figs.py}, \texttt{figs4.py}, \texttt{frontdoor\_dgp.py}, \texttt{smoking\_bayes.py} \\
+\ref{ch:did} & \texttt{did\_hs.py}, \texttt{did\_checks.py}, \texttt{did\_sim2.py} with \texttt{did\_sim2\_fig.py} (the simulations of Tables~\ref{tab:didsim}, \ref{tab:didsimgrid} and \ref{tab:didsimdep}, and the figure), \texttt{did\_dep\_diag.py} with \texttt{did\_dep\_diag\_summary.py} (the refits that diagnose the horseshoe's bias when adopters depart), \texttt{did\_castle2.py} (the four chain and AR(1) castle fits), \texttt{castle\_refit.py} (the population weight refits of the castle data, in the chapter and its exercise; results in \texttt{results/res\_castle\_*.json}) \\
+\ref{ch:k401} & \texttt{app401k\_book.py}, \texttt{dml\_partitions.py}, \texttt{bart\_apps.py}, \texttt{bart\_chains.py} (chain checks of the BART and causal forest fits), \texttt{dml\_irm\_401k.py} (the DML quintile effects), \texttt{lalonde\_book.py}, \texttt{workflow\_figs.py}, \texttt{k401\_student\_t.py} and \texttt{k401\_quantiles.py} (the Student $t$ refit and the quantile regressions), \texttt{k401\_ppc.py} (the posterior predictive check of the Gaussian and Student $t$ fits),
+ \texttt{k401\_checks.py} (least squares on the 54 term basis, the lasso plug in, the quintile weights, the standard errors of the least squares and DML rows of the LaLonde table) \\
+\ref{ch:nhefs} & \texttt{apps2.py}, \texttt{thornton\_laplace.py} (the Laplace check of the Thornton interaction), \texttt{thornton\_village.py} (the assignment audit and the village intercepts), \texttt{nhefs\_validation.py} (the coverage simulation and the predictive check; the simulation runs as an array of 100 tasks), \texttt{nhefs\_sensitivity.py} (the sensitivity analysis) \\
+\ref{ch:workflow} & \texttt{bart\_apps.py}, \texttt{app401k\_book.py}, \texttt{apps2.py} (Table~\ref{tab:apps}) \\
+\ref{ch:cdt} & \texttt{gbc\_distort.py}, \texttt{gbc\_decision\_check.py} (the network's decisions against the exact Bayes rule in a two arm trial; PyTorch) \\
+\ref{ch:blp} & the folder \texttt{blp\_merger}, including \texttt{validate\_integration.py} (the integration draws and the equilibrium checks) and \texttt{calib\_extra.py} (the calibration of conduct and merger probabilities) \\
+\ref{ch:open} & \texttt{open\_sims.py}, \texttt{open\_sims2.py}, \texttt{open\_sims3.py}, \texttt{open\_rates\_hr.py} with \texttt{open\_rates\_hr\_merge.py} (Problem 8 rates), \texttt{open\_product2\_fig.py}, \texttt{open\_localsbc.py} (PyTorch), \texttt{exact\_localsbc.py}, \texttt{localsbc\_density.py} with \texttt{localsbc\_density\_merge.py} (PyTorch) \\
+Appendix~\ref{app:guarantees} & \texttt{hs\_theory.py}, \texttt{hs\_theory\_plot.py} \\
+\bottomrule
+\end{tabular}
+\caption{The scripts behind each chapter. Chapters~\ref{ch:predictive} and~\ref{ch:frameworks} have no computed figures.}\label{tab:chscripts}
+\end{table}
+
+\section{Data}
+
+The real data sets\index{data set|textbf} are public, but not all under the same terms, so the file \texttt{data/README.md} in the repository gives for each one its source, its terms, the credit it asks for, and whether the repository holds a copy or a script fetches it (Table~\ref{tab:data}). The NHEFS file is the complete case extract of Hern\'an and Robins (2020) from the NHANES I Epidemiologic Follow-up Study of the National Center for Health Statistics, whose data user agreement applies to it. The Thornton file has seven variables, and the Card (1995) file is the sample of 3,010 men from the 1976 wave of the National Longitudinal Survey of Young Men. The NSW, CPS, NHEFS, Thornton and castle doctrine files are also distributed with the \texttt{causaldata} package for R, Python and Stata, and a short module of the same name in the repository reads them from the data folder.
+
+\begin{table}[!htb]\index{data set}
+\centering
+\small
+\begin{tabular}{@{}L{1.65in}L{0.95in}L{1.9in}@{}}
+\toprule
+File & Chapters & Source \\
+\midrule
+\texttt{sipp1991.dta} & Introduction, \ref{ch:dml}, \ref{ch:critique}, \ref{ch:computation}, \ref{ch:gente}, \ref{ch:tianpearl}, \ref{ch:k401} & 1991 SIPP (U.S. Census Bureau), extract of Chernozhukov and Hansen (2004), from \nolinkurl{github.com/VC2015/DMLonGitHub} (MIT licence) \\
+\texttt{nsw\_mixtape.dta}, \texttt{cps\_mixtape.dta} & \ref{ch:horseshoe} (NSW only), \ref{ch:k401} & LaLonde (1986) NSW sample and CPS comparison group as prepared by Dehejia and Wahba (1999, 2002); CC BY-NC 2.0 \\
+\texttt{psid\_controls.dta} & \ref{ch:k401} (solutions) & Dehejia's PSID comparison group (2,490 men) of Dehejia and Wahba (1999, 2002), same source and terms as the NSW and CPS files; used in the solution of Exercise~\ref{ex:chlalonde:1} \\
+\texttt{nhefs\_complete.dta} & \ref{ch:nhefs} & NHEFS (National Center for Health Statistics), extract of Hern\'an and Robins (2020) \\
+\texttt{thornton\_hiv.dta} & \ref{ch:nhefs} & Thornton (2008), extract of the replication data \\
+\texttt{castle.dta} & \ref{ch:did} & Cheng and Hoekstra (2013), from the FBI Uniform Crime Reports \\
+\texttt{card.csv} & \ref{ch:iv} & Card (1995), NLS Young Men, as distributed with Wooldridge (2020) \\
+\bottomrule
+\end{tabular}
+\caption{The data sets the scripts read.}\label{tab:data}
+\end{table}
+
+\section{Software for Bayesian causal inference}
+
+Mature software\index{software|textbf} packages cover most models in this book. The R package \texttt{bartCause}\index{software!bartCause|textbf} of Dorie and Hill fits Hill's BART for causal effects and returns the average effect, the effect on the treated and the common support rules of Hill and Su. The R package \texttt{bcf}\index{software!bcf|textbf} of Hahn, Murray and Carvalho fits Bayesian causal forests and takes an estimated propensity score as an input to the prognostic forest. The Python package \texttt{stochtree}, which the scripts of this book use, fits both BART, with the treatment as a covariate, and Bayesian causal forests. For the horseshoe there are the R packages \texttt{horseshoe} and \texttt{bayesreg}, and the regularized horseshoe of Piironen and Vehtari in Stan; to couple the outcome model to the treatment model as in Chapter~\ref{ch:horseshoe}, add the estimated propensity score as a column and leave it, the intercept and the treatment column unpenalized. P\'olya Gamma augmentation for binary and count outcomes is in the R package \texttt{BayesLogit}\index{software!BayesLogit|textbf} and the Python package \texttt{polyagamma}\index{software!polyagamma|textbf}. The \texttt{DoubleML}\index{software!DoubleML} package in R and Python implements the partially linear and interactive models with cross fitting. Stan\index{software!Stan|textbf}, PyMC\index{software!PyMC|textbf} and NumPyro\index{software!NumPyro|textbf} fit any of the parametric models, as general purpose alternatives to the sampler of Chapter~\ref{ch:computation}. Function names and arguments change between releases, so follow the documentation of the installed version.

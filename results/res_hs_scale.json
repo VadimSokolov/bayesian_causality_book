@@ -1,0 +1,11 @@
+{
+ "design": "n=50, d=10 standard normal design (seed [2026, 0]), sigma=0.5, 80,000 horseshoe prior draws (seed [2026, 1])",
+ "sd_beta_min": 808.3158351701112,
+ "sd_beta_max": 21740.06688683823,
+ "median_abs_beta": 0.5631618441451037,
+ "percent_within_0_01_sd_of_mean": 91.58874999999999,
+ "error_in_beta_for_0_001_standardized_min": 0.8083158351701112,
+ "sd_b_equals_sd_beta_within_1_percent": true,
+ "sd_of_b_minus_beta_min": 0.06679965771334635,
+ "sd_of_b_minus_beta_max": 0.09618705461558251
+}

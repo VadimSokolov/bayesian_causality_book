@@ -1,0 +1,35 @@
+\chapter{Computing the Posterior}\label{ch:computation}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+Horseshoe Gibbs samplers took under a second in the two Gaussian outcome designs with 51 and 56 columns, half the time of a cross fitted lasso in one and a twentieth of the time of a cross fitted random forest in the other, so for models of that size computation is no reason to prefer double machine learning\index{double machine learning!Bayesian alternative to}. With 300 or 400 covariates the comparison turns, and DML with a lasso nuisance is the cheaper of the two (Section~\ref{comp:sec:engine}). When the likelihood cannot be evaluated cheaply, a quantile network trained on simulated pairs of parameter and data turns uniform noise and a summary of the data into posterior draws, and the cost moves to a single training phase. Diagnostics are part of the computation, and a closing table says which engine to use when.
+\end{tcolorbox}
+
+One question organizes this chapter: how long it takes to get a few thousand posterior draws that we can trust. The answer has two parts, a time and a check. A Gibbs sampler serves when the likelihood is cheap to evaluate; when it is not, generative Bayesian computation\index{generative Bayesian computation|textbf}\index{GBC|see{generative Bayesian computation}} learns a map from noise and a summary of the data.
+
+\input{chapters/comp/s01}
+\input{chapters/comp/s02}
+\input{chapters/comp/s03}
+\input{chapters/comp/s04}
+\input{chapters/comp/s05}
+\input{chapters/comp/s06}
+\input{chapters/comp/s07}
+\input{chapters/comp/s08}
+\input{chapters/comp/s09}
+\input{chapters/comp/s10}
+
+\section*{Notes}
+Noise outsourcing is a case of the transfer theorem of Kallenberg (2002); Villani (2009) treats optimal transport. Chernozhukov, Fern\'andez Val and Galichon (2010) show that sorting an estimated monotone function never raises its error in an $L^p$ norm. Learning a posterior as a quantile function of noise is the generative Bayesian computation of Polson and Sokolov (2023). Distributional reinforcement learning begins with Bellemare, Dabney and Munos (2017), and quantile regression for it is in Dabney, Rowland, Bellemare and Munos (2018).
+
+Jiang and coauthors (2017) learned summaries with a neural network. Rank checks go back to Cook, Gelman and Rubin (2006) and were developed as simulation based calibration by Talts and coauthors (2018); Lueckmann and coauthors (2021) is the benchmark behind the under-dispersion result. That result, the other failure modes of Section~\ref{comp:sec:checks} and the consistency statement of Section~\ref{comp:sec:summaries} come from our book \emph{Generative Bayesian Computation} (Polson and Sokolov 2026a). The fast sampler for $p > n$ is Bhattacharya, Chakraborty and Mallick (2016), the simple horseshoe sampler Makalic and Schmidt (2016), and the Polya Gamma augmentation Polson, Scott and Windle (2013).
+
+\begin{exercises}
+\item\label{ex:ch14:1} Derive the Bhattacharya, Chakraborty and Mallick sampler for $N(A^{-1}Z^\top Y, \sigma^2 A^{-1})$, with $A = Z^\top Z + \Lambda^{-1}$ and $\Lambda$ diagonal as in Section~\ref{comp:sec:cost}, using the Woodbury identity.
+\item\label{ex:ch14:2} Verify the Polya Gamma identity of Section~\ref{comp:sec:cost} for $b = 1$ by computing the Laplace transform of the Polya Gamma law defined in Appendix~\ref{app:toolkit}.
+\item\label{ex:ch14:3} Show that, for a scalar parameter $\theta$ whose log posterior given $n$ observations $D$ is smooth with a unique interior mode, the Laplace approximation to the normalizing constant $\int p(D \mid \theta)\,\pi(\theta)\,d\theta$ has relative error $O(n^{-1})$ under regularity conditions. Show with a Gamma posterior that the normal approximation to the posterior density has relative error of order $n^{-1/2}$ at a fixed number of standard deviations from the mode.
+\item\label{ex:ch14:4} Design summary statistics for an amortized posterior of the average treatment effect in a partially linear model, and argue for their approximate sufficiency.
+\item\label{ex:ch14:5} Implement simulation based calibration for a proper version of the horseshoe regression of Section~\ref{sec:hsgibbs} with $n = 100$ and $p = 20$: a fixed design whose first column is a binary treatment and whose other columns are independent standard normals, the prior $\tau \mid \sigma^2 \sim N(0, 100\sigma^2)$ on the treatment coefficient in place of the flat one, the horseshoe on the other coefficients and an inverse gamma prior with shape 2 and scale 1 on $\sigma^2$, all used in the full conditionals. In each of 1,000 replications draw the parameters from this prior, simulate $Y$, run the sampler, keep 19 draws spaced far enough apart to be nearly independent for both $\tau$ and $\gscale$, and rank the generating values. Report the two rank histograms and how you checked the dependence of the kept draws.
+\item\label{ex:chgbc:3} Let $Y_1, \ldots, Y_N$ be independent $N(\theta, \sigma^2)$ given $\theta$, with $\sigma$ known and $\theta \sim N(\mu_0, \sigma_0^2)$, as in the normal learning example of Section~\ref{gbc:sec:normal}. Given the summary $s = \bar Y$ the posterior of $\theta$ is $N(\mu_N(s), \sigma_N^2)$ with $\mu_N(s) = (\mu_0/\sigma_0^2 + Ns/\sigma^2)/(1/\sigma_0^2 + N/\sigma^2)$ and $\sigma_N^2 = (1/\sigma_0^2 + N/\sigma^2)^{-1}$. Verify that the check loss at level $u$ is minimized by $\mu_N(s) + \sigma_N\Phi^{-1}(u)$. Then, for the report $a^\ast = \mu_N(s)$ under the loss $(a^\ast-\theta)^2$, compute the mean of the upper 10\% of the loss over the posterior of $\theta$, which is the negative of the conditional value at risk (CVaR) at level 0.1 of the utility $-(a^\ast-\theta)^2$, the mean of the worst 10\% of that utility.
+\item\label{ex:ch08:1} Prove Theorem~\ref{comp:thm:outsourcing} for real valued $Y$ by taking $G(u,x)$ to be the conditional quantile function, including laws with atoms.
+\item\label{ex:ch08:2} Show that minimizing the expected check loss $\E\rho_u(Y - q)$ over $q$ gives the $u$ quantile of $Y$.
+\input{chapters/comp/exercises_new}
+\end{exercises}

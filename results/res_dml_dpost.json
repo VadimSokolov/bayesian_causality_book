@@ -1,0 +1,32 @@
+{
+ "dense": {
+  "nb": {
+   "bias": 0.9352188768495171,
+   "bias_mcse": 0.0006766904069840591,
+   "coverage": 0.0,
+   "coverage_se": 0.0,
+   "se_over_sd": 0.9880157186307901,
+   "se_over_rmse": 0.0226009693692007,
+   "width": 0.08293899320719716,
+   "share_converged": 1.0,
+   "n_converged": 1000,
+   "median_ess": 50636.5679491019,
+   "max_L": 100000,
+   "share_L_above_first": 0.0
+  },
+  "rf": {
+   "bias": 3075.7179676190344,
+   "bias_mcse": 5046.467993417248,
+   "coverage": 0.071,
+   "coverage_se": 0.008121514637061242,
+   "se_over_sd": 0.41858035768952295,
+   "se_over_rmse": 0.4187119659225486,
+   "width": 260263.55991113634,
+   "share_converged": 0.897,
+   "n_converged": 897,
+   "median_ess": 13392.706951529417,
+   "max_L": 800000,
+   "share_L_above_first": 0.557
+  }
+ }
+}

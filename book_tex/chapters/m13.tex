@@ -1,0 +1,199 @@
+\chapter{Difference in Differences with the Horseshoe}\label{ch:did}
+
+\begin{tcolorbox}[colback=gray!6,colframe=gray!50,title=In brief,fonttitle=\normalfont\itshape,coltitle=black,colbacktitle=gray!15,boxrule=0.4pt,arc=1pt]
+Two way fixed effects is a weighted average of cohort by time effects with possibly negative weights. The horseshoe difference in differences estimator models those cells directly, with an unshrunk event time path, horseshoe cohort deviations and horseshoe departures from parallel trends, and reports every summary as an accounting of the posterior.
+\end{tcolorbox}
+
+Difference in differences\index{difference in differences|textbf} reads a policy's effect from the change in the gap between adopters and nonadopters from before to after. We introduce a horseshoe\index{horseshoe prior} estimator for heterogeneous effects under staggered adoption and departures from parallel trends.
+
+\section{The model behind the design}
+
+Unit $i$ in period $t$ has outcome $Y_{it}$ and adoption period\index{staggered adoption|textbf} $G_i$, with $G_i = \infty$ for units that never adopt. The canonical model for untreated outcomes is two way additive:
+\begin{equation}
+Y_{it}(\infty) = \alpha_i + \gamma_t + \varepsilon_{it}.
+\label{eq:twoway}
+\end{equation}
+Parallel trends\index{parallel trends|textbf} says that \eqref{eq:twoway} holds for every unit, adopters included, with $\E(\varepsilon_{it}\mid G_i) = 0$ in every period, so that without the policy each adoption cohort's mean outcome would have moved in step with that of the never adopting units. Treated outcomes add an effect that may depend on adoption cohort\index{cohort|textbf} $g$ and time since adoption $e = t - g$:
+\[
+Y_{it}(g) = Y_{it}(\infty) + \tau_{g,e}, \qquad e \geq 0.
+\]
+The cohort by event time\index{event time|textbf} effects $\tau_{g,e}$ form a matrix, and every summary a study reports is a weighted sum of its cells. Parallel trends is a statement about a model for untreated outcomes, equation \eqref{eq:twoway}, and not about an estimator. Counts of treated unit periods give the average effect on the treated\index{effect on the treated}, the same counts within one event time give the event study\index{event study|textbf} path, and weights on one cohort give that cohort's experience. Each cohort appears only at the event times its adoption date allows, so some cells rest on very few observations and every summary must carry that uncertainty.
+
+\section{What two way fixed effects estimates}
+
+Two way fixed effects\index{two way fixed effects|textbf}\index{TWFE|see{two way fixed effects}} regresses $Y_{it}$ on unit and period dummies and $D_{it}$, equal to one from adoption on. Goodman Bacon (2021), de Chaisemartin and D'Haultf\oe uille (2020), and Sun and Abraham (2021) showed that, when effects vary across cohorts or over time, the coefficient on $D_{it}$ is a weighted average of the $\tau_{g,e}$ in which some weights can be negative\index{two way fixed effects!negative weights|textbf}\index{negative weights|see{two way fixed effects}}.
+
+\begin{proposition}\label{prop:twfe}
+Fix the adoption dates and observation pattern, denoted by $\mathcal G$, and suppose \eqref{eq:twoway} holds with $\E(\varepsilon_{it}\mid\mathcal G)=0$ and $Y_{it}=Y_{it}(\infty)+D_{it}\tau_{G_i,t-G_i}$. Let $\tilde D$ be treatment residualized on unit and period dummies, and assume $S=\sum_{it}\tilde D_{it}^2>0$. The conditional mean of the sample two way fixed effects\index{two way fixed effects} coefficient is
+\[
+\beta_{\mathrm{TWFE}}:=\E(\hat\beta_{\mathrm{TWFE}}\mid\mathcal G)=\sum_{(g,e)}\omega_{g,e}\tau_{g,e},\qquad
+\omega_{g,e}=\frac{\sum_{\{(i,t):G_i=g,\ t-g=e\}}\tilde D_{it}}{S},
+\]
+where the sum is over observed treated cells and $\sum_{(g,e)}\omega_{g,e}=1$.
+\end{proposition}
+
+\begin{proof}
+The Frisch Waugh Lovell theorem and $\sum_{it}\tilde D_{it}D_{it}=S$ give
+\[
+\hat\beta_{\mathrm{TWFE}}=\sum_{(g,e)}\omega_{g,e}\tau_{g,e}+\frac{\sum_{it}\tilde D_{it}\varepsilon_{it}}{S}.
+\]
+The fixed effects vanish by orthogonality. Conditional expectation given $\mathcal G$ removes the error term; the same identity gives $\sum_{(g,e)}\omega_{g,e}=1$.
+\end{proof}
+
+Early adopters' late observations have the smallest, possibly negative, residualized treatment because unit and period fixed effects absorb much of their treatment status. When effects grow with exposure, these cells have the largest effects and the smallest or negative weights, so two way fixed effects can understate the effect or reverse its sign. In the 500 simulated panels of 40 units of the design used below, the four latest cells of the period 4 cohort get weight $-0.026$ each on average, from $-0.062$ to $0.004$ across panels; the castle panel of the application has no negative weight at all, its smallest cell weight being 0.008 because 29 of the 50 states never adopt. Appendix~\ref{app:theory} gives the weights in a balanced panel.
+
+\section{The horseshoe difference in differences estimator}
+
+Untreated outcomes satisfy\index{difference in differences!horseshoe estimator|textbf}
+\begin{equation}
+Y_{it}(\infty) = \alpha_i + \gamma_t + \delta_i\,\tilde t + \varepsilon_{it}, \qquad \varepsilon_{it} \sim N(0, \sigma^2),
+\label{eq:hsdid0}
+\end{equation}
+with $\tilde t$ standardized time and $\delta_i$ a unit specific departure from parallel trends\index{parallel trends!unit specific departures|textbf}. Effects decompose as
+\begin{equation}
+\tau_{g,e} = \theta_e + u_{g,e},
+\label{eq:hsdid1}
+\end{equation}
+a common event time path $\theta_e$ plus cohort deviations $u_{g,e}$. Proposition~\ref{gr:prop:hstest} studies the same split, a common effect with horseshoe departures, as a test of whether the effect is stable across strata. Adopters may also lift or dip just before adoption, through anticipation or for reasons the unit trends do not absorb, so the observed outcome is
+\begin{equation}
+Y_{it} = Y_{it}(\infty) + \sum_{k=2}^{5}\ell_k\,\mathbf 1\{t - G_i = -k\} + D_{it}\,\tau_{G_i,\,t - G_i},
+\label{eq:hsdid2}
+\end{equation}
+where the lead coefficients\index{lead coefficient|textbf} $\ell_2, \ldots, \ell_5$ depend on the event time only and are shared across cohorts. Event times $e = -1$ and $e \le -6$ carry no lead coefficient. We use the horseshoe\index{horseshoe prior!in difference in differences|textbf} of Chapter~\ref{ch:horseshoe} with local scales $\lambda$ and separate half Cauchy global scales $\tau_{\mathrm{g},u}$, $\tau_{\mathrm{g},\delta}$ and $\tau_{\mathrm{g},\ell}$ for cohort deviations, trend departures and leads, respectively. The upright g marks a global scale. The priors are:
+\begin{itemize}
+\item flat priors on $\alpha_i$, $\gamma_t$ and the path $\theta_e$;
+\item a horseshoe on the cohort deviations, $u_{g,e} \sim N(0, \lambda_{g,e}^2\tau_{\mathrm{g},u}^2\sigma^2)$;
+\item a horseshoe on the trend departures, $\delta_i \sim N(0, \lambda_i^2\tau_{\mathrm{g},\delta}^2\sigma^2)$;
+\item a horseshoe on the lead coefficients, $\ell_k \sim N(0, \lambda_k^2\tau_{\mathrm{g},\ell}^2\sigma^2)$ for $k = 2, \ldots, 5$.
+\end{itemize}
+
+Each prior encodes a judgement. The flat path lets effects grow or fade with exposure without shrinkage. The horseshoes say that cohorts usually respond alike, most units follow parallel trends, and adopters usually follow the common path up to adoption, while letting a few cohort effects, trends or leads escape where the data insist.
+
+\begin{proposition}
+Under model \eqref{eq:hsdid0}, \eqref{eq:hsdid1} and \eqref{eq:hsdid2} with never treated units\index{never treated unit|textbf} present and at least two pre adoption periods for each cohort beyond those used by any lead coefficients, the cell effects $\tau_{g,e}$ are identified, and the trend departures $\delta_i$ are identified up to a common shift, fixed by a normalization such as a zero mean departure among never treated units. The split of $\tau_{g,e}$ into the path $\theta_e$ and the deviations $u_{g,e}$ is not identified by the likelihood; it is supplied by the prior.
+\end{proposition}
+
+\begin{proof}[Sketch]
+Never treated units identify $\gamma_t$ up to an intercept and a common linear trend, with matching shifts in $\alpha_i$ and $\delta_i$. Given $\gamma_t$, at least two pre adoption observations outside the lead window identify each adopter's $\alpha_i$ and $\delta_i$. Post adoption, $Y_{it} - \alpha_i - \gamma_t - \delta_i\tilde t$ has mean $\tau_{G_i, t - G_i}$, identifying each cell effect. Adding a constant to every $\delta_i$ and subtracting it times $\tilde t$ from $\gamma_t$ leaves the likelihood unchanged, hence the normalization. The likelihood depends on $\theta_e$ and $u_{g,e}$ only through their sum, so the prior supplies the split; the horseshoe concentrates deviations near zero without setting them exactly to zero. Given never treated units, staggered adoption is not needed for identification, though it sharpens the separation of $\gamma_t$ from $\theta_e$. The simulation below falls outside the two period condition for its period 4 cohort, which has only $e = -1$ left beyond the leads at $e = -5, \ldots, -2$. The period 8 and period 12 cohorts meet the condition, so their units identify the shared lead coefficients; with the leads known, the four pre adoption observations of each period 4 unit identify its $\alpha_i$ and $\delta_i$.
+\end{proof}
+
+The sampler fixes the first period effect at zero and imposes no other normalization: the horseshoes on $\delta_i$ and on $u_{g,e}$ settle the common trend shift and the split between path and deviations. At an event time with a single cohort, such as event time 4 in the castle data, the data inform only the sum $\theta_4 + u_{2006,4}$, and every summary, the event study included, is computed from that sum.
+
+The average effect on the treated is an accounting of the posterior,
+\[
+\mathrm{ATT} = \frac{\sum_{(g,e)} n_{g,e}(\theta_e + u_{g,e})}{\sum_{(g,e)} n_{g,e}},
+\]
+where $n_{g,e}$ counts treated unit periods in each cell. An event study averages the same draws within event time, and a cohort effect averages them within cohort. All are computed by the horseshoe Gibbs sampler of Chapter~\ref{ch:horseshoe} with one change: each block of penalized coefficients has its own global scale, updated from that block's coefficients alone. Later cohorts are observed at fewer event times, so the cohorts behind an event study change with $e$, and its shape can move with that composition even when every cohort's effect is constant. Callaway and Sant'Anna (2021) separate the two by fixing the cohorts: choose a window of event times and average, at each $e$ in it, only over the cohorts observed throughout the window, weighted by cohort size. In the castle data a window of event times 0 to 3 keeps the 2006 and 2007 cohorts, 14 states, and a window of 0 to 4 keeps only the 2006 adopter.
+
+Appendix~\ref{app:guarantees} gives guarantees for an idealized version of the design, in which the event path is known and the $GE$ cells, for $G$ cohorts and $E$ event times, have independent normal estimates with common noise variance $v$. If at most $s$ cohort deviations are nonzero and the global scale is at its oracle value, the posterior of the deviations contracts in Euclidean norm at the minimax rate $\varepsilon_{GE}$, where
+\[
+\varepsilon_{GE}^2 = v\,s\log(GE/s);
+\]
+when the scale is learned under the conditions stated there, the squared rate is $v\,s\log(GE)$. A weighted effect on the treated with weights $w$ contracts at rate $\lVert w\rVert_2\,\varepsilon_{GE}$. If the common trend were also known, the horseshoe on unit departures would give counterfactual predictions with Kullback and Leibler risk of minimax order for sparse departures (Mukherjee and Johnstone 2015; Zhai and Ro\v{c}kov\'a 2026). No such result is proved for the joint model, in which the event path and the unit trends are estimated.
+
+\paragraph{A design error worth recording.} Our first version placed a flat prior on a single common effect and a horseshoe on all cohort by event time deviations from it, with the leads and the unit trends as in the estimator above. When effects grow steadily with exposure, every cell deviates from a single common effect, so the deviations are dense rather than sparse. A sparsity prior shrinks them toward zero, dragging the estimate toward the early, small effects, and unit specific trends absorb part of the growth. On the 500 panels of 40 units of the next section that version had bias $-0.27$, 24 percent of the average true effect of 1.12, root mean squared error 0.32 against 0.09 for the estimator described above, and 95\% intervals that covered the truth in 268 of 500 panels against 488. On the panels of 200 units the damage nearly disappears: bias $-0.03$, root mean squared error 0.052 against 0.040, and coverage in 468 of 500 panels. With little data in each cell the prior counts for most. Moving the dynamics into the unpenalized path $\theta_e$ and shrinking only cohort deviations fixes both problems. A shrinkage prior belongs on a quantity that is plausibly sparse, and the analyst's job is to find that parametrization.
+
+\section{A simulation}
+
+We generated 500 panels for each of 18 settings: 40 or 200 units, departure probability $p\in\{0,0.1,0.3\}$, and three effect designs, all over periods 0 to 15\index{difference in differences!simulation|textbf}\index{simulation study!difference in differences|textbf}. Each unit adopts in period 4, 8 or 12, or never, with probability one quarter each; we repeat the adoption draw if any group is empty. Untreated outcomes are
+\[
+Y_{it}(\infty)=\alpha_i+\gamma_t+0.15V_i(t-8)+\varepsilon_{it},\qquad V_i\sim\mathrm{Bernoulli}(p),
+\]
+with $\alpha_i\sim N(0,1)$, a common random walk $\gamma_t$ with $N(0,0.2^2)$ steps, and independent errors $\varepsilon_{it}\sim N(0,0.5^2)$. The departure indicators $V_i$ are independent of adoption and of the other draws.
+
+Effect design (a) has $\tau_{g,e}=0.5+0.15e$, growing with exposure. Design (b) adds a sparse deviation of 0.8 in the period 4 cohort at event time 2. Design (c) adds dense deviations $0.3\sin(g+e)$ in every treated cell. Table~\ref{tab:didsim} and Figure~\ref{fig:didsim} show design (a) with $p=0.1$, whose average effect on the treated is about 1.12; Table~\ref{tab:didsimgrid} gives all 18 settings.
+
+We compare five estimators on the same panels: two way fixed effects; the cohort by time estimator\index{cohort by time estimator|textbf} with never treated controls and base period $g-1$, in the spirit of Callaway and Sant'Anna (2021); the imputation estimator of Borusyak, Jaravel and Spiess (2024); the same imputation estimator with a linear trend for every unit; and the horseshoe estimator. The imputation estimator fits unit and period effects by least squares to the untreated observations alone, predicts the untreated outcome of every treated unit period, and averages observed minus predicted outcomes over the treated cells. Like the horseshoe, and unlike the cohort by time estimator, it uses every untreated observation, so it separates the gain from using all the data from the gain from shrinkage. Its 95\% interval uses a conservative standard error clustered by unit. Each horseshoe fit has leads at $e=-5,\ldots,-2$ and a trend departure for every unit, runs 1,500 sweeps and discards the first 500, and reports the posterior mean and central 95\% interval of the effect on the treated over treated unit periods.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{did_sim.pdf}
+\caption{Estimate minus the true average effect on the treated for five estimators in 500 simulated staggered adoption panels of 40 units (left) and of 200 units (right), with effects growing with exposure and 10 percent of units departing from parallel trends. Boxes show quartiles; whiskers reach the most extreme estimate within 1.5 interquartile ranges of the box.}
+\label{fig:didsim}
+\end{figure}
+
+\input{chapters/did_sim_table}
+
+\input{chapters/did_sim_grid_table}
+
+\input{chapters/did_sim_dep_table}
+
+ Two way fixed effects is biased downward by 0.40 at 40 units and 0.39 at 200, about 36 percent of the average effect of 1.12: the negative weighting problem at work, and more units do not remove it. The cohort by time estimator removes that bias. Its root mean squared error is 0.18 at 40 units and 0.078 at 200, against 0.092 and 0.040 for the horseshoe, and the paired differences in squared error, 0.024 and 0.0045 with Monte Carlo standard errors 0.002 and 0.0004, are many standard errors from zero. The horseshoe's 95\% intervals cover the truth in 98 and 97 percent of panels, and in 94 to 98 percent in all 18 settings of Table~\ref{tab:didsimgrid}, whose departures are independent of adoption.
+
+The imputation estimator shows where the gain comes from. With no departures it is as accurate as the horseshoe or slightly more (root mean squared error 0.082 against 0.088 at 40 units, 0.035 against 0.038 at 200), so there the advantage over the cohort by time estimator (0.159 and 0.066) comes from using every untreated observation rather than one base period. Departures are independent of adoption and add noise through differing shares of diverging units among adopters and controls, without biasing imputation (absolute bias at most 0.012 in all 18 settings). With 10 percent departures its error rises to 0.139 and 0.059, its intervals cover in 90 and 94 percent of panels, and the horseshoe is ahead by 0.011 and 0.0019 in squared error, with Monte Carlo standard errors 0.001 and 0.0002; with 30 percent departures the gap is wider, 0.18 against 0.14 at 40 units and 0.08 against 0.05 at 200. That remaining gain comes from shrinking the trend departures: the horseshoe gives the few diverging units their own trends and holds the rest on the common path. Giving every unit its own unshrunk trend in the imputation estimator absorbs the departures too, but raises its root mean squared error to 0.34 and 0.17, about two and a half to three times that of the imputation estimator without trends.
+
+The sparse and dense cohort deviations of designs (b) and (c) change none of these comparisons: at a given panel size and share of departures, the root mean squared error of each estimator other than two way fixed effects moves by at most 0.022 across the three designs.
+
+In the 18 settings the departing units are drawn independently of adoption. Table~\ref{tab:didsimdep} drops that assumption in three further designs, with the same departure trend $0.15(t-8)$, the effects of design (a), the same five estimators and 500 panels at each of 40 and 200 units. In the first, a unit departs with probability 0.3 if it adopts and never if it is never treated, so about 22 percent of all units depart and every one of them is treated. The second is the same with probability 0.1, so about 7.5 percent of units depart, again all of them adopters. In the third, only units of the period 12 cohort depart, each with probability 0.3, about 7.5 percent of all units.
+
+When the adopters depart, the imputation estimator is biased upward by 0.26, about a quarter of the average effect, at both sizes; cohort by time and two way fixed effects are biased too, by 0.23 and $-0.22$. The horseshoe has half the root mean squared error of the imputation estimator or less (0.144 against 0.294 at 40 units, 0.072 against 0.269 at 200), but it is biased as well, by 0.070 at 40 units and 0.056 at 200 with Monte Carlo standard errors 0.006 and 0.002. The bias barely falls with the sample size, and at 200 units it makes up about 60 percent of the horseshoe's mean squared error. Refitting the same panels traces the bias to shrinkage: departing units' posterior mean trends are 0.85 of truth at 40 units and 0.87 at 200. Each trend uses its unit's 16 periods, so more units do not sharpen it. Four times as many sweeps leave the bias unchanged to three decimals. A fit that gives unshrunk trends only to the known departing units is unbiased ($-0.001$ and 0.000) and covers in 96 and 97 percent of panels, ruling out sampler and identification failures.
+
+The horseshoe's intervals cover in 93 percent of panels at 40 units and 87 percent at 200, below the 94 to 98 percent of the 18 settings. The imputation estimator's interval covers the truth in 47 percent of panels at 40 units and in 1 of 500 at 200. Imputation with unshrunk unit trends is nearly unbiased ($-0.016$ and $-0.010$) and covers in 92 and 94 percent of panels, at a root mean squared error of 0.367 and 0.157, two and a half and two times the horseshoe's.
+
+With departure probability 0.1 the shrinkage costs much less. The horseshoe's bias falls to 0.016 at 40 units and 0.010 at 200 (standard errors 0.004 and 0.002), its intervals cover in 97 percent of panels at both sizes, and its root mean squared error, 0.092 and 0.042, is a third and more than half below that of the imputation estimator, which is biased by 0.09 and covers in 84 and 58 percent. This is the case the horseshoe on departures is built for, a few units leaving the common trend, and it is the most accurate of the five estimators there.
+
+When only the period 12 cohort departs, the imputation estimator is nearly unbiased ($-0.014$ and $-0.020$) and the horseshoe gains nothing: the two have the same root mean squared error, 0.087, at 40 units, and 0.038 against 0.041 at 200. There the horseshoe's intervals cover in 98 and 99 percent of panels and the imputation estimator's in 93.
+
+\section{Application: castle doctrine laws and homicide}
+
+Between 2005 and 2010 over twenty American states adopted castle doctrine laws\index{castle doctrine laws|textbf}, which extend the right to use lethal force in self defense beyond the home and remove the duty to retreat. Cheng and Hoekstra (2013) used the staggered adoption to estimate a homicide increase of roughly eight percent\index{castle doctrine laws!homicide|textbf}. Their data, distributed with Cunningham's \emph{Mixtape} (Cunningham 2021), cover 50 states from 2000 to 2010.
+
+Here 21 states adopt within the sample: one in 2006, thirteen in 2007, four in 2008, two in 2009 and one in 2010, with adoption dated by the first year the post law indicator equals one; for Florida, whose law took effect in October 2005, that is 2006. Figure~\ref{fig:castleraw} shows mean log homicide rates for never adopting states, the 2006 adopter and later adopters.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{castle_raw.pdf}
+\caption{Mean log homicide rate per 100,000 in never adopting states, the 2006 adopter and the states adopting in 2007 or later, 2000 to 2010.}
+\label{fig:castleraw}
+\end{figure}
+
+\input{chapters/castle_table}
+
+Unweighted two way fixed effects\index{two way fixed effects!in the castle data|textbf} on log homicide gives 0.069, close to the published estimate. The cohort by time estimator gives 0.019. With four chains of 20,000 sweeps from dispersed starts, discarding the first 5,000 of each, the horseshoe gives posterior mean 0.025, 95\% interval $-0.046$ to $0.096$, and posterior probability 0.76 of a positive effect. Figure~\ref{fig:castle} shows the event study and the posterior.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{castle.pdf}
+\caption{Left: horseshoe event study for castle doctrine laws, posterior means and 95\% intervals; leads are shrunk by their own horseshoe and the period before adoption, with all periods more than five years before, is the reference. Right: posterior of the average effect on the treated, with the two way fixed effects and cohort by time estimates.}
+\label{fig:castle}
+\end{figure}
+
+The leads are close to zero, but they measure shrunk departures beyond the modelled state trends and cannot be read as support for parallel trends. The post adoption path is positive but imprecise; the effect four years out rests on one state and is very uncertain. The largest absolute posterior mean of a state trend departure is about 0.5 on the log scale per standard deviation of the year index (3.2 years), so a few states do diverge.
+
+With flat priors on the leads and the rest of the model unchanged, the lead at $e = -2$ is $-0.064$ (95\% interval $-0.16$ to 0.03), the effect on the treated is 0.013 and the probability that it is positive is 0.63; with the horseshoe on the leads the same three numbers are $-0.024$, 0.023 and 0.74. These two fits, and the fit without trends below, each run one chain of 4,000 sweeps, discard the first 1,000 and start from the same fixed seed. The horseshoe lead fit uses the model of Figure~\ref{fig:castle}; 0.74 is about two Monte Carlo standard errors from the four chain fit's 0.76 (standard errors about 0.01 and 0.002, respectively). Flat leads and dropping the trend block change the model, so their differences from 0.76 are not Monte Carlo error.
+
+The four chains agree: the effect on the treated has split $\hat R=1.0003$ and effective sample sizes of about 26,000 for its mean and 34,000 for the indicator that it is positive; Monte Carlo standard errors are 0.0002 for the mean and 0.0004 for each end of the interval. Errors within a state may be serially correlated, which Bertrand, Duflo and Mullainathan (2004) show makes the usual standard errors too small. Refitting with AR(1) errors within each state, correlation $\rho^{|t-s|}$ between years $t$ and $s$ and a uniform prior on $\rho$ over $(-1, 1)$, again with four chains of 20,000 sweeps, gives a posterior mean of 0.06 for $\rho$ (95\% interval $-0.06$ to 0.18), an effect on the treated of 0.023 with interval $-0.051$ to 0.095, and probability 0.73 that it is positive. Little serial correlation is left once the state effects and trends are in the model, and the conclusion does not move.
+
+What moves the estimate, in this model with equal noise in every state, is the trend departure block. Refitting the horseshoe model without it, with the same path, cohort deviations and leads, gives 0.067 with 95\% interval 0.000 to 0.133 and probability 0.97 that the effect is positive, essentially the two way fixed effects value of 0.069. Cohort heterogeneity alone barely changes the estimate: all 15 two way fixed effects cell weights are positive and the posterior event path does not grow with exposure, so the simulation's 36 percent bias does not carry over. The cohort by time estimate of 0.019 is low because it uses one base period and only never treated controls, so it agrees with the horseshoe's 0.025 for different reasons. Cheng and Hoekstra's specification also included covariates and population weights, and the weights change the answer. The log of the squared residual falls with slope about $-1$ on log population, so equal noise across states does not fit these data. Refitting with $\mathrm{Var}(\varepsilon_{it}) = \sigma^2/w_i$, where $w_i$ is the state's average population over the panel relative to the mean of these averages, gives 0.079 with 95\% interval 0.027 to 0.129 and probability 0.998 that the effect is positive, close to the published eight percent, and adding their covariates gives 0.084; the covariates alone change almost nothing (Exercise~\ref{ex:chdid:3}). So the reading of about three to one, with a central estimate a third of the two way fixed effects coefficient, holds only under equal noise. Under the noise model the residuals support, allowing departures from parallel trends leaves Cheng and Hoekstra's estimate standing. It does lean on a few large adopters: dropping the single 2006 adopter gives 0.049 and probability 0.96.
+
+No number of pre adoption periods can separate an effect from an adopter specific shock that starts at adoption: adding a constant $a$ to the untreated outcomes of adopters in every post adoption period and subtracting $a$ from every post adoption effect leaves the observed data unchanged. The model assumes no such shocks and that each unit's linear trend continues unchanged after adoption; the castle posterior mean of 0.025 depends on extrapolating the estimated state trends past adoption. Rambachan and Roth (2023) bound post adoption departures relative to pre adoption ones, for example by limiting changes in slope between adjacent periods to $M$ ($M = 0$ gives a linear departure). They report the set of compatible effects, with confidence sets accounting for estimated pre trends. These are frequentist sensitivity results, not posterior intervals under one model. The Bayesian counterpart is a prior on the post adoption change in slope.
+
+\section{Relation to synthetic control}
+
+Synthetic control\index{synthetic control|textbf} (Abadie and Gardeazabal 2003; Abadie, Diamond and Hainmueller 2010) builds a treated unit's counterfactual as a weighted average of controls matching its pre treatment path. It complements difference in differences when few units are treated and parallel trends is doubtful. Nonnegative weights summing to one keep the counterfactual within the donors' range and usually give only a few donors positive weight. A horseshoe on the weights likewise says few controls matter, but the weights may then be negative and need not sum to one, so the counterfactual can extrapolate beyond the donors. The trend departure $\delta_i$ in \eqref{eq:hsdid0} is a one factor model with a unit specific loading on time.
+
+The two designs answer the same question with different information. Difference in differences borrows the common period effects $\gamma_t$ from every control unit and each adopter supplies its own level $\alpha_i$ and trend; synthetic control uses one adopter's pre treatment path to choose controls and uses those alone. With many adopters and a common untreated time effect, the first is more efficient; for one adopter whose path looks like no average, such as California in the tobacco study of Abadie, Diamond and Hainmueller (2010), the second is more credible. The horseshoe formulation makes the choice one of model and prior. For one adopter $i$ and controls $j$, synthetic control fits $Y_{it} = \sum_j w_j Y_{jt} + \varepsilon_{it}$ for $t < G_i$, with a horseshoe on the weights $w_j$. The factor model in Exercise~\ref{ex:chdid:4} uses two latent factors, their number fixed by the analyst, with a horseshoe on the loadings so most units load little and a few heavily. These two models and the trend departures $\delta_i$ give three sparsity judgements about departures from two way additivity; each gives a posterior counterfactual path for every adopter, from which the effect on the treated is an accounting. In all three, check the pre adoption residuals: shrunken leads can look flat despite poor fit, and even close pre adoption fit cannot show that the relation holds afterwards.
+
+\section{In practice}
+
+\paragraph{The target.} The targets are the average effect on the treated, the event study path, and the effect for each cohort, each a weighted sum of the draws of $\theta_e + u_{g,e}$ over the relevant cells. The posterior probability that an effect is positive, 0.76 for castle doctrine laws, is the fraction of draws in which the weighted sum exceeds zero.
+
+\paragraph{What the analyst does differently.} The analyst writes down the cohort by event time matrix before estimating anything and notes which cells rest on little data: in the castle doctrine data thirteen of the 21 adopting states fall in the 2007 cohort, and the effect four years out rests on one state. She fits the horseshoe model with the path $\theta_e$ unpenalized and reports from one posterior the event study with its leads, checked against the pre adoption residuals because the leads are shrunk; the effect on the treated with its interval; the probability of a positive effect; and the largest trend departure, so the reader knows that a few states diverge and that the model let them. She reports the two way fixed effects coefficient alongside, not as the answer, with the fit without the trend block that accounts for the gap between them.
+
+\paragraph{Against DML.} DML is not the natural competitor in this chapter. The modern difference in differences estimators of Callaway and Sant'Anna (2021), de Chaisemartin and D'Haultf\oe uille (2020), Sun and Abraham (2021) and Borusyak, Jaravel and Spiess (2024) are the right comparison, and some of them use doubly robust scores in the DML spirit when covariates enter. On the average effect under parallel trends they are adequate: in the simulation with no trend departures the imputation estimator was unbiased, as accurate as the horseshoe and faster. Giving every unit its own unshrunk trend cost two and a half to three times the error when 10 percent of units departed independently of adoption. When 22 percent of units departed, all of them adopters, the estimators without unit trends were biased by 0.22 to 0.26 in absolute value and the horseshoe by 0.06 to 0.07; the version with unshrunk trends kept its intervals close to nominal at both panel sizes, at two to two and a half times the horseshoe's error. When 7.5 percent departed with adoption, the horseshoe's bias fell to 0.01 or 0.02 and its error was the lowest of the five estimators. Nor do they give the probability of a positive effect, and the leads are tested rather than modelled. Where the analyst needs to say how strong the evidence is, as the castle doctrine data require, the posterior gives that directly.
+
+\section*{Notes}
+
+Three papers show the negative weights of two way fixed effects from different sides. Goodman Bacon (2021) splits the coefficient into two by two comparisons, some of which use units that are already treated as controls, de Chaisemartin and D'Haultf\oe uille (2020) write it as a weighted sum of cohort by period effects, and Sun and Abraham (2021) show that event study coefficients from the same regression pick up effects from other event times. Roth, Sant'Anna, Bilinski and Poe (2023) survey the recent literature.
+
+The horseshoe is from Carvalho, Polson and Scott (2010), and the sources for its theory are in the Notes of Chapter~\ref{ch:critique}. The idealized rates in Appendix~\ref{app:guarantees} use van der Pas, Kleijn and van der Vaart (2014) and van der Pas, Szab\'o and van der Vaart (2017a), with the minimax lower bound of Donoho, Johnstone, Hoch and Stern (1992).
+
+Arkhangelsky and coauthors (2021) combine synthetic control with difference in differences, and Brodersen and coauthors (2015) build the counterfactual path with a Bayesian structural time series model. The chapter takes adoption to be absorbing and covariates to be absent, and its simulations take errors to be independent. Callaway and Sant'Anna (2021) allow covariates and de Chaisemartin and D'Haultf\oe uille (2020) let treatment switch on and off. The targets here are means. For continuous outcomes, the changes in changes model of Athey and Imbens (2006) writes untreated outcomes as $h_t(U)$, with $h_t$ common to both groups and strictly increasing in the scalar $U$. If the distribution of $U$ is stable over time within each group and the adopters' latent support is contained in the controls' support, the model identifies the adopters' counterfactual outcome distribution and quantile effects on the treated.
+
+\begin{exercises}
+\item\label{ex:chdid:1} Compute the two way fixed effects weights $\omega_{g,e}$ in a balanced panel with periods 1 to 8, two cohorts of any sizes that first adopt in periods 3 and 6, and no never treated units, and identify the negative weights.
+\item\label{ex:chdid:2} Show that the cohort by time estimator with never treated controls and base period $g - 1$ is unbiased for $\tau_{g,e}$ under parallel trends, and biased by $(t - g + 1)/s_t$ times the average of $\delta_i$ over the cohort under the trend departure model, where $s_t$ is the standard deviation used to standardize time and the departures average zero over the never treated units.
+\item\label{ex:chdid:3} Refit the castle doctrine model with population weights and the covariates used by Cheng and Hoekstra and compare the posterior with the equal noise rows of Table~\ref{tab:castle}.
+\item\label{ex:chdid:4} Replace the horseshoe on trend departures with a horseshoe on loadings in a two factor model with latent factors $f_t \in \R^2$ with prior $N(0, I_2)$ and unit loadings $\delta_i \in \R^2$, and derive the Gibbs sampler.
+\item\label{ex:chdid:5} Construct a simulation in which the original single effect parametrization of the horseshoe estimator fails and the path parametrization succeeds, and explain the result in terms of sparsity.
+\end{exercises}

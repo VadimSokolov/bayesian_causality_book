@@ -1,0 +1,19 @@
+\begin{table}[ht]
+\centering
+\caption{Limiting posterior of the bias model of Section~\ref{sec:sensitivity} under two illustrative priors for the genotype. $L$ is the Tian and Pearl lower bound on $\PN$ without exogeneity, and $\PN$ has its position within the bounds uniform. The probability of no positive effect comes from numerical integration and the other summaries from 4,000,000 prior draws, both restricted to values whose stratum risks lie between zero and one, with a cohort of smoking prevalence 0.5 and nonsmoker risk 0.0002.}
+\label{tab:smokingbayes}
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Prior & \shortstack{$\Prob$(no positive\\effect)} & $\Prob(L > 1/2)$ & \shortstack{$\PN$\\mean} & \shortstack{$\PN$ 95\%\\interval} \\
+\midrule
+\multicolumn{5}{@{}l}{Observed risk ratio 9, E value 17.5} \\
+Sceptical & 0.022 & 0.923 & 0.886 & [0.512, 0.996] \\
+Twin informed & $4.4 \times 10^{-5}$ & 0.998 & 0.925 & [0.802, 0.997] \\
+\midrule
+\multicolumn{5}{@{}l}{Observed risk ratio 60, E value 119.5} \\
+Sceptical & $2.5 \times 10^{-4}$ & 0.999 & 0.982 & [0.922, 0.999] \\
+Twin informed & $< 10^{-6}$ & 1.000 & 0.989 & [0.970, 0.999] \\
+\bottomrule
+\end{tabular}
+\end{table}

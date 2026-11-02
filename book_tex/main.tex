@@ -1,0 +1,212 @@
+\documentclass[11pt,openany,twoside]{book}
+% Amazon KDP paperback trim 7 x 10 in, no bleed. Inside margin 1.0 in exceeds KDP's
+% requirement for books up to 828 pages (0.875 in); outside, top and bottom exceed the 0.25 in minimum.
+\usepackage[paperwidth=7in,paperheight=10in,inner=1.0in,outer=0.75in,top=0.85in,bottom=0.9in,headheight=14pt,headsep=0.25in,footskip=0.4in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{mathpazo}
+\usepackage{courier}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{tcolorbox}
+\usepackage{bm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{makeidx}
+\makeindex
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
+\tikzset{v/.style={circle,draw,minimum size=8mm,inner sep=0pt},h/.style={circle,draw,dashed,minimum size=8mm,inner sep=0pt},e/.style={-{Stealth[length=2mm]},thick}}
+\usepackage{booktabs}
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\usepackage[round,authoryear]{natbib}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage[hidelinks,pdftitle={Bayesian Causality},pdfauthor={Nick Polson and Vadim Sokolov}]{hyperref}
+\pdfminorversion=4
+\input{bookmeta}
+
+
+% No hyphenation anywhere, per the authors' house style
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+\emergencystretch=3em
+\sloppy
+
+\graphicspath{{figs/}}
+\makeatletter
+\renewcommand*\l@section{\@dottedtocline{1}{1.5em}{2.6em}}
+\renewcommand*\l@subsection{\@dottedtocline{2}{4.1em}{3.4em}}
+\makeatother
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}{1.5ex \@plus .5ex}{-1em}{\normalfont\itshape}}
+\makeatother
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{assumption}[theorem]{Assumption}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\makeatletter
+\newcommand{\chlabel}[1]{{\protected@edef\@currentlabel{\thechapter}\label{#1}}}
+\makeatother
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\indep}{\perp\!\!\!\perp}
+\newcommand{\expit}{\operatorname{expit}}
+\newcommand{\logit}{\operatorname{logit}}
+\newcommand{\ATE}{\mathrm{ATE}}
+\newcommand{\PNS}{\mathrm{PNS}}
+\newcommand{\PN}{\mathrm{PN}}
+\newcommand{\PS}{\mathrm{PS}}
+\newcommand{\KL}{\mathrm{KL}}
+\providecommand{\LATE}{\mathrm{LATE}}
+\providecommand{\Cov}{\mathrm{Cov}}
+\providecommand{\doint}{\mathrm{do}}
+\providecommand{\one}{\mathbf{1}}
+\newcommand{\gscale}{\tau_{\mathrm{g}}}
+\newcommand{\EU}{\mathrm{EU}}
+\newcommand{\CVaR}{\mathrm{CVaR}}
+\newcommand{\Vbeta}{V_{\beta}}
+\newcommand{\Qz}{Q_{Z(a)}}
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\coderepo}{\nolinkurl{github.com/VadimSokolov/bayesian_causality_book}}
+\definecolor{gbc}{HTML}{2a78d6}
+\definecolor{jmr}{HTML}{eb6834}
+\definecolor{aqua}{HTML}{1baf7a}
+\definecolor{sand}{HTML}{eda100}
+
+\newenvironment{exercises}{\section*{Exercises}\begin{enumerate}[label=\thechapter.\arabic*,leftmargin=*]}{\end{enumerate}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\chaptermark}[1]{\markboth{\ifnum\value{chapter}>0 \thechapter.\ \fi #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection.\ #1}}
+\fancyhead[LE]{\small\thepage\quad\leftmark}
+\fancyhead[RO]{\small\rightmark\quad\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\small\thepage}}
+
+\title{Bayesian Causality\\[1ex]\large Models, Accounting and the Bayesian Alternative\\to Double Machine Learning}
+\author{Nick Polson \and Vadim Sokolov}
+\date{}
+
+\makeatletter
+\renewcommand\mainmatter{\clearpage\@mainmattertrue\pagenumbering{arabic}}
+\renewcommand\frontmatter{\clearpage\@mainmatterfalse\pagenumbering{roman}}
+\makeatother
+\begin{document}
+\frontmatter
+\pagestyle{empty}
+% Title page (page i)
+\thispagestyle{empty}
+\begin{center}
+\vspace*{1.5in}
+{\Huge Bayesian Causality\par}
+\vspace{0.3in}
+{\Large Models, Accounting and the Bayesian\\ Alternative to Double Machine Learning\par}
+\vspace{1in}
+{\Large Nick Polson\par}
+\vspace{0.15in}
+{\Large Vadim Sokolov\par}
+\vfill
+\end{center}
+\clearpage
+% Copyright page (page ii)
+\thispagestyle{empty}
+\vspace*{\fill}
+{\footnotesize\noindent
+\emph{Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning}\\[1ex]
+Copyright \copyright\ \BookYear\ Nick Polson and Vadim Sokolov.\\[1ex]
+First edition, \BookYear.%
+\ifx\BookDOIline\empty\else\\[1ex]\BookDOIline\fi
+\\[1ex]
+License: distributed under the Creative Commons Attribution 4.0 International License (CC BY 4.0), \url{https://creativecommons.org/licenses/by/4.0/}: you may copy, share and adapt this book for any purpose, provided you credit the authors. The code is released under the MIT License.\\[1ex]
+The code, the data and the simulation scripts are released as source files in the book's public repository, described in Appendix~\ref{app:code}.\\[1ex]
+Typeset by the authors in \LaTeX.\par}
+\clearpage
+% Dedication (page iii)
+\thispagestyle{empty}
+\vspace*{2in}
+\begin{center}
+\emph{For Student, who weighed the children,\\ and for D. Basu, who weighed the elephants.}
+\end{center}
+\clearpage
+% Epigraph (page iv)
+\thispagestyle{empty}
+\vspace*{1.6in}
+\begin{flushright}
+\begin{minipage}{3.6in}
+\raggedleft
+\emph{Take up one idea. Make that one idea your life; think of it, dream of it, live on that idea. Let the brain, muscles, nerves, every part of your body, be full of that idea, and just leave every other idea alone. This is the way to success.}\\[1ex]
+Swami Vivekananda, \emph{Raja Yoga}, 1896
+\end{minipage}
+
+\vspace{0.6in}
+
+\begin{minipage}{3.6in}
+\raggedleft
+\emph{Thus the law of Karma means the law of causation, of inevitable cause and sequence. Wheresoever there is a cause, there an effect must be produced; this necessity cannot be resisted, and this law of Karma, according to our philosophy, is true throughout the whole universe.}\\[1ex]
+Swami Vivekananda, \emph{Karma Yoga}, 1896
+\end{minipage}
+\end{flushright}
+\clearpage
+\pagestyle{fancy}
+
+\tableofcontents
+\listoffigures
+\listoftables
+\include{chapters/preface}
+
+\mainmatter
+\include{chapters/intro}
+\part{Foundations}
+\include{chapters/m01}
+\include{chapters/m01b}
+\include{chapters/m02}
+\include{chapters/m02b}
+\part{Double Machine Learning}
+\include{chapters/m03}
+\include{chapters/m04}
+\include{chapters/m04b}
+\part{Bayesian Alternatives}
+\include{chapters/m05}
+\include{chapters/mcomp}
+\include{chapters/m06}
+\include{chapters/m07}
+\part{Identification beyond Ignorability}
+\include{chapters/m08}
+\include{chapters/m09}
+\include{chapters/m10}
+\part{Designs and Applications}
+\include{chapters/m13}
+\include{chapters/m11}
+\include{chapters/m12}
+\include{chapters/m11b}
+\part{Decisions, Markets and Open Problems}
+\include{chapters/m14}
+\include{chapters/m15}
+\include{chapters/m16}
+
+\appendix
+\include{chapters/appA}
+\include{chapters/appT}
+\include{chapters/appG}
+\include{chapters/appD}
+\include{chapters/appE}
+\include{chapters/appCode}
+
+\backmatter
+\include{chapters/chfurther}
+\include{chapters/refs}
+\clearpage\phantomsection\addcontentsline{toc}{chapter}{Index}
+\printindex
+\end{document}
