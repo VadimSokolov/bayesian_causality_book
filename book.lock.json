@@ -449,12 +449,21 @@
  },
  "updated": "2026-11-02",
  "zenodo": {
-  "draft": {
-   "doi": "10.5281/zenodo.23899019",
-   "html": "https://zenodo.org/deposit/23899019",
-   "id": 23899019,
-   "reserved_on": "2026-11-02",
-   "version": "1.0.0"
-  }
+  "concept_doi": "10.5281/zenodo.23899018",
+  "doi": "10.5281/zenodo.23899019",
+  "html": "https://zenodo.org/records/23899019",
+  "latest_id": 23899019,
+  "tag": "v1.0.0",
+  "version": "1.0.0",
+  "versions": [
+   {
+    "doi": "10.5281/zenodo.23899019",
+    "html": "https://zenodo.org/records/23899019",
+    "id": 23899019,
+    "published_on": "2026-11-02",
+    "tag": "v1.0.0",
+    "version": "1.0.0"
+   }
+  ]
  }
 }

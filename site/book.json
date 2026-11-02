@@ -26,6 +26,7 @@
  "date_released": "2026-11-02",
  "publisher": "Independently published",
  "doi": "10.5281/zenodo.23899019",
+ "concept_doi": "10.5281/zenodo.23899018",
  "language": "en",
  "keywords": [
   "Bayesian causal inference",
@@ -64,6 +65,9 @@
   "repository": "https://github.com/VadimSokolov/bayesian_causality_book",
   "source": "https://github.com/VadimSokolov/bayesian_causality_book/tree/v1.0.0",
   "doi": "https://doi.org/10.5281/zenodo.23899019",
+  "concept_doi": "https://doi.org/10.5281/zenodo.23899018",
+  "zenodo": "https://zenodo.org/records/23899019",
+  "doi_badge": "https://zenodo.org/badge/DOI/10.5281/zenodo.23899019.svg",
   "icon_pdf": "https://vsokolov.org/books/icon-pdf.svg",
   "icon_github": "https://vsokolov.org/books/icon-github.svg",
   "cover": "https://vsokolov.org/books/bayesian_causality_book/cover.jpg"
