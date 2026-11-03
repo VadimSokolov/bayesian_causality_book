@@ -22,10 +22,10 @@
  "credit_names": "Polson and Sokolov",
  "year": "2026",
  "edition": "1",
- "version": "1.0.0",
+ "version": "1.0.1",
  "date_released": "2026-11-02",
  "publisher": "Independently published",
- "doi": "10.5281/zenodo.23899019",
+ "doi": "10.5281/zenodo.23902093",
  "concept_doi": "10.5281/zenodo.23899018",
  "language": "en",
  "keywords": [
@@ -41,7 +41,7 @@
   "causal decisions"
  ],
  "short_description": "A textbook that builds one Bayesian model of outcomes given treatment and covariates and reads every causal quantity from its posterior, and compares it with double machine learning in simulations and in the 401(k), LaLonde and NHEFS data.",
- "description": "Ask double machine learning (DML) how much eligibility for a 401(k) plan raised household savings and it returns one number. Ask for the effect at the median household and each question needs a new derivation and a new run. This book builds one probability model for outcomes given treatment and covariates and reads every causal quantity off its posterior draws: the average effect, the effect in each subgroup, the probability of causation, and the decision that follows.\nThe central idea is an accounting identity. The average effect is an average of fitted contrasts over a population the analyst chooses, so a change of population changes the answer in a way the model states. Under one stable odds ratio the average effect fills a whole range, and the posterior selects the group on which an effect is stable. For DML the book proves an exact decomposition of the error, and that no interval is both uniformly valid and of bounded expected length. It studies regularization induced confounding and the coupled horseshoe posterior that reduces it. In the simulations the book reports, with 200 observations and five strong confounders, the posterior trails DML slightly with 50 covariates, and DML is more accurate with 150 and with 300 covariates; with thirty weak confounders among 150 covariates the order reverses.\nLater chapters cover instruments, bounds, difference in differences, causal decisions and a Bayesian model of a merger, whose price effect is identified by the demand parameters and the form of competition. Every exercise has a solution, and the code folder of this repository holds the scripts, including many of those behind the solutions of Appendix D (in `book_scripts/solutions/`), apart from the results that Appendix F lists as quoted or absent. The book is written for statisticians, econometricians and data scientists.",
+ "description": "Ask double machine learning (DML) how much eligibility for a 401(k) plan raised household savings and it returns one number. Ask for the effect at the median household and each question needs a new derivation and a new run. This book builds one probability model for outcomes given treatment and covariates and reads every causal quantity off its posterior draws: the average effect, the effect in each subgroup, the probability of causation, and the decision that follows.\nThe central idea is an accounting identity. The average effect is an average of fitted contrasts over a population the analyst chooses, so a change of population changes the answer in a way the model states. Under one stable odds ratio the average effect fills a whole range, and the posterior selects the group on which an effect is stable. For DML the book proves an exact decomposition of the error, and that no interval is both uniformly valid and of bounded expected length. It studies regularization induced confounding and the coupled horseshoe posterior that reduces it. In the simulations the book reports, with 200 observations and five strong confounders, the posterior trails DML slightly with 50 covariates, and DML is more accurate with 150 and with 300 covariates; with thirty weak confounders among 150 covariates the order reverses.\nLater chapters cover instruments, bounds, difference in differences, causal decisions and a Bayesian model of a merger, whose price effect is identified by the demand parameters and the form of competition. Every exercise has a solution, and the code folder of this repository holds the scripts, including many of those behind the solutions of Appendix D (in `book_scripts/solutions/`), apart from the results that Appendix F lists as quoted or absent. Version 1.0.1 corrects the print layout of two tables. The book is written for statisticians, econometricians and data scientists.",
  "license_text": {
   "id": "CC-BY-4.0",
   "name": "CC BY 4.0",
@@ -53,36 +53,34 @@
   "url": "https://opensource.org/license/mit"
  },
  "release": {
-  "tag": "v1.0.0",
-  "url": "https://github.com/VadimSokolov/bayesian_causality_book/releases/tag/v1.0.0"
+  "tag": "v1.0.1",
+  "url": "https://github.com/VadimSokolov/bayesian_causality_book/releases/tag/v1.0.1"
  },
  "links": {
   "page": "https://vsokolov.org/books/bayesian_causality_book/",
   "page_markdown": "https://vsokolov.org/books/bayesian_causality_book/index.html.md",
   "results": "https://vsokolov.org/books/bayesian_causality_book/results.html",
   "results_markdown": "https://vsokolov.org/books/bayesian_causality_book/results.html.md",
-  "pdf": "https://github.com/VadimSokolov/bayesian_causality_book/releases/download/v1.0.0/bayesian_causality_book.pdf",
+  "pdf": "https://github.com/VadimSokolov/bayesian_causality_book/releases/download/v1.0.1/bayesian_causality_book.pdf",
   "repository": "https://github.com/VadimSokolov/bayesian_causality_book",
-  "source": "https://github.com/VadimSokolov/bayesian_causality_book/tree/v1.0.0",
-  "doi": "https://doi.org/10.5281/zenodo.23899019",
+  "source": "https://github.com/VadimSokolov/bayesian_causality_book/tree/v1.0.1",
+  "doi": "https://doi.org/10.5281/zenodo.23902093",
   "concept_doi": "https://doi.org/10.5281/zenodo.23899018",
-  "zenodo": "https://zenodo.org/records/23899019",
-  "doi_badge": "https://zenodo.org/badge/DOI/10.5281/zenodo.23899019.svg",
   "icon_pdf": "https://vsokolov.org/books/icon-pdf.svg",
   "icon_github": "https://vsokolov.org/books/icon-github.svg",
   "cover": "https://vsokolov.org/books/bayesian_causality_book/cover.jpg"
  },
  "citation": {
-  "text": "Polson and Sokolov (2026), Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning, edition 1, https://doi.org/10.5281/zenodo.23899019.",
-  "bibtex": "@book{polsonsokolov2026bayesian_causality_book,\n  author = {Polson, Nick and Sokolov, Vadim},\n  title = {{Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning}},\n  year = {2026},\n  publisher = {Independently published},\n  doi = {10.5281/zenodo.23899019},\n  url = {https://vsokolov.org/books/bayesian_causality_book/}\n}",
+  "text": "Polson and Sokolov (2026), Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning, edition 1, https://doi.org/10.5281/zenodo.23902093.",
+  "bibtex": "@book{polsonsokolov2026bayesian_causality_book,\n  author = {Polson, Nick and Sokolov, Vadim},\n  title = {{Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning}},\n  year = {2026},\n  publisher = {Independently published},\n  doi = {10.5281/zenodo.23902093},\n  url = {https://vsokolov.org/books/bayesian_causality_book/}\n}",
   "bibkey": "polsonsokolov2026bayesian_causality_book",
   "example": "Polson and Sokolov (2026), Proposition 4.3"
  },
  "pdf": {
   "file": "bayesian_causality_book.pdf",
-  "pages": 702,
-  "bytes": 6667981,
-  "sha256": "53aaffb06fcc236d14d44ea020e7aebd1ebf22b0620ea206cd21eeb7b1829f74"
+  "pages": 703,
+  "bytes": 6663495,
+  "sha256": "6a27ab1a4276b6fadcf23992391cd53223d82c1469262699ab001125c8fa2a5e"
  },
  "bundle": {
   "page": "site/index.md",
@@ -94,7 +92,7 @@
  "serve": [
   {
    "path": "cover.jpg",
-   "url": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/v1.0.0/pdf/cover.jpg"
+   "url": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/v1.0.1/pdf/cover.jpg"
   }
  ],
  "chapters": [
@@ -181,8 +179,8 @@
    "stem": "08_the_horseshoe_and_the_coupled_prior",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/08_the_horseshoe_and_the_coupled_prior.md",
    "first_page": "165",
-   "last_page": "195",
-   "pages": 31,
+   "last_page": "196",
+   "pages": 32,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/08_the_horseshoe_and_the_coupled_prior.md",
    "summary": "The horseshoe shrinks noise hard and leaves large signals almost untouched, and this chapter uses it for causal regression. Independent shrinkage of confounder coefficients creates regularization induced confounding, because a shrunk coefficient lets the treatment absorb part of the confounding. Coupling the outcome prior to the treatment model through the estimated treatment regression reduces the bias. The chapter reports simulations at 200 observations: with 50 covariates the coupled posterior trails DML slightly on the average effect and also returns every other summary, with 150 and 300 covariates DML is clearly more accurate, and with thirty weak confounders among 150 covariates the order reverses. It also covers shared local scales and instruments, the global scale, comparison with spike and slab priors, nonlinear nuisances, and a horseshoe nuisance estimator inside DML.\n\n#### From the literature\n\nThe chapter presents or builds on the horseshoe prior (Carvalho, Polson and Scott 2010), shrink globally and act locally (Polson and Scott 2011), the horseshoe plus estimator (Bhadra, Datta, Polson and Willard 2017), posterior contraction of the horseshoe (van der Pas, Kleijn and van der Vaart 2014), regularization induced confounding (Hahn, Carvalho, Puelz and He 2018), the simulation comparison of DML and hierarchical Bayes (Nareklishvili, Polson and Sokolov 2026a).\n\n#### New results\n\nNo new results of this chapter are catalogued.\n\n#### Key terms\n\nhorseshoe prior, global local shrinkage, regularization induced confounding, coupled horseshoe, partially exchangeable prior, hierarchical Bayes, DML versus Bayes, sparse regression, spike and slab, shared local scales, coverage, simulation"
   },
@@ -191,8 +189,8 @@
    "title": "Computing the Posterior",
    "stem": "09_computing_the_posterior",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/09_computing_the_posterior.md",
-   "first_page": "196",
-   "last_page": "222",
+   "first_page": "197",
+   "last_page": "223",
    "pages": 27,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/09_computing_the_posterior.md",
    "summary": "This chapter takes up the objection that Bayesian computation is too costly. Horseshoe Gibbs samplers were fast in the Gaussian designs of the book, so at that size computation is no reason to prefer DML, while at 300 or 400 covariates DML with a lasso nuisance is cheaper. When the likelihood cannot be evaluated cheaply, a posterior is a map from noise to parameters: a quantile network trained on simulated pairs of parameter and data with the check loss turns uniform noise and a summary of the data into posterior draws. The chapter gives the algorithm, what the network sees through summaries, how to get posteriors of effects from simulated pairs, and why one usually does not learn the horseshoe posterior this way. Diagnostics, including rank statistics, are part of the computation, and a closing table says which engine to use when.\n\n#### From the literature\n\nThe chapter presents or builds on noise outsourcing (Kallenberg 2002), quantile regression and the check loss (Koenker and Bassett 1978), simulation based calibration (Talts, Betancourt, Simpson, Vehtari and Gelman 2018), generative Bayesian computation (Polson and Sokolov 2023), Polya Gamma augmentation (Polson, Scott and Windle 2013).\n\n#### New results\n\nNo new results of this chapter are catalogued.\n\n#### Key terms\n\nBayesian computation, Gibbs sampler, horseshoe sampler, generative Bayesian computation, quantile neural network, check loss, noise outsourcing, amortized inference, simulation based calibration, rank statistic, computational cost, DML timing"
@@ -202,8 +200,8 @@
    "title": "Generative Treatment Effects and Joint Potential Outcomes",
    "stem": "10_generative_treatment_effects_and_joint_potential_outcomes",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/10_generative_treatment_effects_and_joint_potential_outcomes.md",
-   "first_page": "223",
-   "last_page": "246",
+   "first_page": "224",
+   "last_page": "247",
    "pages": 24,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/10_generative_treatment_effects_and_joint_potential_outcomes.md",
    "summary": "Noise outsourcing represents any conditional law as a map from noise to outcomes. Learning that map for treated and untreated outcomes gives every conditional and quantile effect and every other functional of the two marginal laws, which is what decisions under concave utility need and the average effect does not supply. This chapter presents the generative treatment effect learner, benchmarks it, treats uncertainty for a learned map and deep learning in high dimensions, and covers individualized decisions, heterogeneity with the horseshoe, quantile regression as a likelihood and comparison with conformal prediction. The joint law of the two potential outcomes is a separate question: the marginals bound it without identifying it, optimal transport supplies a canonical coupling, and a copula prior covers the rest. A coverage study checks the bands on the 401(k) data.\n\n#### From the literature\n\nThe chapter presents or builds on generative causal inference and generative learners for distributional effects (Nareklishvili, Polson and Sokolov 2023a, 2025), the Makarov bounds (Makarov 1981), optimal transport (Villani 2009), conformal prediction (Lei and Candes 2021), deep partial least squares (Nareklishvili, Polson and Sokolov 2023b).\n\n#### New results\n\nNo new results of this chapter are catalogued.\n\n#### Key terms\n\ngenerative treatment effects, noise outsourcing, quantile treatment effect, distributional effects, joint potential outcomes, Makarov bounds, optimal transport coupling, copula prior, deep learning, individualized treatment rules, policy learning, conformal prediction"
@@ -213,8 +211,8 @@
    "title": "Bayesian Nonparametrics for Causal Inference",
    "stem": "11_bayesian_nonparametrics_for_causal_inference",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/11_bayesian_nonparametrics_for_causal_inference.md",
-   "first_page": "247",
-   "last_page": "264",
+   "first_page": "248",
+   "last_page": "265",
    "pages": 18,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/11_bayesian_nonparametrics_for_causal_inference.md",
    "summary": "Under ignorability, causal inference is regression of the potential outcomes on the covariates, and Bayesian nonparametrics puts a prior on the whole response surface. This chapter covers Bayesian additive regression trees, Hill's causal BART, the overlap problem that plain BART meets, and Bayesian causal forests, which separate prognosis from effect and put the propensity score into the prior. It reviews posterior contraction for forests, runs a simulation in the spirit of Hill, and treats Gaussian process causal inference. Every effect, average, conditional or on the treated, is read off one fitted surface with its uncertainty attached. The chapter also looks at heterogeneous effects, instruments and sensitivity in these models, the prior as a selector of structure, the role of the propensity score in a Bayesian model, and trees compared with the horseshoe.\n\n#### From the literature\n\nThe chapter presents or builds on Bayesian additive regression trees (Chipman, George and McCulloch 2010), BART for causal inference (Hill 2011), Bayesian causal forests (Hahn, Murray and Carvalho 2020), posterior contraction of Bayesian forests (Rockova and van der Pas 2020).\n\n#### New results\n\nNo new results of this chapter are catalogued.\n\n#### Key terms\n\nBayesian nonparametrics, BART, Bayesian additive regression trees, Bayesian causal forest, Gaussian process, response surface modelling, heterogeneous treatment effects, overlap, propensity score in the prior, posterior contraction, Hill simulation"
@@ -224,8 +222,8 @@
    "title": "Instruments",
    "stem": "12_instruments",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/12_instruments.md",
-   "first_page": "266",
-   "last_page": "286",
+   "first_page": "267",
+   "last_page": "287",
    "pages": 21,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/12_instruments.md",
    "summary": "Instruments identify effects under unmeasured confounding at the price of an exclusion restriction, and this chapter develops the Bayesian treatment. It starts from the linear model and the local average treatment effect as an accounting over compliers, then builds Bayesian instrumental variables. With one weak instrument a posterior reports the weakness as a wide interval, whether the prior sits on the reduced form or on the structural model. With twenty weak instruments a diffuse structural prior is confident and wrong, and a shrunk first stage gives intervals that cover the truth by being wide. A horseshoe on the first stage handles many instruments. The chapter also treats unlikely instruments, kernel methods for nonlinear structural functions, with a proposed global local prior, and Mendelian randomization, which turns Fisher's genetic confounder into an instrument.\n\n#### From the literature\n\nThe chapter presents or builds on instrumental variables (Wright 1928), the local average treatment effect (Imbens and Angrist 1994; Angrist, Imbens and Rubin 1996), the returns to schooling application (Card 1995), weak instruments (Bound, Jaeger and Baker 1995; Staiger and Stock 1997), Anderson Rubin sets (Anderson and Rubin 1949), Mendelian randomization (Davey Smith and Ebrahim 2003).\n\n#### New results\n\nNo new results of this chapter are catalogued.\n\n#### Key terms\n\ninstrumental variables, Bayesian IV, exclusion restriction, local average treatment effect, compliers, weak instruments, many instruments, horseshoe first stage, Anderson Rubin, Mendelian randomization, returns to schooling, nonparametric IV"
@@ -235,8 +233,8 @@
    "title": "Bounds and Sensitivity",
    "stem": "13_bounds_and_sensitivity",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/13_bounds_and_sensitivity.md",
-   "first_page": "287",
-   "last_page": "304",
+   "first_page": "288",
+   "last_page": "305",
    "pages": 18,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/13_bounds_and_sensitivity.md",
    "summary": "The probabilities that a treatment was necessary, sufficient, or both depend on the joint law of the potential outcomes, so they are bounded rather than identified. This chapter derives the bounds, shows how combining experimental and observational data narrows them, and gives the Bayesian reading: a posterior over the position inside the bounds gives a court the probability it actually needs. Partially identified posteriors keep a prior dependence that never washes out. The second half turns to unmeasured confounding. Cornfield's inequality, Rosenbaum's sensitivity parameter and the E value say how strong a hidden confounder must be to overturn a result, and a prior on the confounding parameters turns the threshold into a posterior probability that the effect is positive. Benchmarking on the 401(k) data and Lanarkshire numbers illustrate the method.\n\n#### From the literature\n\nThe chapter presents or builds on probabilities of causation and their bounds (Tian and Pearl 2000), Cornfield's inequality (Cornfield, Haenszel, Hammond, Lilienfeld, Shimkin and Wynder 1959), the sensitivity parameter (Rosenbaum 2002), the E value (VanderWeele and Ding 2017), partial identification (Manski 2003), Bayesian inference in partially identified models (Gustafson 2015).\n\n#### New results\n\nNo new results of this chapter are catalogued.\n\n#### Key terms\n\nprobability of necessity, probability of sufficiency, Tian Pearl bounds, partial identification, Bayesian sensitivity analysis, unmeasured confounding, Cornfield inequality, Rosenbaum bounds, E value, probabilities of causation in court, benchmarking, partial R squared"
@@ -246,8 +244,8 @@
    "title": "Smoking and Lung Cancer",
    "stem": "14_smoking_and_lung_cancer",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/14_smoking_and_lung_cancer.md",
-   "first_page": "305",
-   "last_page": "316",
+   "first_page": "306",
+   "last_page": "317",
    "pages": 12,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/14_smoking_and_lung_cancer.md",
    "summary": "Fisher doubted that smoking causes lung cancer, and this chapter asks how a Bayesian should weigh the evidence. Fisher was right that observation cannot exclude every common cause and wrong about which way the evidence pointed. Cornfield's inequality, dose response, the twin studies, the inhalation paradox, the front door criterion and Mendelian randomization each constrain the alternatives, and the chapter says what a Bayesian synthesis would combine, with the assumptions in view. Bradford Hill's considerations are read as prior information. The front door section simulates a population with a hidden genotype, and a computed illustration, with no cohort data, gives the posterior of the effect under stated priors on the strength of a hidden confounder. The chapter is a historical case study as much as a method, and it says plainly where the data cannot decide.\n\n#### From the literature\n\nThe chapter presents or builds on Fisher's constitutional hypothesis (Fisher 1958), Cornfield's inequality (Cornfield and coauthors 1959), Bradford Hill's considerations (Hill 1965), the front door adjustment (Pearl 1995), Mendelian randomization (Davey Smith and Ebrahim 2003).\n\n#### New results\n\nNo new results of this chapter are catalogued.\n\n#### Key terms\n\nsmoking and lung cancer, Fisher, Cornfield inequality, Bradford Hill criteria, front door criterion, twin studies, inhalation paradox, Mendelian randomization, hidden confounder, Bayesian synthesis of evidence, observational evidence"
@@ -257,8 +255,8 @@
    "title": "Difference in Differences with the Horseshoe",
    "stem": "15_difference_in_differences_with_the_horseshoe",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/15_difference_in_differences_with_the_horseshoe.md",
-   "first_page": "318",
-   "last_page": "334",
+   "first_page": "319",
+   "last_page": "335",
    "pages": 17,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/15_difference_in_differences_with_the_horseshoe.md",
    "summary": "Two way fixed effects estimates a weighted average of cohort by time effects with possibly negative weights, and this chapter replaces it with a model of the cells. The horseshoe difference in differences estimator keeps an unshrunk event time path, puts horseshoe priors on cohort deviations and on departures from parallel trends, and reports every summary, such as the effect on the treated or an event study, as an accounting of the posterior. A simulation studies its behaviour. The application is the castle doctrine laws and homicide: with equal noise in every state the posterior mean is 0.025 with probability 0.76 of a positive effect, and with population weights, which the residuals support, it is 0.079 with probability 0.998, close to the published eight percent. The chapter relates the estimator to synthetic control and states the assumptions it needs, among them parallel trends after the modelled departures and no anticipation.\n\n#### From the literature\n\nThe chapter presents or builds on two way fixed effects and its weights (Goodman Bacon 2021; de Chaisemartin and D'Haultfoeuille 2020), heterogeneity robust estimators (Callaway and Sant'Anna 2021; Sun and Abraham 2021), the castle doctrine study (Cheng and Hoekstra 2013), synthetic control (Abadie, Diamond and Hainmueller 2010).\n\n#### New results\n\nNo new results of this chapter are catalogued.\n\n#### Key terms\n\ndifference in differences, two way fixed effects, staggered adoption, negative weights, horseshoe prior, event study, parallel trends, castle doctrine, homicide, synthetic control, cohort effects, heterogeneity robust estimators"
@@ -268,8 +266,8 @@
    "title": "Two Benchmarks",
    "stem": "16_two_benchmarks",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/16_two_benchmarks.md",
-   "first_page": "335",
-   "last_page": "350",
+   "first_page": "336",
+   "last_page": "351",
    "pages": 16,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/16_two_benchmarks.md",
    "summary": "Two benchmark data sets test the methods of the book. On the 401(k) data, DML and the horseshoe report one effect for everyone and put it near the same range, well above least squares with nine covariates. The posterior adds what that single number hides: effects that rise with income and an effect on the untreated that differs from the effect on the treated. A Bayesian causal forest did not converge on these data, so the chapter reports no forest estimates and the income profile still lacks a check by a second model class. Overlap is adequate but thin at low incomes. On the LaLonde benchmark the randomized experiment gives a benchmark effect, the raw difference with survey controls is badly off, and flexible methods land much closer. The chapter reports the numbers with their posteriors, discusses overlap and the outcome distribution, and says where the methods still differ.\n\n#### From the literature\n\nThe chapter presents or builds on the 401(k) study (Poterba, Venti and Wise 1995; Chernozhukov and Hansen 2004), the LaLonde benchmark (LaLonde 1986; Dehejia and Wahba 1999), DML (Chernozhukov and coauthors 2018), Bayesian causal forests (Hahn, Murray and Carvalho 2020).\n\n#### New results\n\nNo new results of this chapter are catalogued.\n\n#### Key terms\n\n401(k) eligibility and savings, LaLonde benchmark, NSW experiment, CPS comparison group, heterogeneous effects by income, effect on the treated and untreated, Bayesian causal forest, overlap, DML comparison, observational benchmark"
@@ -279,8 +277,8 @@
    "title": "Two Applications in Health",
    "stem": "17_two_applications_in_health",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/17_two_applications_in_health.md",
-   "first_page": "351",
-   "last_page": "362",
+   "first_page": "352",
+   "last_page": "363",
    "pages": 12,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/17_two_applications_in_health.md",
    "summary": "Two health applications close the applied chapters. The first estimates the effect of quitting smoking on weight gain over eleven years in the NHEFS cohort. Three Bayesian models agree with each other and with the published analysis, and a causal forest shows little heterogeneity by smoking intensity or age. The second analyses Thornton's randomized trial of cash incentives for learning HIV results in Malawi, with a logistic model, marginal and conditional odds ratios, risk differences and a dose response in the incentive. The Thornton analysis shows the accounting view at work: the same fitted model gives a conditional odds ratio and a different marginal one, and both are reported with their posterior.\n\n#### From the literature\n\nThe chapter presents or builds on the NHEFS analysis (Hernan and Robins 2020), the Thornton experiment (Thornton 2008), noncollapsibility (Greenland, Robins and Pearl 1999).\n\n#### New results\n\nNo new results of this chapter are catalogued.\n\n#### Key terms\n\nNHEFS, smoking cessation, weight gain, Thornton HIV experiment, Malawi incentives, logistic regression, marginal odds ratio, conditional odds ratio, standardization, dose response, Bayesian causal forest"
@@ -290,8 +288,8 @@
    "title": "A Workflow for Applied Bayesian Causal Inference",
    "stem": "18_a_workflow_for_applied_bayesian_causal_inference",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/18_a_workflow_for_applied_bayesian_causal_inference.md",
-   "first_page": "363",
-   "last_page": "369",
+   "first_page": "364",
+   "last_page": "370",
    "pages": 7,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/18_a_workflow_for_applied_bayesian_causal_inference.md",
    "summary": "This chapter collects the book's advice into a seven step workflow for applied Bayesian causal inference: state the question and the population, draw the assignment mechanism, check overlap before modelling, fit at least two flexible outcome models, check the model against the data, report accountings and not a single number, and quantify sensitivity to unmeasured confounding. The first two steps ask for the same statement and the same graph under any method. In the later steps the Bayesian analysis uses its posterior for more than an average. A summary table reprints results from earlier chapters, and a closing section compares the workflow with DML and states the conditions under which, for one average effect, DML is enough.\n\n#### From the literature\n\nThe chapter presents or builds on Bayesian workflow (Gelman and coauthors 2020), posterior predictive checks (Rubin 1984; Gelman, Meng and Stern 1996), overlap diagnostics (Crump and coauthors 2009; Li, Morgan and Zaslavsky 2018; Hill and Su 2013), sensitivity analysis (Cornfield and coauthors 1959; Rosenbaum 2002).\n\n#### New results\n\nNo new results of this chapter are catalogued.\n\n#### Key terms\n\nBayesian causal inference workflow, posterior predictive check, overlap diagnostic, assignment mechanism, sensitivity analysis, accountings, applied causal analysis checklist, DML versus Bayes"
@@ -301,8 +299,8 @@
    "title": "Causal Decisions",
    "stem": "19_causal_decisions",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/19_causal_decisions.md",
-   "first_page": "371",
-   "last_page": "389",
+   "first_page": "372",
+   "last_page": "390",
    "pages": 19,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/19_causal_decisions.md",
    "summary": "A causal decision maximizes expected utility under an intervention, and the posterior does the averaging, so the Bayes action depends on the whole posterior and not only on the average effect. This chapter separates evidential from causal expected utility and treats policy evaluation, structural estimation and the Lucas critique, games and strategic interaction, industrial organization, mechanism design, targeting and cost effectiveness, climate and fiscal policy, and behavioural departures. A result bounds the regret of the Bayes policy by the posterior's expected error. The chapter ends with risk sensitive decisions computed from a posterior. The chapter is mostly a map of where posterior based decisions differ from decisions based on one estimate, with worked examples and exercises.\n\n#### From the literature\n\nThe chapter presents or builds on expected utility (von Neumann and Morgenstern 1944), causal decision theory (Lewis 1981; Joyce 1999), the Lucas critique (Lucas 1976), generative Bayesian computation for maximum expected utility (Polson, Ruggeri and Sokolov 2024), distortion risk measures (Wang 2000).\n\n#### New results\n\nNo new results of this chapter are catalogued.\n\n#### Key terms\n\ncausal decision theory, Bayes action, expected utility, regret, policy evaluation, Lucas critique, structural estimation, targeting, cost effectiveness, mechanism design, risk sensitive decisions, distortion risk measures"
@@ -312,19 +310,19 @@
    "title": "The Causal Effect of a Merger",
    "stem": "20_the_causal_effect_of_a_merger",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/20_the_causal_effect_of_a_merger.md",
-   "first_page": "390",
-   "last_page": "435",
+   "first_page": "391",
+   "last_page": "436",
    "pages": 46,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/20_the_causal_effect_of_a_merger.md",
-   "summary": "A merger is a treatment applied once, to one industry, and never at random, so its price effect can only come from a model. This chapter defines the merger as the intervention do(H := H post) on the form of competition and shows that, under modularity and given the premerger data, the price effect depends on three nonlinear demand parameters and the form of competition alone. The agency's answer is then a pushforward posterior. Markups are the hinge: the Lerner index, upward pricing pressure and the merger price effect follow from the markup map. The chapter explains why orthogonal moments fall short for a nonlinear fixed point, then learns the posterior of the estimands and of conduct by simulating industries and training a network on summary statistics. Calibration on fresh industries compares the posterior with the usual BLP moment estimator, and a section covers wrong conduct.\n\n#### From the literature\n\nThe chapter presents or builds on the random coefficients logit demand model (Berry, Levinsohn and Pakes 1995), merger simulation and upward pricing pressure (Nevo 2000; Farrell and Shapiro 2010; Miller and Weinberg 2017), Bayesian estimation of BLP models (Viard, Gron and Polson 2015), approximate Bayesian computation with summary statistics (Frazier, Martin, Robert and Rousseau 2018).\n\n#### New results\n\n- [Identification of the merger effect](https://vsokolov.org/books/bayesian_causality_book/results.html#merger_effect_depends_only_on_demand_and_conduct) (Proposition 20.5, page 398; proved): Given the premerger data, the price effect of a merger is a function of the nonlinear demand parameters and the form of competition alone, so the agency question is a question about their posterior. New in this book.\n- [Falsifying a conduct model](https://vsokolov.org/books/bayesian_causality_book/results.html#falsifying_a_conduct_model_under_logit) (Proposition 20.7, page 399; proved): Under logit demand a candidate form of competition is rejected by the instruments unless its markup function differs from the truth only by a combination of cost shifters. New in this book.\n- [First order flatness at zero heterogeneity](https://vsokolov.org/books/bayesian_causality_book/results.html#first_order_flatness_at_zero_heterogeneity) (Proposition 20.11, page 400; proved): At zero taste heterogeneity the market shares of the random coefficients logit are flat to first order in the heterogeneity scale, so moments built on shares carry no first order information about it. New in this book.\n- [Markup pressure versus GUPPI under logit](https://vsokolov.org/books/bayesian_causality_book/results.html#markup_pressure_exceeds_guppi_under_logit) (Lemma 20.13, page 401; proved): Under logit demand and Bertrand Nash pricing the exact markup increase from a merger exceeds the gross upward pricing pressure index whenever the merger partner has a positive share. New in this book.\n- [A Bayes rule for merger review](https://vsokolov.org/books/bayesian_causality_book/results.html#bayes_rule_for_merger_review) (Proposition 20.15, page 403; proved): The agency should challenge a merger when the posterior probability of harm exceeds a ratio of the two error costs, or, for graded costs, when expected excess harm outweighs the cost of blocking. New in this book.\n- [Model averaging over conduct](https://vsokolov.org/books/bayesian_causality_book/results.html#model_averaging_over_conduct_variance) (Proposition 20.16, page 403; proved): The posterior variance of a merger estimand splits into a within conduct term and a between conduct term, and a procedure that fixes one conduct omits the second. New in this book.\n\n#### Key terms\n\nmerger simulation, BLP demand, random coefficients logit, upward pricing pressure, GUPPI, markups, conduct, Bertrand Nash, antitrust, merger retrospective, Bayesian decision rule, generative Bayesian computation, model averaging"
+   "summary": "A merger is a treatment applied once, to one industry, and never at random, so its price effect can only come from a model. This chapter defines the merger as the intervention do(H := H post) on the form of competition and shows that, under modularity and given the premerger data, the price effect depends on three nonlinear demand parameters and the form of competition alone. The agency's answer is then a pushforward posterior. Markups are the hinge: the Lerner index, upward pricing pressure and the merger price effect follow from the markup map. The chapter explains why orthogonal moments fall short for a nonlinear fixed point, then learns the posterior of the estimands and of conduct by simulating industries and training a network on summary statistics. Calibration on fresh industries compares the posterior with the usual BLP moment estimator, and a section covers wrong conduct.\n\n#### From the literature\n\nThe chapter presents or builds on the random coefficients logit demand model (Berry, Levinsohn and Pakes 1995), merger simulation and upward pricing pressure (Nevo 2000; Farrell and Shapiro 2010; Miller and Weinberg 2017), Bayesian estimation of BLP models (Viard, Gron and Polson 2015), approximate Bayesian computation with summary statistics (Frazier, Martin, Robert and Rousseau 2018).\n\n#### New results\n\n- [Identification of the merger effect](https://vsokolov.org/books/bayesian_causality_book/results.html#merger_effect_depends_only_on_demand_and_conduct) (Proposition 20.5, page 399; proved): Given the premerger data, the price effect of a merger is a function of the nonlinear demand parameters and the form of competition alone, so the agency question is a question about their posterior. New in this book.\n- [Falsifying a conduct model](https://vsokolov.org/books/bayesian_causality_book/results.html#falsifying_a_conduct_model_under_logit) (Proposition 20.7, page 400; proved): Under logit demand a candidate form of competition is rejected by the instruments unless its markup function differs from the truth only by a combination of cost shifters. New in this book.\n- [First order flatness at zero heterogeneity](https://vsokolov.org/books/bayesian_causality_book/results.html#first_order_flatness_at_zero_heterogeneity) (Proposition 20.11, page 401; proved): At zero taste heterogeneity the market shares of the random coefficients logit are flat to first order in the heterogeneity scale, so moments built on shares carry no first order information about it. New in this book.\n- [Markup pressure versus GUPPI under logit](https://vsokolov.org/books/bayesian_causality_book/results.html#markup_pressure_exceeds_guppi_under_logit) (Lemma 20.13, page 402; proved): Under logit demand and Bertrand Nash pricing the exact markup increase from a merger exceeds the gross upward pricing pressure index whenever the merger partner has a positive share. New in this book.\n- [A Bayes rule for merger review](https://vsokolov.org/books/bayesian_causality_book/results.html#bayes_rule_for_merger_review) (Proposition 20.15, page 404; proved): The agency should challenge a merger when the posterior probability of harm exceeds a ratio of the two error costs, or, for graded costs, when expected excess harm outweighs the cost of blocking. New in this book.\n- [Model averaging over conduct](https://vsokolov.org/books/bayesian_causality_book/results.html#model_averaging_over_conduct_variance) (Proposition 20.16, page 404; proved): The posterior variance of a merger estimand splits into a within conduct term and a between conduct term, and a procedure that fixes one conduct omits the second. New in this book.\n\n#### Key terms\n\nmerger simulation, BLP demand, random coefficients logit, upward pricing pressure, GUPPI, markups, conduct, Bertrand Nash, antitrust, merger retrospective, Bayesian decision rule, generative Bayesian computation, model averaging"
   },
   {
    "key": "21",
    "title": "Open Problems",
    "stem": "21_open_problems",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/21_open_problems.md",
-   "first_page": "436",
-   "last_page": "464",
+   "first_page": "437",
+   "last_page": "465",
    "pages": 29,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/21_open_problems.md",
    "summary": "This chapter lists twenty problems that earlier chapters raise and leave open. Each is stated as a setting, what is known, and a conjecture or an open question. They include a Bernstein von Mises theorem for the coupled horseshoe, coupling for nonlinear nuisances, the Robins and Ritov problem with an unknown propensity, default priors for couplings, rates for the triangular network posterior, calibration of amortized posteriors and of distorted values, and a course built on the book. Simulations show what to expect: the coupled horseshoe posterior reaches the efficient standard deviation by 1,600 observations, the coupled prior with an estimated propensity fails in the Robins and Ritov design, and a Student t working model halves the error of DML in a design with infinite variance errors. Seventeen of the problems ask for a theorem.\n\n#### From the literature\n\nThe chapter presents or builds on semiparametric Bernstein von Mises theorems (Castillo and Rousseau 2015), the Robins and Ritov example (Robins and Ritov 1997), posterior contraction for the horseshoe (van der Pas, Kleijn and van der Vaart 2014).\n\n#### New results\n\nNo new results of this chapter are catalogued.\n\n#### Key terms\n\nopen problems in Bayesian causal inference, Bernstein von Mises for the horseshoe, coupling, Robins Ritov, unknown propensity, heavy tailed outcomes, calibration of amortized posteriors, conjectures"
@@ -334,8 +332,8 @@
    "title": "Mathematical Background",
    "stem": "A_mathematical_background",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/A_mathematical_background.md",
-   "first_page": "465",
-   "last_page": "478",
+   "first_page": "466",
+   "last_page": "479",
    "pages": 14,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/A_mathematical_background.md",
    "summary": "This appendix collects the mathematical background that the chapters use without proof. It fixes conventions, then reviews conditioning and independence, Bayesian inference, large sample tools, linear regression and partialling out, and the distributional tools used with shrinkage priors. It states the Frisch, Waugh and Lovell theorem, which turns the coefficient of the treatment in a multiple regression into a regression of residuals, and closes with graphs, the do calculus and linear programs, which the bounds of Chapter 13 need. Nothing in it is new; it is there so that a reader with a first course in mathematical statistics can follow the proofs of the appendices that follow.\n\n#### From the literature\n\nThe chapter presents or builds on the Frisch, Waugh and Lovell theorem (Frisch and Waugh 1933; Lovell 1963), the do calculus (Pearl 2009), large sample theory (van der Vaart 1998).\n\n#### New results\n\nNo new results of this appendix are catalogued.\n\n#### Key terms\n\nmathematical background, conditional independence, Bayesian inference, large sample theory, Frisch Waugh Lovell theorem, partialling out, shrinkage priors, do calculus, linear programming, notation conventions"
@@ -345,8 +343,8 @@
    "title": "Theory",
    "stem": "B_theory",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/B_theory.md",
-   "first_page": "479",
-   "last_page": "496",
+   "first_page": "480",
+   "last_page": "497",
    "pages": 18,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/B_theory.md",
    "summary": "This appendix holds the proofs of results stated in the chapters. It covers noncollapsibility of the odds ratio, exchangeability in the finite and infinite cases, ignorability and the Bayesian posterior, a Bernstein von Mises theorem for causal functionals, tail robustness of the horseshoe, regularization induced confounding, the limit of Li's estimator, partially identified posteriors, the Makarov and Tian and Pearl bounds as linear programs, noise outsourcing and the weights of two way fixed effects. It ends with the proofs for the chapters on groups and urns, on DML and on its critique. Where a result is classical, the appendix gives a short proof for completeness and names the source.\n\n#### From the literature\n\nThe chapter presents or builds on the Bernstein von Mises theorem (van der Vaart 1998), the tail robustness of the horseshoe (Carvalho, Polson and Scott 2010; Polson and Sokolov 2026b), the Makarov bounds (Makarov 1981), the Tian and Pearl bounds (Tian and Pearl 2000).\n\n#### New results\n\nNo new results of this appendix are catalogued.\n\n#### Key terms\n\nproofs, noncollapsibility, exchangeability, Bernstein von Mises for causal functionals, tail robustness, regularization induced confounding, partially identified posterior, Makarov bounds, Tian Pearl linear programs, noise outsourcing, two way fixed effects weights"
@@ -356,8 +354,8 @@
    "title": "Posterior Guarantees",
    "stem": "C_posterior_guarantees",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/C_posterior_guarantees.md",
-   "first_page": "497",
-   "last_page": "511",
+   "first_page": "498",
+   "last_page": "512",
    "pages": 15,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/C_posterior_guarantees.md",
    "summary": "This appendix gives the posterior guarantees behind the horseshoe analyses. It states posterior concentration theorems, Bernstein von Mises theorems, the behaviour of the horseshoe in the sparse normal means model, predictive densities, and the consequences for treatment effects. It then applies them to difference in differences, where cohort deviations from an event path are sparse, and to groups, scales and stability. Several theorems are quoted from the literature with their authors and the exact result used, and the corollaries that follow from them, such as the coverage of credible intervals under misspecification and the predictive risk of the horseshoe, are derived here. The guarantees are asymptotic and sparse; the chapters say where simulation shows them failing in finite samples.\n\n#### From the literature\n\nThe chapter presents or builds on posterior concentration (Ghosal, Ghosh and van der Vaart 2000), Bernstein von Mises under misspecification (Kleijn and van der Vaart 2012), the horseshoe in the sparse normal means model (van der Pas, Kleijn and van der Vaart 2014; van der Pas, Szabo and van der Vaart 2017a, 2017b), predictive density estimation (Brown, George and Xu 2008).\n\n#### New results\n\nNo new results of this appendix are catalogued.\n\n#### Key terms\n\nposterior concentration, posterior contraction rate, Bernstein von Mises, misspecification, sandwich variance, horseshoe, sparse normal means, minimax rate, predictive risk, credible interval coverage, difference in differences guarantees"
@@ -367,8 +365,8 @@
    "title": "Solutions to the Exercises",
    "stem": "D_solutions_to_selected_exercises",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/D_solutions_to_selected_exercises.md",
-   "first_page": "512",
-   "last_page": "604",
+   "first_page": "513",
+   "last_page": "605",
    "pages": 93,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/D_solutions_to_selected_exercises.md",
    "summary": "This appendix gives worked solutions to the exercises that close most chapters, one paragraph for each exercise, in chapter order. The solutions derive identities, reproduce small numerical examples by hand, check simulation designs, and in some cases report short computations whose scripts are in the repository. They are meant for a reader teaching from the book or studying alone. Every exercise has a solution.\n\n#### From the literature\n\nThe exercises build on the results of the chapters they follow, which carry their own credits.\n\n#### New results\n\nNo new results of this appendix are catalogued.\n\n#### Key terms\n\nsolutions to exercises, worked solutions, exercises, problem sets, teaching Bayesian causal inference"
@@ -378,8 +376,8 @@
    "title": "Notation",
    "stem": "E_notation",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/E_notation.md",
-   "first_page": "605",
-   "last_page": "618",
+   "first_page": "606",
+   "last_page": "619",
    "pages": 14,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/E_notation.md",
    "summary": "This appendix is the notation reference for the book. It lists the symbols for potential outcomes, treatment and covariates, the treatment effect tau and the horseshoe global scale, the nuisance functions and fitting errors of DML, the posterior and its draws, and the groups and urns of Chapter 4, and it says where a symbol is reused with a different meaning in a different chapter. \n\n#### From the literature\n\nThe notation follows common usage in the potential outcomes literature (Rubin 1974) and in the horseshoe literature (Carvalho, Polson and Scott 2010).\n\n#### New results\n\nNo new results of this appendix are catalogued.\n\n#### Key terms\n\nnotation, symbols, abbreviations, treatment effect, nuisance functions, global scale, glossary of symbols"
@@ -389,9 +387,9 @@
    "title": "Code and Data",
    "stem": "F_code_and_data",
    "url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/main/summaries/F_code_and_data.md",
-   "first_page": "619",
-   "last_page": "623",
-   "pages": 5,
+   "first_page": "620",
+   "last_page": "625",
+   "pages": 6,
    "summary_markdown": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/main/summaries/F_code_and_data.md",
    "summary": "This appendix says what is in the public repository and maps each chapter to the scripts that produce its computed numbers, tables and figures. It lists the data sets with their sources and terms, and a short survey of software for Bayesian causal inference. The printed book carries no code, so every simulation states its design in the text and the scripts are released as source files. The appendix also names the exceptions: results quoted from working papers and small checks in the solutions that were not rerun. A reader who wants to reproduce a number starts here.\n\n#### From the literature\n\nThe data sets are credited to their sources: the SIPP extract of Chernozhukov and Hansen (2004), the LaLonde data as prepared by Dehejia and Wahba (1999), NHEFS (Hernan and Robins 2020), Thornton (2008), the castle doctrine data of Cheng and Hoekstra (2013) and the NLS Young Men data of Card (1995).\n\n#### New results\n\nNo new results of this appendix are catalogued.\n\n#### Key terms\n\ncode and data, reproducibility, GitHub repository, scripts by chapter, data sets, 401(k) data, LaLonde data, NHEFS, software for Bayesian causal inference"
   }
@@ -413,7 +411,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#average_effect_range_under_case_mix",
    "source": "book_tex/chapters/m02b.tex",
    "label": "gr:prop:range",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m02b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m02b.tex"
   },
   {
    "id": "separability_of_functionals_on_frechet_class",
@@ -431,7 +429,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#separability_of_functionals_on_frechet_class",
    "source": "book_tex/chapters/m02b.tex",
    "label": "gr:thm:sep",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m02b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m02b.tex"
   },
   {
    "id": "identified_estimands_are_functions_of_the_margins",
@@ -449,7 +447,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#identified_estimands_are_functions_of_the_margins",
    "source": "book_tex/chapters/m02b.tex",
    "label": "gr:cor:complete",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m02b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m02b.tex"
   },
   {
    "id": "stratified_urns_and_the_reversal",
@@ -467,7 +465,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#stratified_urns_and_the_reversal",
    "source": "book_tex/chapters/m02b.tex",
    "label": "gr:prop:strat",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m02b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m02b.tex"
   },
   {
    "id": "posterior_selects_the_group",
@@ -485,7 +483,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#posterior_selects_the_group",
    "source": "book_tex/chapters/m02b.tex",
    "label": "gr:thm:select",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m02b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m02b.tex"
   },
   {
    "id": "effect_transport_bound_by_total_variation",
@@ -503,7 +501,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#effect_transport_bound_by_total_variation",
    "source": "book_tex/chapters/m02b.tex",
    "label": "gr:prop:dv",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m02b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m02b.tex"
   },
   {
    "id": "exact_error_decomposition_of_the_robinson_estimator",
@@ -521,7 +519,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#exact_error_decomposition_of_the_robinson_estimator",
    "source": "book_tex/chapters/m03.tex",
    "label": "dml:lem:exact",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m03.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m03.tex"
   },
   {
    "id": "two_channels_of_the_dml_bias",
@@ -539,7 +537,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#two_channels_of_the_dml_bias",
    "source": "book_tex/chapters/m03.tex",
    "label": "dml:cor:channels",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m03.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m03.tex"
   },
   {
    "id": "sharp_rate_condition_for_dml",
@@ -557,7 +555,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#sharp_rate_condition_for_dml",
    "source": "book_tex/chapters/m04b.tex",
    "label": "crit:thm:sharp",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m04b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m04b.tex"
   },
   {
    "id": "alignment_of_errors_under_retained_lasso_shrinkage",
@@ -575,7 +573,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#alignment_of_errors_under_retained_lasso_shrinkage",
    "source": "book_tex/chapters/m04b.tex",
    "label": "crit:prop:alignment",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m04b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m04b.tex"
   },
   {
    "id": "attenuation_representation",
@@ -594,7 +592,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#attenuation_representation",
    "source": "book_tex/chapters/m04b.tex",
    "label": "crit:thm:atten",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m04b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m04b.tex"
   },
   {
    "id": "cross_fitted_variance_identity",
@@ -612,7 +610,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#cross_fitted_variance_identity",
    "source": "book_tex/chapters/m04b.tex",
    "label": "crit:prop:cfvar",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m04b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m04b.tex"
   },
   {
    "id": "no_uniformly_valid_interval_of_finite_length",
@@ -630,7 +628,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#no_uniformly_valid_interval_of_finite_length",
    "source": "book_tex/chapters/m04b.tex",
    "label": "crit:prop:dufour",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m04b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m04b.tex"
   },
   {
    "id": "complete_shrinkage_bias",
@@ -648,13 +646,13 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#complete_shrinkage_bias",
    "source": "book_tex/chapters/m04b.tex",
    "label": "crit:prop:ric",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m04b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m04b.tex"
   },
   {
    "id": "merger_effect_depends_only_on_demand_and_conduct",
    "name": "Identification of the merger effect",
    "printed": "Proposition 20.5",
-   "page": "398",
+   "page": "399",
    "chapter": "20",
    "status": "proved",
    "status_text": "proved",
@@ -666,13 +664,13 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#merger_effect_depends_only_on_demand_and_conduct",
    "source": "book_tex/chapters/m15.tex",
    "label": "blp:prop:ident",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m15.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m15.tex"
   },
   {
    "id": "falsifying_a_conduct_model_under_logit",
    "name": "Falsifying a conduct model",
    "printed": "Proposition 20.7",
-   "page": "399",
+   "page": "400",
    "chapter": "20",
    "status": "proved",
    "status_text": "proved",
@@ -684,13 +682,13 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#falsifying_a_conduct_model_under_logit",
    "source": "book_tex/chapters/m15.tex",
    "label": "blp:prop:conduct",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m15.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m15.tex"
   },
   {
    "id": "first_order_flatness_at_zero_heterogeneity",
    "name": "First order flatness at zero heterogeneity",
    "printed": "Proposition 20.11",
-   "page": "400",
+   "page": "401",
    "chapter": "20",
    "status": "proved",
    "status_text": "proved",
@@ -702,13 +700,13 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#first_order_flatness_at_zero_heterogeneity",
    "source": "book_tex/chapters/m15.tex",
    "label": "blp:prop:flat",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m15.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m15.tex"
   },
   {
    "id": "markup_pressure_exceeds_guppi_under_logit",
    "name": "Markup pressure versus GUPPI under logit",
    "printed": "Lemma 20.13",
-   "page": "401",
+   "page": "402",
    "chapter": "20",
    "status": "proved",
    "status_text": "proved",
@@ -720,13 +718,13 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#markup_pressure_exceeds_guppi_under_logit",
    "source": "book_tex/chapters/m15.tex",
    "label": "blp:lem:pressure",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m15.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m15.tex"
   },
   {
    "id": "bayes_rule_for_merger_review",
    "name": "A Bayes rule for merger review",
    "printed": "Proposition 20.15",
-   "page": "403",
+   "page": "404",
    "chapter": "20",
    "status": "proved",
    "status_text": "proved",
@@ -738,13 +736,13 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#bayes_rule_for_merger_review",
    "source": "book_tex/chapters/m15.tex",
    "label": "blp:prop:decision",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m15.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m15.tex"
   },
   {
    "id": "model_averaging_over_conduct_variance",
    "name": "Model averaging over conduct",
    "printed": "Proposition 20.16",
-   "page": "403",
+   "page": "404",
    "chapter": "20",
    "status": "proved",
    "status_text": "proved",
@@ -756,7 +754,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#model_averaging_over_conduct_variance",
    "source": "book_tex/chapters/m15.tex",
    "label": "blp:prop:bma",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.0/book_tex/chapters/m15.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.0.1/book_tex/chapters/m15.tex"
   }
  ]
 }

@@ -3,8 +3,8 @@
 \usepackage{mathpazo}
 \usepackage{xcolor,tikz}
 \usetikzlibrary{calc}
-\usepackage[paperwidth=15.8309in,paperheight=10.2500in,margin=0in]{geometry}
-\pdfpagewidth=15.8309in \pdfpageheight=10.2500in
+\usepackage[paperwidth=15.8332in,paperheight=10.2500in,margin=0in]{geometry}
+\pdfpagewidth=15.8332in \pdfpageheight=10.2500in
 \definecolor{navy}{HTML}{A3172C}
 \definecolor{navy2}{HTML}{1F3150}
 \definecolor{gold}{HTML}{FFFFFF}
@@ -16,10 +16,10 @@
 \noindent\begin{tikzpicture}[x=1in,y=1in,remember picture,overlay]
 \begin{scope}[shift={(current page.south west)}]
 % background
-\fill[navy] (0,0) rectangle (15.8309,10.2500);
+\fill[navy] (0,0) rectangle (15.8332,10.2500);
 
 % front motif: posterior densities of an effect, one curve per accounting
-\begin{scope}[shift={(9.2059,0.5000)}]
+\begin{scope}[shift={(9.2082,0.5000)}]
   \foreach \m/\sd/\c/\o in {2.2/0.42/teal/0.6, 2.9/0.36/teal/0.5, 3.5/0.30/gold/1.0, 3.95/0.40/teal/0.45}{
     \fill[\c,opacity=0.18*\o] plot[domain=0.3:5.7,samples=160,smooth] (\x,{1.25+1.55*exp(-((\x-\m)^2)/(2*\sd^2))}) -- (5.7,1.25) -- (0.3,1.25) -- cycle;
     \draw[\c,line width=1.1pt,opacity=\o] plot[domain=0.3:5.7,samples=160,smooth] (\x,{1.25+1.55*exp(-((\x-\m)^2)/(2*\sd^2))});
@@ -42,8 +42,8 @@
   \node[anchor=south,text=pale,font=\fontsize{20}{24}\selectfont] at (3.0,0.45) {Nick Polson \quad\textcolor{gold}{\textbullet}\quad Vadim Sokolov};
 \end{scope}
 % spine
-\node[rotate=-90,text=pale,font=\fontsize{20}{24}\selectfont] at ($(7.1250,0)!0.5!(8.7059,0)+(0,6.8500)$) {Bayesian Causality};
-\node[rotate=-90,text=gold,font=\fontsize{12}{14}\selectfont] at ($(7.1250,0)!0.5!(8.7059,0)+(0,2.7000)$) {Polson \quad Sokolov};
+\node[rotate=-90,text=pale,font=\fontsize{20}{24}\selectfont] at ($(7.1250,0)!0.5!(8.7082,0)+(0,6.8500)$) {Bayesian Causality};
+\node[rotate=-90,text=gold,font=\fontsize{12}{14}\selectfont] at ($(7.1250,0)!0.5!(8.7082,0)+(0,2.7000)$) {Polson \quad Sokolov};
 % back cover
 \begin{scope}[shift={(0.1250,0)}]
   \node[anchor=north west,text width=5.7000in,text=pale,font=\fontsize{10.5}{14.2}\selectfont,align=left] at (0.6500,9.6500) {\raggedright%

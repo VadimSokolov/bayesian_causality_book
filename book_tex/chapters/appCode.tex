@@ -16,13 +16,20 @@ The horseshoe experiment of Section~\ref{comp:sec:horseshoe} comes from \emph{Ge
 
 The repository README\index{code repository} names the figure or table each script in Table~\ref{tab:chscripts} writes.
 
-\begin{table}[!htb]
-\centering
-\small
-\begin{tabular}{@{}L{0.75in}L{3.5in}@{}}
+{\small
+\begin{longtable}{@{}L{0.75in}L{3.5in}@{}}
+\caption{The scripts behind each chapter. Chapters~\ref{ch:predictive} and~\ref{ch:frameworks} have no computed figures.}\label{tab:chscripts}\\
 \toprule
 Chapter & Scripts \\
 \midrule
+\endfirsthead
+\multicolumn{2}{@{}l}{\emph{Table~\thetable, continued}}\\
+\toprule
+Chapter & Scripts \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
 Introduction & \texttt{deep\_401k.py}, \texttt{intro\_fig.py} \\
 \ref{ch:mccullagh} & \texttt{make\_figs.py}, \texttt{make\_figs2.py}, \texttt{milk\_unrecorded.py} (selection on an unrecorded score) \\
 \ref{ch:groups} & \texttt{groups\_urn\_tau.py} (the urn, Sanov and case mix figures), \texttt{groups\_kidney.py} (the kidney stone analyses) \\
@@ -45,10 +52,8 @@ Introduction & \texttt{deep\_401k.py}, \texttt{intro\_fig.py} \\
 \ref{ch:blp} & the folder \texttt{blp\_merger}, including \texttt{validate\_integration.py} (the integration draws and the equilibrium checks) and \texttt{calib\_extra.py} (the calibration of conduct and merger probabilities) \\
 \ref{ch:open} & \texttt{open\_sims.py}, \texttt{open\_sims2.py}, \texttt{open\_sims3.py}, \texttt{open\_rates\_hr.py} with \texttt{open\_rates\_hr\_merge.py} (Problem 8 rates), \texttt{open\_product2\_fig.py}, \texttt{open\_localsbc.py} (PyTorch), \texttt{exact\_localsbc.py}, \texttt{localsbc\_density.py} with \texttt{localsbc\_density\_merge.py} (PyTorch) \\
 Appendix~\ref{app:guarantees} & \texttt{hs\_theory.py}, \texttt{hs\_theory\_plot.py} \\
-\bottomrule
-\end{tabular}
-\caption{The scripts behind each chapter. Chapters~\ref{ch:predictive} and~\ref{ch:frameworks} have no computed figures.}\label{tab:chscripts}
-\end{table}
+\end{longtable}
+}
 
 \section{Data}
 

@@ -182,20 +182,7 @@ for n_u in NU:
                 pn[(n_u, dropout, m)] = stats(sub)
 
 pL = [r"\begin{table}[ht]", r"\centering",
-      (r"\caption{Panel simulation of the companion paper: five periods, $p = 50$ covariates "
-       r"of which the first 10 drive treatment and the first 5 drive the outcome, unit effects $N(0,1)$, standard normal errors, true effect 1, "
-       r"%d replications per block, 200 or 1,000 units. A unit still observed leaves before the next period with probability "
-       r"$\mathrm{expit}(-2 + 0.5\,Y_{t-1})$ (mild) or $\mathrm{expit}(-2 + Y_{t-1})$ (strong); the share of unit periods observed is given in each block heading. "
-       r"Units observed in fewer than two periods are dropped before demeaning, for every estimator. "
-       r"Within OLS is least squares of the demeaned outcome on the demeaned treatment and all 50 demeaned covariates, with no cross fitting. "
-       r"The other rows are DML on the demeaned data with nuisance fits by least squares, lasso or horseshoe regression. "
-       r"Cross fitting is by unit: each unit's whole history lies in one of five folds, the lasso penalty is tuned on unit folds, and the "
-       r"dropout hazard of the weighted rows is fitted on the training units only. "
-       r"The weighted rows weight unit periods by the inverse of the probability of still being observed, computed from an estimated horseshoe logistic hazard or the oracle hazard, with each period's hazard clipped to $[0.01, 0.99]$ and the probability of still being observed floored at 0.01, so that no weight exceeds 100. "
-       r"Every standard error is clustered by unit, the square root of $G/(G-1)\sum_i S_i^2/(\sum_{it} w_{it}V_{it}^2)^2$ with $G$ the number of units used and $S_i$ the unit sum of the scores. "
-       r"Bias is the mean error, SD the standard deviation of the estimates, SE the mean reported standard error, and coverage that of nominal 95\%% intervals, "
-       r"whose Monte Carlo standard error is about 0.005 near 0.95.}"
-       % n_reps_panel),
+      r"\caption{Panel simulation of the companion paper: bias, standard deviation, mean standard error, RMSE and coverage of nominal 95\% intervals, by sample size and dropout. The design is in the text.}",
       r"\label{tab:hbdml:panel}", r"\scriptsize", r"\begin{tabular}{lccccc}", r"\toprule",
       r"Estimator & Bias & SD & SE & RMSE & Coverage \\"]
 for n_u in NU:
