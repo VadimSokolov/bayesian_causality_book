@@ -66,6 +66,8 @@
   "source": "https://github.com/VadimSokolov/bayesian_causality_book/tree/v1.0.1",
   "doi": "https://doi.org/10.5281/zenodo.23902093",
   "concept_doi": "https://doi.org/10.5281/zenodo.23899018",
+  "zenodo": "https://zenodo.org/records/23902093",
+  "doi_badge": "https://zenodo.org/badge/DOI/10.5281/zenodo.23902093.svg",
   "icon_pdf": "https://vsokolov.org/books/icon-pdf.svg",
   "icon_github": "https://vsokolov.org/books/icon-github.svg",
   "cover": "https://vsokolov.org/books/bayesian_causality_book/cover.jpg"
