@@ -9,8 +9,8 @@ authors:
 - family-names: Sokolov
   given-names: Vadim
   affiliation: George Mason University
-version: 1.0.1
-doi: 10.5281/zenodo.23902093
+version: 1.1.0
+doi: 10.5281/zenodo.23905002
 date-released: '2026-11-02'
 license: CC-BY-4.0
 repository-code: https://github.com/VadimSokolov/bayesian_causality_book
@@ -30,7 +30,7 @@ abstract: 'Ask double machine learning (DML) how much eligibility for a 401(k) p
 
   The central idea is an accounting identity. The average effect is an average of fitted contrasts over a population the analyst chooses, so a change of population changes the answer in a way the model states. Under one stable odds ratio the average effect fills a whole range, and the posterior selects the group on which an effect is stable. For DML the book proves an exact decomposition of the error, and that no interval is both uniformly valid and of bounded expected length. It studies regularization induced confounding and the coupled horseshoe posterior that reduces it. In the simulations the book reports, with 200 observations and five strong confounders, the posterior trails DML slightly with 50 covariates, and DML is more accurate with 150 and with 300 covariates; with thirty weak confounders among 150 covariates the order reverses.
 
-  Later chapters cover instruments, bounds, difference in differences, causal decisions and a Bayesian model of a merger, whose price effect is identified by the demand parameters and the form of competition. Every exercise has a solution, and the code folder of this repository holds the scripts, including many of those behind the solutions of Appendix D (in `book_scripts/solutions/`), apart from the results that Appendix F lists as quoted or absent. Version 1.0.1 corrects the print layout of two tables. The book is written for statisticians, econometricians and data scientists.'
+  Later chapters cover instruments, bounds, difference in differences, causal decisions and a Bayesian model of a merger, whose price effect is identified by the demand parameters and the form of competition. Every exercise has a solution, and the code folder of this repository holds the scripts, including many of those behind the solutions of Appendix D (in `book_scripts/solutions/`), apart from the results that Appendix F lists as quoted or absent. Version 1.1.0 sets the text in 10 point type, which brings the book to 604 pages. The book is written for statisticians, econometricians and data scientists.'
 preferred-citation:
   type: book
   title: 'Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning'
@@ -42,7 +42,7 @@ preferred-citation:
     given-names: Vadim
     affiliation: George Mason University
   year: 2026
-  doi: 10.5281/zenodo.23902093
+  doi: 10.5281/zenodo.23905002
   url: https://vsokolov.org/books/bayesian_causality_book/
   publisher:
     name: Independently published

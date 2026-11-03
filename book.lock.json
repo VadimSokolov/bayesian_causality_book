@@ -1,229 +1,229 @@
 {
  "edition": "1",
  "pdf": {
-  "bytes": 6663495,
+  "bytes": 6523171,
   "file": "pdf/bayesian_causality_book.pdf",
-  "pages": 703,
+  "pages": 604,
   "parts": [
    {
     "first_page": "i",
     "key": "",
-    "last_page": "4",
-    "pages": 45,
+    "last_page": "3",
+    "pages": 39,
     "title": "Front matter"
    },
    {
-    "first_page": "6",
+    "first_page": "5",
     "key": "1",
-    "last_page": "17",
-    "pages": 12,
+    "last_page": "14",
+    "pages": 10,
     "title": "Chapter 1. Causal Questions"
    },
    {
-    "first_page": "18",
+    "first_page": "15",
     "key": "2",
-    "last_page": "40",
-    "pages": 23,
+    "last_page": "33",
+    "pages": 19,
     "title": "Chapter 2. Frameworks for Causal Inference"
    },
    {
-    "first_page": "41",
+    "first_page": "34",
     "key": "3",
-    "last_page": "60",
-    "pages": 20,
+    "last_page": "50",
+    "pages": 17,
     "title": "Chapter 3. Models, Accounting and Randomization"
    },
    {
-    "first_page": "61",
+    "first_page": "51",
     "key": "4",
-    "last_page": "89",
-    "pages": 29,
+    "last_page": "74",
+    "pages": 24,
     "title": "Chapter 4. Groups, Urns and Information"
    },
    {
-    "first_page": "91",
+    "first_page": "76",
     "key": "5",
-    "last_page": "110",
-    "pages": 20,
+    "last_page": "92",
+    "pages": 17,
     "title": "Chapter 5. What Double Machine Learning Assumes"
    },
    {
-    "first_page": "111",
+    "first_page": "93",
     "key": "6",
-    "last_page": "135",
-    "pages": 25,
+    "last_page": "113",
+    "pages": 21,
     "title": "Chapter 6. The Inverse Weighting Lineage"
    },
    {
-    "first_page": "136",
+    "first_page": "114",
     "key": "7",
-    "last_page": "163",
-    "pages": 28,
+    "last_page": "137",
+    "pages": 24,
     "title": "Chapter 7. Orthogonality Is Not Enough"
    },
    {
-    "first_page": "165",
+    "first_page": "139",
     "key": "8",
-    "last_page": "196",
-    "pages": 32,
+    "last_page": "165",
+    "pages": 27,
     "title": "Chapter 8. The Horseshoe and the Coupled Prior"
    },
    {
-    "first_page": "197",
+    "first_page": "166",
     "key": "9",
-    "last_page": "223",
-    "pages": 27,
+    "last_page": "188",
+    "pages": 23,
     "title": "Chapter 9. Computing the Posterior"
    },
    {
-    "first_page": "224",
+    "first_page": "189",
     "key": "10",
-    "last_page": "247",
-    "pages": 24,
+    "last_page": "208",
+    "pages": 20,
     "title": "Chapter 10. Generative Treatment Effects and Joint Potential Outcomes"
    },
    {
-    "first_page": "248",
+    "first_page": "209",
     "key": "11",
-    "last_page": "265",
-    "pages": 18,
+    "last_page": "224",
+    "pages": 16,
     "title": "Chapter 11. Bayesian Nonparametrics for Causal Inference"
    },
    {
-    "first_page": "267",
+    "first_page": "226",
     "key": "12",
-    "last_page": "287",
-    "pages": 21,
+    "last_page": "243",
+    "pages": 18,
     "title": "Chapter 12. Instruments"
    },
    {
-    "first_page": "288",
+    "first_page": "244",
     "key": "13",
-    "last_page": "305",
-    "pages": 18,
+    "last_page": "259",
+    "pages": 16,
     "title": "Chapter 13. Bounds and Sensitivity"
    },
    {
-    "first_page": "306",
+    "first_page": "260",
     "key": "14",
-    "last_page": "317",
-    "pages": 12,
+    "last_page": "270",
+    "pages": 11,
     "title": "Chapter 14. Smoking and Lung Cancer"
    },
    {
-    "first_page": "319",
+    "first_page": "272",
     "key": "15",
-    "last_page": "335",
-    "pages": 17,
+    "last_page": "285",
+    "pages": 14,
     "title": "Chapter 15. Difference in Differences with the Horseshoe"
    },
    {
-    "first_page": "336",
+    "first_page": "286",
     "key": "16",
-    "last_page": "351",
-    "pages": 16,
+    "last_page": "299",
+    "pages": 14,
     "title": "Chapter 16. Two Benchmarks"
    },
    {
-    "first_page": "352",
+    "first_page": "300",
     "key": "17",
-    "last_page": "363",
-    "pages": 12,
+    "last_page": "310",
+    "pages": 11,
     "title": "Chapter 17. Two Applications in Health"
    },
    {
-    "first_page": "364",
+    "first_page": "311",
     "key": "18",
-    "last_page": "370",
-    "pages": 7,
+    "last_page": "316",
+    "pages": 6,
     "title": "Chapter 18. A Workflow for Applied Bayesian Causal Inference"
    },
    {
-    "first_page": "372",
+    "first_page": "318",
     "key": "19",
-    "last_page": "390",
-    "pages": 19,
+    "last_page": "334",
+    "pages": 17,
     "title": "Chapter 19. Causal Decisions"
    },
    {
-    "first_page": "391",
+    "first_page": "335",
     "key": "20",
-    "last_page": "436",
-    "pages": 46,
+    "last_page": "375",
+    "pages": 41,
     "title": "Chapter 20. The Causal Effect of a Merger"
    },
    {
-    "first_page": "437",
+    "first_page": "376",
     "key": "21",
-    "last_page": "465",
-    "pages": 29,
+    "last_page": "400",
+    "pages": 25,
     "title": "Chapter 21. Open Problems"
    },
    {
-    "first_page": "466",
+    "first_page": "401",
     "key": "A",
-    "last_page": "479",
-    "pages": 14,
+    "last_page": "413",
+    "pages": 13,
     "title": "Appendix A. Mathematical Background"
    },
    {
-    "first_page": "480",
+    "first_page": "414",
     "key": "B",
-    "last_page": "497",
-    "pages": 18,
+    "last_page": "428",
+    "pages": 15,
     "title": "Appendix B. Theory"
    },
    {
-    "first_page": "498",
+    "first_page": "429",
     "key": "C",
-    "last_page": "512",
-    "pages": 15,
+    "last_page": "441",
+    "pages": 13,
     "title": "Appendix C. Posterior Guarantees"
    },
    {
-    "first_page": "513",
+    "first_page": "442",
     "key": "D",
-    "last_page": "605",
-    "pages": 93,
+    "last_page": "520",
+    "pages": 79,
     "title": "Appendix D. Solutions to the Exercises"
    },
    {
-    "first_page": "606",
+    "first_page": "521",
     "key": "E",
-    "last_page": "619",
-    "pages": 14,
+    "last_page": "531",
+    "pages": 11,
     "title": "Appendix E. Notation"
    },
    {
-    "first_page": "620",
+    "first_page": "532",
     "key": "F",
-    "last_page": "625",
-    "pages": 6,
+    "last_page": "536",
+    "pages": 5,
     "title": "Appendix F. Code and Data"
    },
    {
-    "first_page": "626",
+    "first_page": "537",
     "key": "",
-    "last_page": "627",
+    "last_page": "538",
     "pages": 2,
     "title": "Further Reading"
    },
    {
-    "first_page": "628",
+    "first_page": "539",
     "key": "",
-    "last_page": "650",
-    "pages": 23,
+    "last_page": "557",
+    "pages": 19,
     "title": "Bibliography"
    },
    {
-    "first_page": "651",
+    "first_page": "558",
     "key": "",
-    "last_page": "662",
-    "pages": 12,
+    "last_page": "568",
+    "pages": 11,
     "title": "Index"
    }
   ],
-  "sha256": "6a27ab1a4276b6fadcf23992391cd53223d82c1469262699ab001125c8fa2a5e"
+  "sha256": "f66f4f006a2ad7ea92dc78c18b273f84dba654e49a5803e07047dad3b2332f58"
  },
  "results": {
   "alignment_of_errors_under_retained_lasso_shrinkage": {
@@ -232,7 +232,7 @@
    "fingerprint": "0367438e0843",
    "label": "crit:prop:alignment",
    "number": "7.2",
-   "page": "140",
+   "page": "117",
    "printed": "Proposition 7.2",
    "verified_fingerprint": "0367438e0843",
    "verified_on": "2026-11-02"
@@ -243,7 +243,7 @@
    "fingerprint": "fd84583f6041",
    "label": "crit:thm:atten",
    "number": "7.5",
-   "page": "142",
+   "page": "119",
    "printed": "Theorem 7.5",
    "verified_fingerprint": "fd84583f6041",
    "verified_on": "2026-11-02"
@@ -254,7 +254,7 @@
    "fingerprint": "1c5f1b41daef",
    "label": "gr:prop:range",
    "number": "4.3",
-   "page": "64",
+   "page": "53",
    "printed": "Proposition 4.3",
    "verified_fingerprint": "1c5f1b41daef",
    "verified_on": "2026-11-02"
@@ -265,7 +265,7 @@
    "fingerprint": "5d8173deea13",
    "label": "blp:prop:decision",
    "number": "20.15",
-   "page": "404",
+   "page": "346",
    "printed": "Proposition 20.15",
    "verified_fingerprint": "5d8173deea13",
    "verified_on": "2026-11-02"
@@ -276,7 +276,7 @@
    "fingerprint": "6c7ec93541da",
    "label": "crit:prop:ric",
    "number": "7.10",
-   "page": "152",
+   "page": "127",
    "printed": "Proposition 7.10",
    "verified_fingerprint": "6c7ec93541da",
    "verified_on": "2026-11-02"
@@ -287,7 +287,7 @@
    "fingerprint": "64f60fe1e6a2",
    "label": "crit:prop:cfvar",
    "number": "7.7",
-   "page": "146",
+   "page": "122",
    "printed": "Proposition 7.7",
    "verified_fingerprint": "64f60fe1e6a2",
    "verified_on": "2026-11-02"
@@ -298,7 +298,7 @@
    "fingerprint": "c72c2934fcb5",
    "label": "gr:prop:dv",
    "number": "4.27",
-   "page": "80",
+   "page": "70",
    "printed": "Proposition 4.27",
    "verified_fingerprint": "c72c2934fcb5",
    "verified_on": "2026-11-02"
@@ -309,7 +309,7 @@
    "fingerprint": "f01cbf8c9709",
    "label": "dml:lem:exact",
    "number": "5.3",
-   "page": "96",
+   "page": "81",
    "printed": "Lemma 5.3",
    "verified_fingerprint": "f01cbf8c9709",
    "verified_on": "2026-11-02"
@@ -320,7 +320,7 @@
    "fingerprint": "c98949a9c416",
    "label": "blp:prop:conduct",
    "number": "20.7",
-   "page": "400",
+   "page": "343",
    "printed": "Proposition 20.7",
    "verified_fingerprint": "c98949a9c416",
    "verified_on": "2026-11-02"
@@ -331,7 +331,7 @@
    "fingerprint": "f60ac7e5b064",
    "label": "blp:prop:flat",
    "number": "20.11",
-   "page": "401",
+   "page": "344",
    "printed": "Proposition 20.11",
    "verified_fingerprint": "f60ac7e5b064",
    "verified_on": "2026-11-02"
@@ -342,7 +342,7 @@
    "fingerprint": "72a9d0fb6371",
    "label": "gr:cor:complete",
    "number": "4.9",
-   "page": "68",
+   "page": "57",
    "printed": "Corollary 4.9",
    "verified_fingerprint": "72a9d0fb6371",
    "verified_on": "2026-11-02"
@@ -353,7 +353,7 @@
    "fingerprint": "a9411c6be1f9",
    "label": "blp:lem:pressure",
    "number": "20.13",
-   "page": "402",
+   "page": "345",
    "printed": "Lemma 20.13",
    "verified_fingerprint": "a9411c6be1f9",
    "verified_on": "2026-11-02"
@@ -364,7 +364,7 @@
    "fingerprint": "16fd2108ac3a",
    "label": "blp:prop:ident",
    "number": "20.5",
-   "page": "399",
+   "page": "343",
    "printed": "Proposition 20.5",
    "verified_fingerprint": "16fd2108ac3a",
    "verified_on": "2026-11-02"
@@ -375,7 +375,7 @@
    "fingerprint": "186d0c200081",
    "label": "blp:prop:bma",
    "number": "20.16",
-   "page": "404",
+   "page": "347",
    "printed": "Proposition 20.16",
    "verified_fingerprint": "186d0c200081",
    "verified_on": "2026-11-02"
@@ -386,7 +386,7 @@
    "fingerprint": "cecc1fc45fae",
    "label": "crit:prop:dufour",
    "number": "7.8",
-   "page": "149",
+   "page": "125",
    "printed": "Proposition 7.8",
    "verified_fingerprint": "cecc1fc45fae",
    "verified_on": "2026-11-02"
@@ -397,7 +397,7 @@
    "fingerprint": "cc5908c5d821",
    "label": "gr:thm:select",
    "number": "4.19",
-   "page": "74",
+   "page": "63",
    "printed": "Theorem 4.19",
    "verified_fingerprint": "cc5908c5d821",
    "verified_on": "2026-11-02"
@@ -408,7 +408,7 @@
    "fingerprint": "818644ce6222",
    "label": "gr:thm:sep",
    "number": "4.8",
-   "page": "68",
+   "page": "57",
    "printed": "Theorem 4.8",
    "verified_fingerprint": "818644ce6222",
    "verified_on": "2026-11-02"
@@ -419,7 +419,7 @@
    "fingerprint": "319a84d21b5b",
    "label": "crit:thm:sharp",
    "number": "7.1",
-   "page": "139",
+   "page": "116",
    "printed": "Theorem 7.1",
    "verified_fingerprint": "319a84d21b5b",
    "verified_on": "2026-11-02"
@@ -430,7 +430,7 @@
    "fingerprint": "aa4fc3b52abb",
    "label": "gr:prop:strat",
    "number": "4.11",
-   "page": "69",
+   "page": "58",
    "printed": "Proposition 4.11",
    "verified_fingerprint": "aa4fc3b52abb",
    "verified_on": "2026-11-02"
@@ -441,7 +441,7 @@
    "fingerprint": "1cd7e0eecdcc",
    "label": "dml:cor:channels",
    "number": "5.4",
-   "page": "98",
+   "page": "82",
    "printed": "Corollary 5.4",
    "verified_fingerprint": "1cd7e0eecdcc",
    "verified_on": "2026-11-02"
@@ -451,6 +451,13 @@
  "zenodo": {
   "concept_doi": "10.5281/zenodo.23899018",
   "doi": "10.5281/zenodo.23902093",
+  "draft": {
+   "doi": "10.5281/zenodo.23905002",
+   "html": "https://zenodo.org/deposit/23905002",
+   "id": 23905002,
+   "reserved_on": "2026-11-02",
+   "version": "1.1.0"
+  },
   "html": "https://zenodo.org/records/23902093",
   "latest_id": 23902093,
   "tag": "v1.0.1",
