@@ -18,7 +18,7 @@ The repository README\index{code repository} names the figure or table each scri
 
 {\small
 \begin{longtable}{@{}L{0.75in}L{3.5in}@{}}
-\caption{The scripts behind each chapter. Chapters~\ref{ch:predictive} and~\ref{ch:frameworks} have no computed figures.}\label{tab:chscripts}\\
+\caption{The scripts behind each chapter. Chapter~\ref{ch:frameworks} has no computed figures.}\label{tab:chscripts}\\
 \toprule
 Chapter & Scripts \\
 \midrule
@@ -31,6 +31,7 @@ Chapter & Scripts \\
 \bottomrule
 \endlastfoot
 Introduction & \texttt{deep\_401k.py}, \texttt{intro\_fig.py} \\
+\ref{ch:predictive} & \texttt{moscow\_observers.py} (the Moscow observers experiment, Figure~\ref{fig:moscow}) \\
 \ref{ch:mccullagh} & \texttt{make\_figs.py}, \texttt{make\_figs2.py}, \texttt{milk\_unrecorded.py} (selection on an unrecorded score) \\
 \ref{ch:groups} & \texttt{groups\_urn\_tau.py} (the urn, Sanov and case mix figures), \texttt{groups\_kidney.py} (the kidney stone analyses) \\
 \ref{ch:dml} & \texttt{figs4.py}, \texttt{app401k\_book.py}, \texttt{k401\_checks.py}, \texttt{dml\_partitions.py} (the 401(k) example), \texttt{dml\_baseline\_audit.py} (the simulations of Section~\ref{sec:dml:practice}: five designs, 5,000 replications each) \\
@@ -67,6 +68,7 @@ The real data sets\index{data set|textbf} are public, but not all under the same
 File & Chapters & Source \\
 \midrule
 \texttt{sipp1991.dta} & Introduction, \ref{ch:dml}, \ref{ch:critique}, \ref{ch:computation}, \ref{ch:gente}, \ref{ch:tianpearl}, \ref{ch:k401} & 1991 SIPP (U.S. Census Bureau), extract of Chernozhukov and Hansen (2004), from \nolinkurl{github.com/VC2015/DMLonGitHub} (MIT licence) \\
+\texttt{PNAS\_data\_2011.csv} & \ref{ch:predictive} & Enikolopov et al.\ (2013), replication data, 3,164 Moscow polling stations; terms not stated \\
 \texttt{nsw\_mixtape.dta}, \texttt{cps\_mixtape.dta} & \ref{ch:horseshoe} (NSW only), \ref{ch:k401} & LaLonde (1986) NSW sample and CPS comparison group as prepared by Dehejia and Wahba (1999, 2002); CC BY-NC 2.0 \\
 \texttt{psid\_controls.dta} & \ref{ch:k401} (solutions) & Dehejia's PSID comparison group (2,490 men) of Dehejia and Wahba (1999, 2002), same source and terms as the NSW and CPS files; used in the solution of Exercise~\ref{ex:chlalonde:1} \\
 \texttt{nhefs\_complete.dta} & \ref{ch:nhefs} & NHEFS (National Center for Health Statistics), extract of Hern\'an and Robins (2020) \\

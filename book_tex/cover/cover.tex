@@ -1,64 +1,71 @@
 \documentclass{article}
-\usepackage[T1]{fontenc}
-\usepackage{mathpazo}
-\usepackage{xcolor,tikz}
-\usetikzlibrary{calc}
-\usepackage[paperwidth=15.6102in,paperheight=10.2500in,margin=0in]{geometry}
-\pdfpagewidth=15.6102in \pdfpageheight=10.2500in
-\definecolor{navy}{HTML}{A3172C}
-\definecolor{navy2}{HTML}{1F3150}
-\definecolor{gold}{HTML}{FFFFFF}
-\definecolor{pale}{HTML}{FFFFFF}
-\definecolor{teal}{HTML}{F3D9DC}
+\usepackage{fontspec}
+\setmainfont{texgyrepagella}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,ItalicFont=*-italic,BoldItalicFont=*-bolditalic]
+\newfontfamily\blockfont{texgyreheroscn}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,ItalicFont=*-italic,BoldItalicFont=*-bolditalic]
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\def\pages{608}
+\def\spine{1.3692}
+\def\bleed{0.125}
+\def\trimw{7}
+\def\trimh{10}
+\pgfmathsetmacro{\fullw}{2*\bleed+2*\trimw+\spine}
+\pgfmathsetmacro{\fullh}{2*\bleed+\trimh}
+\pgfmathsetmacro{\spineL}{\bleed+\trimw}
+\pgfmathsetmacro{\spineR}{\spineL+\spine}
+\pgfmathsetmacro{\spineC}{\spineL+\spine/2}
+\pgfmathsetmacro{\frontC}{\spineR+\trimw/2}
+\pgfmathsetmacro{\backC}{\bleed+\trimw/2}
+\pgfmathsetmacro{\frontw}{\fullw-\spineR}
+\usepackage[paperwidth=15.6192in,paperheight=10.2500in,margin=0in]{geometry}
 \pagestyle{empty}
-\setlength{\parindent}{0pt}\hyphenpenalty=10000 \exhyphenpenalty=10000
+\hyphenpenalty=10000 \exhyphenpenalty=10000
+\definecolor{crimson}{HTML}{BE2742}
+\definecolor{deep}{HTML}{8A1530}
+\definecolor{maroon}{HTML}{39050F}
+\definecolor{gold}{HTML}{D9B866}
+\definecolor{cream}{HTML}{F6EEDC}
 \begin{document}
-\noindent\begin{tikzpicture}[x=1in,y=1in,remember picture,overlay]
-\begin{scope}[shift={(current page.south west)}]
-% background
-\fill[navy] (0,0) rectangle (15.6102,10.2500);
-
-% front motif: posterior densities of an effect, one curve per accounting
-\begin{scope}[shift={(8.9852,0.5000)}]
-  \foreach \m/\sd/\c/\o in {2.2/0.42/teal/0.6, 2.9/0.36/teal/0.5, 3.5/0.30/gold/1.0, 3.95/0.40/teal/0.45}{
-    \fill[\c,opacity=0.18*\o] plot[domain=0.3:5.7,samples=160,smooth] (\x,{1.25+1.55*exp(-((\x-\m)^2)/(2*\sd^2))}) -- (5.7,1.25) -- (0.3,1.25) -- cycle;
-    \draw[\c,line width=1.1pt,opacity=\o] plot[domain=0.3:5.7,samples=160,smooth] (\x,{1.25+1.55*exp(-((\x-\m)^2)/(2*\sd^2))});
-  }
-  \draw[pale,line width=0.6pt,opacity=0.6] (0.3,1.25) -- (5.7,1.25);
-  % causal graph
-  \begin{scope}[shift={(3.0,4.05)}]
-    \tikzset{nd/.style={circle,draw=pale,line width=0.9pt,minimum size=0.42in,inner sep=0pt,text=pale,font=\large\itshape}}
-    \node[nd] (X) at (0,0.75) {X};
-    \node[nd] (T) at (-1.05,-0.35) {T};
-    \node[nd] (Y) at (1.05,-0.35) {Y};
-    \draw[gold,line width=1.3pt,->,>=latex] (T) -- (Y);
-    \draw[pale,line width=0.9pt,->,>=latex] (X) -- (T);
-    \draw[pale,line width=0.9pt,->,>=latex] (X) -- (Y);
-  \end{scope}
-  \draw[gold,line width=1.0pt] (0.6,7.2) -- (5.4,7.2);
-  \node[anchor=north,text=pale,font=\fontsize{36}{40}\selectfont] at (3.0,8.65) {Bayesian};
-  \node[anchor=north,text=pale,font=\fontsize{36}{40}\selectfont] at (3.0,8.0) {Causality};
-  \node[anchor=north,text=gold,align=center,font=\fontsize{14}{18}\selectfont\itshape] at (3.0,7.0) {Models, Accounting and the Bayesian\\Alternative to Double Machine Learning};
-  \node[anchor=south,text=pale,font=\fontsize{20}{24}\selectfont] at (3.0,0.45) {Nick Polson \quad\textcolor{gold}{\textbullet}\quad Vadim Sokolov};
-\end{scope}
+\noindent
+\begin{tikzpicture}[x=1in,y=1in,remember picture,overlay,shift={(current page.south west)}]
+\fill[crimson] (0,0) rectangle (\fullw,\fullh);
+\shade[top color=deep,bottom color=maroon!80!deep] (\spineL,0) rectangle (\spineR,\fullh);
+% front
+\shade[top color=deep,bottom color=maroon] (\spineR,0) rectangle (\fullw,2.2);
+\node[text=white,font=\blockfont\bfseries\fontsize{70}{74}\selectfont] at (\frontC,\fullh-1.3) {\resizebox{6.15in}{!}{Bayesian Causality}};
+\node[text=white,font=\blockfont\fontsize{21}{27}\selectfont,align=center] at (\frontC,\fullh-2.36)
+  {Models, Accounting and the Bayesian\\Alternative to Double Machine Learning};
+% the painting keeps its proportions (1838 x 1305 px): full bleed width, height from the aspect ratio
+\node[anchor=south west,inner sep=0] at (\spineR,2.2) {\includegraphics[width=\frontw in,keepaspectratio]{band.jpg}};
+\node[text=white,font=\blockfont\bfseries\fontsize{27}{31}\selectfont] at (\frontC,1.42) {Nick Polson and Vadim Sokolov};
 % spine
-\node[rotate=-90,text=pale,font=\fontsize{20}{24}\selectfont] at ($(7.1250,0)!0.5!(8.4852,0)+(0,6.8500)$) {Bayesian Causality};
-\node[rotate=-90,text=gold,font=\fontsize{12}{14}\selectfont] at ($(7.1250,0)!0.5!(8.4852,0)+(0,2.7000)$) {Polson \quad Sokolov};
-% back cover
-\begin{scope}[shift={(0.1250,0)}]
-  \node[anchor=north west,text width=5.7000in,text=pale,font=\fontsize{10.5}{14.2}\selectfont,align=left] at (0.6500,9.6500) {\raggedright%
-  {\fontsize{15}{19}\selectfont\color{gold} Fit the model. Report the posterior.\\ Then do the accounting.\par}
-  \vspace{12pt}
-  Double machine learning has become the default way to estimate causal effects with many covariates. It fixes a target, builds an orthogonal score, splits the sample and plugs in black box learners. This book argues for a different order of operations. Model the outcome and the assignment as carefully as the data allow, with priors built for high dimensions, and compute any average treatment effect afterwards as an accounting identity of one posterior.\par
-  \vspace{8pt}
-  The argument runs from foundations to practice. It sets the frameworks of Fisher, Rubin, Pearl, Robins and Dawid side by side, and covers exchangeability and potential outcomes, the Lanarkshire milk experiment, the theory and failure modes of double machine learning, inverse weighting from Horvitz and Thompson to H\'ajek and the Robins and Ritov example, the horseshoe prior and what it does about regularization induced confounding, BART and Bayesian causal forests, distributional effects, instruments from Wright's tariff study to quarter of birth, the Tian and Pearl bounds on probabilities of causation, and Cornfield's sensitivity analysis of smoking and lung cancer.\par
-  \vspace{8pt}
-  Every idea is worked on data, real wherever possible: 401(k) eligibility, the LaLonde training programme, the NHEFS smoking cessation cohort, an HIV incentive experiment in Malawi, a horseshoe difference in differences estimator for staggered policy adoption, and a Bayesian merger simulation in which the form of competition is itself uncertain. Generative Bayesian computation turns each posterior into decisions, including risk sensitive ones. Appendices give the mathematical background, the proofs, solutions to most of the exercises and a map to the released code, and a closing chapter sets out open problems.\par
-  \vspace{14pt}
-  {\color{gold}Nick Polson} is the Robert Law Jr. Professor of Econometrics and Statistics at the Booth School of Business, University of Chicago. {\color{gold}Vadim Sokolov} is Associate Professor in Systems Engineering and Operations Research at George Mason University.\par};
-  % barcode area, kept clear for KDP
-  \fill[white] (4.6500,0.375) rectangle (6.6500,1.575);
+\node[rotate=-90,text=white,font=\blockfont\bfseries\fontsize{34}{36}\selectfont] at (\spineC,\fullh*0.6) {Bayesian Causality};
+\node[rotate=-90,text=white,font=\blockfont\bfseries\fontsize{17}{19}\selectfont] at (\spineC,1.95) {Polson \;\textbullet\; Sokolov};
+\draw[gold,line width=0.6pt] (\spineC-0.32,\fullh-0.75) -- (\spineC+0.32,\fullh-0.75);
+\draw[gold,line width=0.6pt] (\spineC-0.32,0.6) -- (\spineC+0.32,0.6);
+% back
+\node[text=cream,font=\itshape\fontsize{15.5}{20}\selectfont,align=center,text width=5.6in] at (\backC,\fullh-1.0)
+  {Causes and effects are discoverable,\\not by reason but by experience.};
+\node[text=gold,font=\fontsize{12}{14}\selectfont] at (\backC,\fullh-1.55) {David Hume};
+\draw[gold,line width=0.6pt] (\backC-1.4,\fullh-1.8) -- (\backC+1.4,\fullh-1.8);
+\node[anchor=north,text=cream,font=\fontsize{12.2}{16.6}\selectfont,align=justify,text width=5.5in] at (\backC,\fullh-2.05) {%
+Every causal question is a question about something we never see: the outcome that would have occurred under a different treatment. Double machine learning answers it with orthogonal scores, sample splitting and asymptotic confidence intervals. This book answers it with probability.\par\smallskip
+\emph{Bayesian Causality} builds causal inference from the ground up as a problem of models and accounting. Treatment effects become posterior quantities, confounding becomes a statement about priors and likelihoods, and uncertainty is carried through every step rather than patched on at the end. Along the way the authors decompose the error of double machine learning, show where its guarantees come from and where they break, and develop Bayesian alternatives that remain coherent in finite samples, with applications from policy evaluation to the effects of mergers.\par\smallskip
+Written for statisticians, economists and data scientists, and for anyone who must decide what caused what.};
+\begin{scope}[shift={(\backC,3.45)},gold,line width=0.7pt]
+  \node[draw,circle,minimum size=0.4in,text=cream,font=\itshape\small] (X) at (0,0.46) {X};
+  \node[draw,circle,minimum size=0.4in,text=cream,font=\itshape\small] (T) at (-0.7,-0.22) {T};
+  \node[draw,circle,minimum size=0.4in,text=cream,font=\itshape\small] (Y) at (0.7,-0.22) {Y};
+  \draw[-{Stealth[length=5pt]}] (X) -- (T);
+  \draw[-{Stealth[length=5pt]}] (X) -- (Y);
+  \draw[-{Stealth[length=5pt]}] (T) -- (Y);
 \end{scope}
-\end{scope}
+% bios bottom left; KDP's barcode (2 x 1.2 in) goes bottom right of the back, kept clear
+\node[anchor=north west,text=cream,font=\fontsize{10.3}{13.4}\selectfont,align=left,text width=3.55in] at (\bleed+0.6,2.4) {%
+{\blockfont\bfseries\color{white}Nick Polson} is the Robert Law Jr.\ Professor of Econometrics and Statistics at the Booth School of Business, University of Chicago.\par\smallskip
+{\blockfont\bfseries\color{white}Vadim Sokolov} is an Associate Professor in Systems Engineering and Operations Research at George Mason University, working on Bayesian methods and machine learning.\par\medskip
+{\color{gold}\itshape\fontsize{9}{11}\selectfont Cover: Vincent van Gogh, \emph{The Starry Night}, 1889.\\The forces are invisible; we see only the swirl they leave.}};
+% \draw[cream,dashed] (\spineL-0.25-2,\bleed+0.25) rectangle (\spineL-0.25,\bleed+0.25+1.2);
 \end{tikzpicture}
 \end{document}

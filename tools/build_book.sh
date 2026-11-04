@@ -26,5 +26,5 @@ echo "  makeindex warnings:      $(grep -c '## Warning' main.ilg || true)"
 NM=$(cd .. && python3 tools/make_numbers.py --check 2>/dev/null || true)
 echo "  number fragments:        $(echo "$NM" | grep -c '^OK' || true) match, $(echo "$NM" | grep -c '^DIFFERS' || true) differ, $(echo "$NM" | grep -c '^NO SOURCE' || true) without saved JSON (tools/make_numbers.py --check)"
 echo "$NM" | grep -E '^(DIFFERS|NO SOURCE)' || true
-cp ../tools/cover.py cover/ && cd cover && python3 cover.py "$P" && pdflatex -interaction=nonstopmode cover.tex >/dev/null && pdflatex -interaction=nonstopmode cover.tex >/dev/null
+cp ../tools/cover.py cover/ && cd cover && python3 cover.py "$P" && xelatex -interaction=nonstopmode cover.tex >/dev/null && xelatex -interaction=nonstopmode cover.tex >/dev/null
 echo "book_tex/cover/cover.pdf written"

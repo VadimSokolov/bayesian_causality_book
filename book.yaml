@@ -17,12 +17,12 @@ authors:
 credit_names: "Polson and Sokolov"                 # how a citation names the authors, e.g. "Polson and Sokolov"; empty: built from the family names
 year: 2026
 edition: "1"
-version: "1.1.0"                 # the release tag is v<version>
-date_released: "2026-11-02"
+version: "1.2.0"                 # the release tag is v<version>
+date_released: "2026-11-04"
 publisher: "Independently published"                    # "Independently published" (the imprint KDP shows for a free KDP ISBN)
 # no isbn: a free KDP ISBN may be used only on KDP, so it goes on the ISBN line of kdp.md (private) and is not printed in
 # the PDF unless kdp.md says "ISBN on the copyright page: yes" (kdp.py interior); this file is published (references/publishing.md)
-doi: "10.5281/zenodo.23905002" # this edition's DOI; zenodo.py reserve writes it before the final build
+doi: "10.5281/zenodo.23961396" # this edition's DOI; zenodo.py reserve writes it before the final build
 license_text: CC-BY-4.0          # text, figures and PDF
 license_code: MIT
 repository: https://github.com/VadimSokolov/bayesian_causality_book   # the public repository; its name is the slug
@@ -47,7 +47,7 @@ short_description: "A textbook that builds one Bayesian model of outcomes given 
 description: |
   Ask double machine learning (DML) how much eligibility for a 401(k) plan raised household savings and it returns one number. Ask for the effect at the median household and each question needs a new derivation and a new run. This book builds one probability model for outcomes given treatment and covariates and reads every causal quantity off its posterior draws: the average effect, the effect in each subgroup, the probability of causation, and the decision that follows.
   The central idea is an accounting identity. The average effect is an average of fitted contrasts over a population the analyst chooses, so a change of population changes the answer in a way the model states. Under one stable odds ratio the average effect fills a whole range, and the posterior selects the group on which an effect is stable. For DML the book proves an exact decomposition of the error, and that no interval is both uniformly valid and of bounded expected length. It studies regularization induced confounding and the coupled horseshoe posterior that reduces it. In the simulations the book reports, with 200 observations and five strong confounders, the posterior trails DML slightly with 50 covariates, and DML is more accurate with 150 and with 300 covariates; with thirty weak confounders among 150 covariates the order reverses.
-  Later chapters cover instruments, bounds, difference in differences, causal decisions and a Bayesian model of a merger, whose price effect is identified by the demand parameters and the form of competition. Every exercise has a solution, and the code folder of this repository holds the scripts, including many of those behind the solutions of Appendix D (in `book_scripts/solutions/`), apart from the results that Appendix F lists as quoted or absent. Version 1.1.0 sets the text in 10 point type, which brings the book to 604 pages. The book is written for statisticians, econometricians and data scientists.
+  Later chapters cover instruments, bounds, difference in differences, causal decisions and a Bayesian model of a merger, whose price effect is identified by the demand parameters and the form of competition. Every exercise has a solution, and the code folder of this repository holds the scripts, including many of those behind the solutions of Appendix D (in `book_scripts/solutions/`), apart from the results that Appendix F lists as quoted or absent. Version 1.2.0 opens the book with the Lanarkshire milk experiment and adds the Moscow election observers and the Gujarat pollution audits to Chapter 1. The book is written for statisticians, econometricians and data scientists.
 source:
   format: latex
   dir: book_tex

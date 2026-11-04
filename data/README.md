@@ -1,6 +1,6 @@
 # Data
 
-The real data sets the scripts read. All eight files are stored in this folder, and no script downloads data: the `causaldata` module in the repository root is a short stub that reads these files (`PYTHONPATH=.` makes it importable).
+The real data sets the scripts read. All nine files are stored in this folder, and no script downloads data: the `causaldata` module in the repository root is a short stub that reads these files (`PYTHONPATH=.` makes it importable).
 
 ## Licence
 
@@ -14,6 +14,7 @@ The text, figures and PDF of the book are released under CC BY 4.0, and the code
 | `nhefs_complete.dta` | Ch. 17 | NHANES I Epidemiologic Follow-up Study (National Center for Health Statistics), complete case extract of Hernán and Robins (2020); also in the `causaldata` package | The NCHS data user agreement applies | Cite Hernán and Robins (2020) and the NCHS as source | Copy in this folder |
 | `thornton_hiv.dta` | Ch. 17 | Thornton (2008), seven variable extract of the replication data (doi 10.3886/E113268V1); also in the `causaldata` package | No licence found on the openICPSR or AEA pages we could read (searched 2 November 2026) | Cite Thornton (2008) and the replication data, openICPSR 113268 | Copy in this folder |
 | `castle.dta` | Ch. 15 | Cheng and Hoekstra (2013), built from the FBI Uniform Crime Reports; also in the `causaldata` package | No licence found for the data file; the Mixtape repository that distributes a copy is under an MIT licence, which may not extend to data (searched 2 November 2026) | Cite Cheng and Hoekstra (2013) | Copy in this folder |
+| `PNAS_data_2011.csv` | Ch. 1 | Enikolopov, Korovkin, Petrova, Sonin and Zakharov (2013), replication data of the Moscow observers experiment, one row per polling station (3,164 stations, 4 December 2011 Duma election) | Not stated in the file or its source | Cite Enikolopov et al. (2013) | Copy in this folder |
 | `card.csv` | Ch. 12 | Card (1995), 3,010 men from the 1976 wave of the National Longitudinal Survey of Young Men, as distributed with Wooldridge (2020) | No licence found; David Card's data page gives only a copyright footer of the University of California (searched 2 November 2026) | Cite Card (1995) and Wooldridge (2020) | Copy in this folder |
 
 ## Notes

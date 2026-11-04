@@ -4,7 +4,7 @@
 set -e
 export PYTHONPATH=.
 mkdir -p figs results
-for s in make_figs make_figs2 figs3 ipw_sim gbc_distort hs_theory hs_theory_plot qnn_book comp_figs exact_localsbc hs_scale_check benchmark_401k frontdoor_dgp iv_card_ar iv_fig_check thornton_laplace milk_unrecorded groups_urn_tau groups_kidney; do
+for s in make_figs make_figs2 figs3 ipw_sim gbc_distort hs_theory hs_theory_plot qnn_book comp_figs exact_localsbc hs_scale_check benchmark_401k frontdoor_dgp iv_card_ar iv_fig_check thornton_laplace milk_unrecorded groups_urn_tau groups_kidney moscow_observers; do
   echo "== $s"; python book_scripts/$s.py
 done
 for s in app401k_book dml_partitions dml_irm_401k bart_apps k401_checks k401_student_t k401_quantiles sim_bart lalonde_book workflow_figs apps2 did_hs did_checks baipw_rep open_sims iv_card iv_weak2 iv_horseshoe iv_chain_check smoking_bayes bounds_examples; do

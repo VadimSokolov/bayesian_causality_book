@@ -1,7 +1,7 @@
 # Appendix F. Code and Data
 
 <!-- cite:begin -->
-From *Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning* by Nick Polson and Vadim Sokolov (2026), appendix F. Cite as Polson and Sokolov (2026), *Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning*, edition 1, https://doi.org/10.5281/zenodo.23905002. Book page: https://vsokolov.org/books/bayesian_causality_book/. Source: https://github.com/VadimSokolov/bayesian_causality_book.
+From *Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning* by Nick Polson and Vadim Sokolov (2026), appendix F. Cite as Polson and Sokolov (2026), *Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning*, edition 1, https://doi.org/10.5281/zenodo.23961396. Book page: https://vsokolov.org/books/bayesian_causality_book/. Source: https://github.com/VadimSokolov/bayesian_causality_book.
 <!-- cite:end -->
 
 This appendix says what is in the public repository and maps each chapter to the scripts that produce its computed numbers, tables and figures. It lists the data sets with their sources and terms, and a short survey of software for Bayesian causal inference. The printed book carries no code, so every simulation states its design in the text and the scripts are released as source files. The appendix also names the exceptions: results quoted from working papers and small checks in the solutions that were not rerun. A reader who wants to reproduce a number starts here.
