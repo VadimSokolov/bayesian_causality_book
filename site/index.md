@@ -2,7 +2,7 @@
 
 By Nick Polson and Vadim Sokolov.
 
-[![PDF](https://vsokolov.org/books/icon-pdf.svg)](https://github.com/VadimSokolov/bayesian_causality_book/releases/download/v1.2.0/bayesian_causality_book.pdf "PDF") [![Source on GitHub](https://vsokolov.org/books/icon-github.svg)](https://github.com/VadimSokolov/bayesian_causality_book/tree/v1.2.0 "Source on GitHub")
+[![PDF](https://vsokolov.org/books/icon-pdf.svg)](https://github.com/VadimSokolov/bayesian_causality_book/releases/download/v1.2.0/bayesian_causality_book.pdf "PDF") [![Source on GitHub](https://vsokolov.org/books/icon-github.svg)](https://github.com/VadimSokolov/bayesian_causality_book/tree/v1.2.0 "Source on GitHub") [![DOI 10.5281/zenodo.23961396](https://zenodo.org/badge/DOI/10.5281/zenodo.23961396.svg)](https://doi.org/10.5281/zenodo.23961396)
 
 ## Description
 
