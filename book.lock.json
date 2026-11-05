@@ -1,15 +1,15 @@
 {
  "edition": "1",
  "pdf": {
-  "bytes": 6559470,
+  "bytes": 6542936,
   "file": "pdf/bayesian_causality_book.pdf",
-  "pages": 608,
+  "pages": 607,
   "parts": [
    {
     "first_page": "i",
     "key": "",
     "last_page": "3",
-    "pages": 39,
+    "pages": 21,
     "title": "Front matter"
    },
    {
@@ -211,19 +211,33 @@
    {
     "first_page": "543",
     "key": "",
-    "last_page": "561",
-    "pages": 19,
+    "last_page": "562",
+    "pages": 20,
     "title": "Bibliography"
    },
    {
-    "first_page": "562",
+    "first_page": "563",
     "key": "",
     "last_page": "572",
+    "pages": 10,
+    "title": "List of Figures"
+   },
+   {
+    "first_page": "573",
+    "key": "",
+    "last_page": "578",
+    "pages": 6,
+    "title": "List of Tables"
+   },
+   {
+    "first_page": "579",
+    "key": "",
+    "last_page": "589",
     "pages": 11,
     "title": "Index"
    }
   ],
-  "sha256": "49f3c9e3252c971651a45abbde590e0189f7bc2bf002c98c625d135e9bba190f"
+  "sha256": "7661461cc186c329f5cd616d631522f55e07bd0385f0ac6657b70cf1edcdd790"
  },
  "results": {
   "alignment_of_errors_under_retained_lasso_shrinkage": {
@@ -447,10 +461,17 @@
    "verified_on": "2026-11-02"
   }
  },
- "updated": "2026-11-04",
+ "updated": "2026-11-05",
  "zenodo": {
   "concept_doi": "10.5281/zenodo.23899018",
   "doi": "10.5281/zenodo.23961396",
+  "draft": {
+   "doi": "10.5281/zenodo.23985916",
+   "html": "https://zenodo.org/deposit/23985916",
+   "id": 23985916,
+   "reserved_on": "2026-11-05",
+   "version": "1.2.1"
+  },
   "html": "https://zenodo.org/records/23961396",
   "latest_id": 23961396,
   "tag": "v1.2.0",

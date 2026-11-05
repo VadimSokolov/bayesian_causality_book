@@ -163,8 +163,6 @@ Swami Vivekananda, \emph{Karma Yoga}, 1896
 \pagestyle{fancy}
 
 \tableofcontents
-\listoffigures
-\listoftables
 \include{chapters/preface}
 
 \mainmatter
@@ -208,6 +206,10 @@ Swami Vivekananda, \emph{Karma Yoga}, 1896
 \backmatter
 \include{chapters/chfurther}
 \include{chapters/refs}
+\cleardoublepage\phantomsection\addcontentsline{toc}{chapter}{List of Figures}
+{\renewcommand{\MakeUppercase}[1]{#1}\listoffigures}
+\cleardoublepage\phantomsection\addcontentsline{toc}{chapter}{List of Tables}
+{\renewcommand{\MakeUppercase}[1]{#1}\listoftables}
 \clearpage\phantomsection\addcontentsline{toc}{chapter}{Index}
 \printindex
 \end{document}

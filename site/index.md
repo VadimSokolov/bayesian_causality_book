@@ -2,17 +2,17 @@
 
 By Nick Polson and Vadim Sokolov.
 
-[![PDF](https://vsokolov.org/books/icon-pdf.svg)](https://github.com/VadimSokolov/bayesian_causality_book/releases/download/v1.2.0/bayesian_causality_book.pdf "PDF") [![Source on GitHub](https://vsokolov.org/books/icon-github.svg)](https://github.com/VadimSokolov/bayesian_causality_book/tree/v1.2.0 "Source on GitHub") [![DOI 10.5281/zenodo.23961396](https://zenodo.org/badge/DOI/10.5281/zenodo.23961396.svg)](https://doi.org/10.5281/zenodo.23961396)
+[![PDF](https://vsokolov.org/books/icon-pdf.svg)](https://github.com/VadimSokolov/bayesian_causality_book/releases/download/v1.2.1/bayesian_causality_book.pdf "PDF") [![Source on GitHub](https://vsokolov.org/books/icon-github.svg)](https://github.com/VadimSokolov/bayesian_causality_book/tree/v1.2.1 "Source on GitHub")
 
 ## Description
 
 Ask double machine learning (DML) how much eligibility for a 401(k) plan raised household savings and it returns one number. Ask for the effect at the median household and each question needs a new derivation and a new run. This book builds one probability model for outcomes given treatment and covariates and reads every causal quantity off its posterior draws: the average effect, the effect in each subgroup, the probability of causation, and the decision that follows.
 The central idea is an accounting identity. The average effect is an average of fitted contrasts over a population the analyst chooses, so a change of population changes the answer in a way the model states. Under one stable odds ratio the average effect fills a whole range, and the posterior selects the group on which an effect is stable. For DML the book proves an exact decomposition of the error, and that no interval is both uniformly valid and of bounded expected length. It studies regularization induced confounding and the coupled horseshoe posterior that reduces it. In the simulations the book reports, with 200 observations and five strong confounders, the posterior trails DML slightly with 50 covariates, and DML is more accurate with 150 and with 300 covariates; with thirty weak confounders among 150 covariates the order reverses.
-Later chapters cover instruments, bounds, difference in differences, causal decisions and a Bayesian model of a merger, whose price effect is identified by the demand parameters and the form of competition. Every exercise has a solution, and the code folder of this repository holds the scripts, including many of those behind the solutions of Appendix D (in `book_scripts/solutions/`), apart from the results that Appendix F lists as quoted or absent. Version 1.2.0 opens the book with the Lanarkshire milk experiment and adds the Moscow election observers and the Gujarat pollution audits to Chapter 1. The book is written for statisticians, econometricians and data scientists.
+Later chapters cover instruments, bounds, difference in differences, causal decisions and a Bayesian model of a merger, whose price effect is identified by the demand parameters and the form of competition. Every exercise has a solution, and the code folder of this repository holds the scripts, including many of those behind the solutions of Appendix D (in `book_scripts/solutions/`), apart from the results that Appendix F lists as quoted or absent. Version 1.2.1 opens the book with the Lanarkshire milk experiment, adds the Moscow election observers and the Gujarat pollution audits to Chapter 1, and moves the lists of figures and tables to the back. The book is written for statisticians, econometricians and data scientists.
 
 ## How to cite
 
-Polson and Sokolov (2026), *Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning*, edition 1, https://doi.org/10.5281/zenodo.23961396.
+Polson and Sokolov (2026), *Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning*, edition 1, https://doi.org/10.5281/zenodo.23985916.
 
 ```bibtex
 @book{polsonsokolov2026bayesian_causality_book,
@@ -20,7 +20,7 @@ Polson and Sokolov (2026), *Bayesian Causality: Models, Accounting and the Bayes
   title = {{Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning}},
   year = {2026},
   publisher = {Independently published},
-  doi = {10.5281/zenodo.23961396},
+  doi = {10.5281/zenodo.23985916},
   url = {https://vsokolov.org/books/bayesian_causality_book/}
 }
 ```
@@ -40,6 +40,6 @@ All 20 results of the book (19 proved, 1 conditional) are on the page [Results b
 
 <small>License: Text, figures and PDF: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Code: [MIT](https://opensource.org/license/mit).</small>
 
-<small>This page is generated from the book's repository ([main](https://github.com/VadimSokolov/bayesian_causality_book/tree/main)). The numbers and pages are those of the PDF, [version 1.2.0](https://github.com/VadimSokolov/bayesian_causality_book/releases/tag/v1.2.0).</small>
+<small>This page is generated from the book's repository ([main](https://github.com/VadimSokolov/bayesian_causality_book/tree/main)). The numbers and pages are those of the PDF, [version 1.2.1](https://github.com/VadimSokolov/bayesian_causality_book/releases/tag/v1.2.1).</small>
 
 <!-- Generated by bookrepo.py from book.yaml and results.yaml. Edit those files, not this one. -->

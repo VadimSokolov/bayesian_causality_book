@@ -22,10 +22,10 @@
  "credit_names": "Polson and Sokolov",
  "year": "2026",
  "edition": "1",
- "version": "1.2.0",
- "date_released": "2026-11-04",
+ "version": "1.2.1",
+ "date_released": "2026-11-05",
  "publisher": "Independently published",
- "doi": "10.5281/zenodo.23961396",
+ "doi": "10.5281/zenodo.23985916",
  "concept_doi": "10.5281/zenodo.23899018",
  "language": "en",
  "keywords": [
@@ -41,7 +41,7 @@
   "causal decisions"
  ],
  "short_description": "A textbook that builds one Bayesian model of outcomes given treatment and covariates and reads every causal quantity from its posterior, and compares it with double machine learning in simulations and in the 401(k), LaLonde and NHEFS data.",
- "description": "Ask double machine learning (DML) how much eligibility for a 401(k) plan raised household savings and it returns one number. Ask for the effect at the median household and each question needs a new derivation and a new run. This book builds one probability model for outcomes given treatment and covariates and reads every causal quantity off its posterior draws: the average effect, the effect in each subgroup, the probability of causation, and the decision that follows.\nThe central idea is an accounting identity. The average effect is an average of fitted contrasts over a population the analyst chooses, so a change of population changes the answer in a way the model states. Under one stable odds ratio the average effect fills a whole range, and the posterior selects the group on which an effect is stable. For DML the book proves an exact decomposition of the error, and that no interval is both uniformly valid and of bounded expected length. It studies regularization induced confounding and the coupled horseshoe posterior that reduces it. In the simulations the book reports, with 200 observations and five strong confounders, the posterior trails DML slightly with 50 covariates, and DML is more accurate with 150 and with 300 covariates; with thirty weak confounders among 150 covariates the order reverses.\nLater chapters cover instruments, bounds, difference in differences, causal decisions and a Bayesian model of a merger, whose price effect is identified by the demand parameters and the form of competition. Every exercise has a solution, and the code folder of this repository holds the scripts, including many of those behind the solutions of Appendix D (in `book_scripts/solutions/`), apart from the results that Appendix F lists as quoted or absent. Version 1.2.0 opens the book with the Lanarkshire milk experiment and adds the Moscow election observers and the Gujarat pollution audits to Chapter 1. The book is written for statisticians, econometricians and data scientists.",
+ "description": "Ask double machine learning (DML) how much eligibility for a 401(k) plan raised household savings and it returns one number. Ask for the effect at the median household and each question needs a new derivation and a new run. This book builds one probability model for outcomes given treatment and covariates and reads every causal quantity off its posterior draws: the average effect, the effect in each subgroup, the probability of causation, and the decision that follows.\nThe central idea is an accounting identity. The average effect is an average of fitted contrasts over a population the analyst chooses, so a change of population changes the answer in a way the model states. Under one stable odds ratio the average effect fills a whole range, and the posterior selects the group on which an effect is stable. For DML the book proves an exact decomposition of the error, and that no interval is both uniformly valid and of bounded expected length. It studies regularization induced confounding and the coupled horseshoe posterior that reduces it. In the simulations the book reports, with 200 observations and five strong confounders, the posterior trails DML slightly with 50 covariates, and DML is more accurate with 150 and with 300 covariates; with thirty weak confounders among 150 covariates the order reverses.\nLater chapters cover instruments, bounds, difference in differences, causal decisions and a Bayesian model of a merger, whose price effect is identified by the demand parameters and the form of competition. Every exercise has a solution, and the code folder of this repository holds the scripts, including many of those behind the solutions of Appendix D (in `book_scripts/solutions/`), apart from the results that Appendix F lists as quoted or absent. Version 1.2.1 opens the book with the Lanarkshire milk experiment, adds the Moscow election observers and the Gujarat pollution audits to Chapter 1, and moves the lists of figures and tables to the back. The book is written for statisticians, econometricians and data scientists.",
  "license_text": {
   "id": "CC-BY-4.0",
   "name": "CC BY 4.0",
@@ -53,36 +53,34 @@
   "url": "https://opensource.org/license/mit"
  },
  "release": {
-  "tag": "v1.2.0",
-  "url": "https://github.com/VadimSokolov/bayesian_causality_book/releases/tag/v1.2.0"
+  "tag": "v1.2.1",
+  "url": "https://github.com/VadimSokolov/bayesian_causality_book/releases/tag/v1.2.1"
  },
  "links": {
   "page": "https://vsokolov.org/books/bayesian_causality_book/",
   "page_markdown": "https://vsokolov.org/books/bayesian_causality_book/index.html.md",
   "results": "https://vsokolov.org/books/bayesian_causality_book/results.html",
   "results_markdown": "https://vsokolov.org/books/bayesian_causality_book/results.html.md",
-  "pdf": "https://github.com/VadimSokolov/bayesian_causality_book/releases/download/v1.2.0/bayesian_causality_book.pdf",
+  "pdf": "https://github.com/VadimSokolov/bayesian_causality_book/releases/download/v1.2.1/bayesian_causality_book.pdf",
   "repository": "https://github.com/VadimSokolov/bayesian_causality_book",
-  "source": "https://github.com/VadimSokolov/bayesian_causality_book/tree/v1.2.0",
-  "doi": "https://doi.org/10.5281/zenodo.23961396",
+  "source": "https://github.com/VadimSokolov/bayesian_causality_book/tree/v1.2.1",
+  "doi": "https://doi.org/10.5281/zenodo.23985916",
   "concept_doi": "https://doi.org/10.5281/zenodo.23899018",
-  "zenodo": "https://zenodo.org/records/23961396",
-  "doi_badge": "https://zenodo.org/badge/DOI/10.5281/zenodo.23961396.svg",
   "icon_pdf": "https://vsokolov.org/books/icon-pdf.svg",
   "icon_github": "https://vsokolov.org/books/icon-github.svg",
   "cover": "https://vsokolov.org/books/bayesian_causality_book/cover.jpg"
  },
  "citation": {
-  "text": "Polson and Sokolov (2026), Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning, edition 1, https://doi.org/10.5281/zenodo.23961396.",
-  "bibtex": "@book{polsonsokolov2026bayesian_causality_book,\n  author = {Polson, Nick and Sokolov, Vadim},\n  title = {{Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning}},\n  year = {2026},\n  publisher = {Independently published},\n  doi = {10.5281/zenodo.23961396},\n  url = {https://vsokolov.org/books/bayesian_causality_book/}\n}",
+  "text": "Polson and Sokolov (2026), Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning, edition 1, https://doi.org/10.5281/zenodo.23985916.",
+  "bibtex": "@book{polsonsokolov2026bayesian_causality_book,\n  author = {Polson, Nick and Sokolov, Vadim},\n  title = {{Bayesian Causality: Models, Accounting and the Bayesian Alternative to Double Machine Learning}},\n  year = {2026},\n  publisher = {Independently published},\n  doi = {10.5281/zenodo.23985916},\n  url = {https://vsokolov.org/books/bayesian_causality_book/}\n}",
   "bibkey": "polsonsokolov2026bayesian_causality_book",
   "example": "Polson and Sokolov (2026), Proposition 4.3"
  },
  "pdf": {
   "file": "bayesian_causality_book.pdf",
-  "pages": 608,
-  "bytes": 6559470,
-  "sha256": "49f3c9e3252c971651a45abbde590e0189f7bc2bf002c98c625d135e9bba190f"
+  "pages": 607,
+  "bytes": 6542936,
+  "sha256": "7661461cc186c329f5cd616d631522f55e07bd0385f0ac6657b70cf1edcdd790"
  },
  "bundle": {
   "page": "site/index.md",
@@ -94,7 +92,7 @@
  "serve": [
   {
    "path": "cover.jpg",
-   "url": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/v1.2.0/pdf/cover.jpg"
+   "url": "https://raw.githubusercontent.com/VadimSokolov/bayesian_causality_book/v1.2.1/pdf/cover.jpg"
   }
  ],
  "chapters": [
@@ -413,7 +411,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#average_effect_range_under_case_mix",
    "source": "book_tex/chapters/m02b.tex",
    "label": "gr:prop:range",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m02b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m02b.tex"
   },
   {
    "id": "separability_of_functionals_on_frechet_class",
@@ -431,7 +429,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#separability_of_functionals_on_frechet_class",
    "source": "book_tex/chapters/m02b.tex",
    "label": "gr:thm:sep",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m02b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m02b.tex"
   },
   {
    "id": "identified_estimands_are_functions_of_the_margins",
@@ -449,7 +447,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#identified_estimands_are_functions_of_the_margins",
    "source": "book_tex/chapters/m02b.tex",
    "label": "gr:cor:complete",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m02b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m02b.tex"
   },
   {
    "id": "stratified_urns_and_the_reversal",
@@ -467,7 +465,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#stratified_urns_and_the_reversal",
    "source": "book_tex/chapters/m02b.tex",
    "label": "gr:prop:strat",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m02b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m02b.tex"
   },
   {
    "id": "posterior_selects_the_group",
@@ -485,7 +483,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#posterior_selects_the_group",
    "source": "book_tex/chapters/m02b.tex",
    "label": "gr:thm:select",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m02b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m02b.tex"
   },
   {
    "id": "effect_transport_bound_by_total_variation",
@@ -503,7 +501,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#effect_transport_bound_by_total_variation",
    "source": "book_tex/chapters/m02b.tex",
    "label": "gr:prop:dv",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m02b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m02b.tex"
   },
   {
    "id": "exact_error_decomposition_of_the_robinson_estimator",
@@ -521,7 +519,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#exact_error_decomposition_of_the_robinson_estimator",
    "source": "book_tex/chapters/m03.tex",
    "label": "dml:lem:exact",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m03.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m03.tex"
   },
   {
    "id": "two_channels_of_the_dml_bias",
@@ -539,7 +537,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#two_channels_of_the_dml_bias",
    "source": "book_tex/chapters/m03.tex",
    "label": "dml:cor:channels",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m03.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m03.tex"
   },
   {
    "id": "sharp_rate_condition_for_dml",
@@ -557,7 +555,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#sharp_rate_condition_for_dml",
    "source": "book_tex/chapters/m04b.tex",
    "label": "crit:thm:sharp",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m04b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m04b.tex"
   },
   {
    "id": "alignment_of_errors_under_retained_lasso_shrinkage",
@@ -575,7 +573,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#alignment_of_errors_under_retained_lasso_shrinkage",
    "source": "book_tex/chapters/m04b.tex",
    "label": "crit:prop:alignment",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m04b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m04b.tex"
   },
   {
    "id": "attenuation_representation",
@@ -594,7 +592,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#attenuation_representation",
    "source": "book_tex/chapters/m04b.tex",
    "label": "crit:thm:atten",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m04b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m04b.tex"
   },
   {
    "id": "cross_fitted_variance_identity",
@@ -612,7 +610,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#cross_fitted_variance_identity",
    "source": "book_tex/chapters/m04b.tex",
    "label": "crit:prop:cfvar",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m04b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m04b.tex"
   },
   {
    "id": "no_uniformly_valid_interval_of_finite_length",
@@ -630,7 +628,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#no_uniformly_valid_interval_of_finite_length",
    "source": "book_tex/chapters/m04b.tex",
    "label": "crit:prop:dufour",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m04b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m04b.tex"
   },
   {
    "id": "complete_shrinkage_bias",
@@ -648,7 +646,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#complete_shrinkage_bias",
    "source": "book_tex/chapters/m04b.tex",
    "label": "crit:prop:ric",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m04b.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m04b.tex"
   },
   {
    "id": "merger_effect_depends_only_on_demand_and_conduct",
@@ -666,7 +664,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#merger_effect_depends_only_on_demand_and_conduct",
    "source": "book_tex/chapters/m15.tex",
    "label": "blp:prop:ident",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m15.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m15.tex"
   },
   {
    "id": "falsifying_a_conduct_model_under_logit",
@@ -684,7 +682,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#falsifying_a_conduct_model_under_logit",
    "source": "book_tex/chapters/m15.tex",
    "label": "blp:prop:conduct",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m15.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m15.tex"
   },
   {
    "id": "first_order_flatness_at_zero_heterogeneity",
@@ -702,7 +700,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#first_order_flatness_at_zero_heterogeneity",
    "source": "book_tex/chapters/m15.tex",
    "label": "blp:prop:flat",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m15.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m15.tex"
   },
   {
    "id": "markup_pressure_exceeds_guppi_under_logit",
@@ -720,7 +718,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#markup_pressure_exceeds_guppi_under_logit",
    "source": "book_tex/chapters/m15.tex",
    "label": "blp:lem:pressure",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m15.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m15.tex"
   },
   {
    "id": "bayes_rule_for_merger_review",
@@ -738,7 +736,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#bayes_rule_for_merger_review",
    "source": "book_tex/chapters/m15.tex",
    "label": "blp:prop:decision",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m15.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m15.tex"
   },
   {
    "id": "model_averaging_over_conduct_variance",
@@ -756,7 +754,7 @@
    "url": "https://vsokolov.org/books/bayesian_causality_book/results.html#model_averaging_over_conduct_variance",
    "source": "book_tex/chapters/m15.tex",
    "label": "blp:prop:bma",
-   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.0/book_tex/chapters/m15.tex"
+   "source_url": "https://github.com/VadimSokolov/bayesian_causality_book/blob/v1.2.1/book_tex/chapters/m15.tex"
   }
  ]
 }
